@@ -1,0 +1,16 @@
+<ion-header-bar class="bar-calm">
+    <h1 class="title">消息</h1>
+</ion-header-bar>
+<ion-view on-swipe-left="onSwipeLeft()">
+    <ion-content overflow-scroll="true" class="has-header">
+        <ion-list rj-close-back-drop>
+            <ion-item class="item-avatar" ng-class="{'rj-item-top': message.isTop}" on-hold="popupMessageOpthins(message)" rj-hold-active ng-repeat="message in messages | orderBy:['isTop', 'lastMessage.timeFrome1970']:true" ng-click="messageDetails(message)">
+                <img ng-src="{{message.pic}}">
+                <span class="rj-sm-red-icon" ng-show="message.showHints"><p ng-bind="message.noReadMessages"></p></span>
+                <h2 ng-bind="message.name"></h2>
+                <p class="rj-list-p" ng-bind="message.lastMessage.content"></p>
+                <span class="rj-push-right" ng-bind="message.lastMessage.time"></span>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>
