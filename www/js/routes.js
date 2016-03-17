@@ -3,6 +3,34 @@ angular.module('wechat.routes', [])
 .config(function($stateProvider, $urlRouterProvider) {
 
     $stateProvider
+
+        .state('login', {
+            url: '/login',
+            templateUrl: 'templates/login.html',
+            controller: "loginCtrl"
+        })
+        .state('about', {
+            url: '/about',
+            templateUrl: 'templates/about.html',
+            controller: "aboutCtrl"
+        })
+        .state('messageDetail', {
+            url: '/messageDetail/:messageId',
+            templateUrl: "templates/detail-message.html",
+            controller: "messageDetailCtrl"
+        })
+        .state('personDetail', {
+            //url: '/personDetail/:personId',
+            url: '/personDetail',
+            templateUrl: "templates/detail-person.html",
+            controller: "personDetailCtrl"
+        })
+        .state('userDetail', {
+            //url: '/userDetail/:userId',
+            url: '/userDetail',
+            templateUrl: "templates/detail-user.html",
+            controller: "userDetailCtrl"
+        })
         .state("tab", {
             url: "/tab",
             abstract: true,
@@ -16,22 +44,6 @@ angular.module('wechat.routes', [])
                     controller: "messageCtrl"
                 }
             }
-        })
-        .state('about', {
-            url: '/about',
-            templateUrl: 'templates/about.html',
-            controller: "aboutCtrl"
-        })
-        .state('messageDetail', {
-            url: '/messageDetail/:messageId',
-            templateUrl: "templates/message-detail.html",
-            controller: "messageDetailCtrl"
-        })
-        .state('personDetail', {
-            //url: '/personDetail/:personId',
-            url: '/personDetail',
-            templateUrl: "templates/person-detail.html",
-            controller: "personDetailCtrl"
         })
         .state('tab.friends', {
             url: '/friends',
@@ -61,5 +73,7 @@ angular.module('wechat.routes', [])
             }
         });
 
-    $urlRouterProvider.otherwise("/tab/message");
+    //set the defalt page
+    //$urlRouterProvider.otherwise("/tab/message");
+    $urlRouterProvider.otherwise("/login");
 });

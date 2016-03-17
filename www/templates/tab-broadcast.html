@@ -2,24 +2,28 @@
 <ion-header-bar class="bar-calm">
 	<h1 class="title">通知</h1>
 </ion-header-bar>
-<ion-view title="通知">
+<ion-view title="通知" on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
         <div class="list card">
-            <div class="item item-divider item-icon-left item-calm">清明放假通知</div>
+            <div class="item item-divider item-icon-left item-calm">
+                <span class="badge badge-assertive">通知</span>清明放假安排
+            </div>
             <div class="item item-body">
                 <div>
                     <p>今年清明放
-                        <strong>7天！！</strong>
+                        <strong>7天</strong>，放假安排...
                     </p>
                 </div>
             </div>
         </div>
         <div class="list card">
-            <div class="item item-divider">Card</div>
+            <div class="item item-divider item-icon-left item-calm">
+                <span class="badge badge-balanced">新闻</span>我司中标新疆天盛花苑建设项目
+            </div>
             <div class="item item-body">
                 <div>
-                    <p>Some friendly
-                        <strong>markdown</strong>
+                    <p>新疆天盛花苑建设项目总投资
+                        <strong>15个亿</strong>...
                     </p>
                 </div>
             </div>

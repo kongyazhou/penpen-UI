@@ -13,13 +13,14 @@
             &nbsp;
             {{group.name}}
           </ion-item>
-          <ion-item class="item-accordion item-thumbnail-left"
+          <ion-item class="item-accordion item-avatar"
                     ng-repeat="item in group.items"
                     ng-show="isGroupShown(group)"
                     ui-sref="personDetail">
                     <img><h2>{{item}}</h2><p>个性签名</p>
             
           </ion-item>
+          
         </div>
       </ion-list>
 

@@ -167,9 +167,17 @@ angular.module('wechat.controllers', [])
         $state.go("tab.friends");
     };
 })
+.controller('userDetailCtrl', function($scope, $state) {
+    $scope.onSwipeRight = function() {
+        $state.go("tab.setting");
+    };
+})
 
 .controller('aboutCtrl', function($scope, $state) {
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
     };
+})
+.controller('loginCtrl', function($scope, $state) {
+
 })

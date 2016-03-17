@@ -4,12 +4,15 @@
 <ion-view title="设置" on-swipe-right="onSwipeRight()">
     <ion-content overflow-scroll="true" class="has-header">
         <ion-list>
+
         	<ion-item class="item-divider">个人资料</ion-item>
-            <ion-item class="item-thumbnail-left" ui-sref="personDetail">
+            <ion-item class="item-thumbnail-left item-icon-right" ui-sref="userDetail">
                 <img>
                 <h2>姓名</h2>
                 <p>部门</p>
+                <i class="icon ion-ios-arrow-right"></i>
             </ion-item>
+
             <ion-item class="item-divider">消息提醒</ion-item>
             <ion-toggle toggle-class="toggle-calm" ng-checked="true">声音</ion-toggle>
             <label class="item item-select">
@@ -22,6 +25,7 @@
             </label>
             <ion-toggle toggle-class="toggle-calm" ng-checked="true">振动</ion-toggle>
             <ion-toggle toggle-class="toggle-calm" ng-checked="true">推送</ion-toggle>
+
             <ion-item class="item-divider">通知提醒</ion-item>
             <ion-toggle toggle-class="toggle-calm" ng-checked="true">声音</ion-toggle>
             <label class="item item-select">
@@ -32,12 +36,15 @@
             </label>
             <ion-toggle toggle-class="toggle-calm" ng-checked="true">振动</ion-toggle>
             <ion-toggle toggle-class="toggle-calm" ng-checked="true">推送</ion-toggle>
+
             <ion-item class="item-divider"></ion-item>
+
             <ion-item class="item-icon-right" ui-sref="about"> 关于PENPEN<i class="icon ion-ios-arrow-right"></i></ion-item>
 
             <ion-item class="item-divider"></ion-item>
+        
+            <button ui-sref="login" id="page5-button4" class="button button-assertive  button-block">退出登录</button>
         </ion-list>
-        <button id="page5-button4" class="button button-assertive  button-block">退出登录</button>
         <div class="spacer" style="width: 283px; height: 20px;"></div>
     </ion-content>
 </ion-view>
