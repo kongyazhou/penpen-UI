@@ -10,28 +10,10 @@ angular.module('wechat.controllers', [])
 
     //
     
-    $scope.groups = [];
-    for (var i=0; i<10; i++) {
-    $scope.groups[i] = {
-      name: i,
-      items: [],
-      show: false
-    };
-    for (var j=0; j<3; j++) {
-      $scope.groups[i].items.push(i + '-' + j);
-    }
-  }
-  
-  /*
-   * if given group is the selected group, deselect it
-   * else, select the given group
-   */
-  $scope.toggleGroup = function(group) {
-    group.show = !group.show;
-  };
-  $scope.isGroupShown = function(group) {
-    return group.show;
-  };
+    $scope.$on("$ionicView.beforeEnter", function(){
+        // console.log($scope.messages);
+        $scope.messages = messageService.getBroadcast();
+    });
   
 })
 
@@ -111,6 +93,28 @@ angular.module('wechat.controllers', [])
     $scope.contacts_right_bar_swipe = function(e){
         console.log(e);
     };
+    $scope.groups = [];
+    for (var i=0; i<3; i++) {
+        $scope.groups[i] = {
+            name: '部门',
+            items: [],
+            show: true
+        };
+        for (var j=0; j<3; j++) {
+            $scope.groups[i].items.push(j);
+        }
+    }
+      
+    /*
+    * if given group is the selected group, deselect it
+    * else, select the given group
+    */
+    $scope.toggleGroup = function(group) {
+        group.show = !group.show;
+    };
+    $scope.isGroupShown = function(group) {
+        return group.show;
+    };
 })
 
 .controller('settingCtrl', function($scope, $state) {
@@ -160,7 +164,7 @@ angular.module('wechat.controllers', [])
 
 .controller('personDetailCtrl', function($scope, $state) {
     $scope.onSwipeRight = function() {
-        $state.go("tab.setting");
+        $state.go("tab.friends");
     };
 })
 
