@@ -10,7 +10,6 @@ angular.module('wechat', ['ionic', 'wechat.controllers', 'wechat.routes',
 .config(['$ionicConfigProvider', function($ionicConfigProvider) {
 
     $ionicConfigProvider.tabs.position('bottom'); // other values: top
-
 }])
 
 .run(function($ionicPlatform, $http, messageService, dateService) {

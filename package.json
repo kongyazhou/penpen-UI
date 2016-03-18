@@ -1,6 +1,7 @@
 {
-  "name": "myionic",
-  "version": "1.1.1",
+  "name": "penpen",
+  "version": "0.1.0",
+  "private": true,
   "description": "MyIonic: An Ionic project",
   "dependencies": {
     "gulp": "^3.5.6",
