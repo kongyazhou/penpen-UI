@@ -5,5 +5,4 @@ cordova-plugin-whitelist
 cordova-plugin-splashscreen
 cordova-plugin-statusbar
 cordova-plugin-vibration"
-https://github.com/jpush/jpush-phonegap-plugin.git --variable API_KEY= 2dab9b8353f700e4ef57fa0e
 ionic-plugin-keyboard

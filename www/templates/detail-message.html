@@ -26,7 +26,7 @@
         </button>
     </div> -->
     <div class="rj-footer-btn-wrap">
-        <button class="button button-icon icon ion-ios-mic-outline rj-footer-btn-left">
+        <button class="button button-icon icon ion-ios-mic-outline rj-footer-btn-left" ng-show="0">
         </button>
     </div>
     <label class="item item-input rj-footer-input">
@@ -40,8 +40,8 @@
             <button class="button button-icon icon ion-ios-plus-outline rj-footer-btn-left">
             </button>
         </div>
-        <div class="rj-send-button" ng-hide="!send_content || send_content === ''">
-            <p>发送</p>
+        <div class="rj-send-button" ng-hide="!send_content || send_content === ''" ng-click="sendMessage(send_content);send_content =''">
+            <p>发送{{test}}</p>
         </div>
     </div>
 </ion-footer-bar>

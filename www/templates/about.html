@@ -8,12 +8,15 @@
         <h1>Heading</h1>
         <div class="spacer" style="width: 283px; height: 37px;"></div>
         <div>
-            <p>Version : 1.0.0</p>
+            <p>Version : 0.1.0</p>
 
             <p>Copyright@郑张宽 2016</p>
         </div>
-        <div class="spacer" style="width: 283px; height: 278px;"></div>
         <button id="page10-button10" class="button button-calm  button-block">检查更新</button>
+        
+        <button class="button button-calm  button-block" onclick="window.plugins.toast.showShortTop('Hello there!', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)})">Toast showShortTop</button>
+        <button class="button button-calm  button-block" onclick="window.plugins.toast.showLongBottom('Hello there!', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)})">Toast showLongBottom</button>
+        <button class="button button-calm  button-block" onclick="window.plugins.toast.show('Hello there!', 'long', 'center', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)})">Toast show long center</button>
         <div class="spacer" style="height: 100px;"></div>
     </ion-content>
 </ion-view>

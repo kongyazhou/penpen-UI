@@ -125,7 +125,7 @@ angular.module('wechat.controllers', [])
 
 .controller('messageDetailCtrl', ['$scope', '$state','$stateParams',
     'messageService', '$ionicScrollDelegate', '$timeout',
-    function($scope, $state, $stateParams, messageService, $ionicScrollDelegate, $timeout) {
+    function($scope, $state, $stateParams, messageService, $ionicScrollDelegate, $timeout ) {
         var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
         // console.log("enter");
         $scope.doRefresh = function() {
@@ -154,6 +154,23 @@ angular.module('wechat.controllers', [])
         $scope.onSwipeRight = function() {
             $state.go("tab.message");
         };
+        $scope.sendMessage= function(msg) {
+            if (window["WebSocket"]) {
+                var wsMsg = new WebSocket('ws://192.168.1.11:8081/');
+ 
+                wsMsg.onopen = function() {
+                    this.send(msg);
+                }
+                wsMsg.onclose = function(evt) {
+                }
+                wsMsg.onmessage = function(evt) {
+                    window.plugins.toast.showShortBottom('收到信息：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                }
+            }
+            else {
+                window.plugins.toast.showShortBottom('Your browser does not support WebSockets.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            }
+        }
 
 
         window.addEventListener("native.keyboardshow", function(e){
