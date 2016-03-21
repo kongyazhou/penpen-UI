@@ -154,21 +154,23 @@ angular.module('wechat.controllers', [])
         $scope.onSwipeRight = function() {
             $state.go("tab.message");
         };
+ 
         $scope.sendMessage= function(msg) {
             if (window["WebSocket"]) {
-                var wsMsg = new WebSocket('ws://192.168.1.11:8081/');
+                //var wsMsg = new WebSocket('ws://192.168.1.11:8080/');
+                var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
  
                 wsMsg.onopen = function() {
-                    this.send(msg);
+                    this.send(Base64.encode(msg));
                 }
                 wsMsg.onclose = function(evt) {
                 }
                 wsMsg.onmessage = function(evt) {
-                    window.plugins.toast.showShortBottom('收到信息：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    window.plugins.toast.showLongBottom('收到信息：'+evt.data+'\n'+Base64.decode(evt.data), function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
                 }
             }
             else {
-                window.plugins.toast.showShortBottom('Your browser does not support WebSockets.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                window.plugins.toast.showLongBottom('Your browser does not support WebSockets.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
             }
         }
 

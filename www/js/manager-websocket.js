@@ -2,12 +2,13 @@ document.addEventListener('deviceready', function () {
 
   if (window["WebSocket"]) {
 
-    var conn = new WebSocket('ws://192.168.1.11:8080/');
+    var conn = new WebSocket('ws://223.202.124.144:20888/');
     //window.plugins.toast.showShortBottom('连接', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
 
     conn.onopen = function() {
       //this.send('hello'); 
       window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+      this.send("Hello HWCloud!")
       updateMessage();
       updateBroadcast();
     }
@@ -17,6 +18,7 @@ document.addEventListener('deviceready', function () {
     }
     //定义:onmessage事件函数
     conn.onmessage = function(evt) {
+      window.plugins.toast.showLongBottom('Recv: '+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
 
     }
   }
@@ -26,7 +28,7 @@ document.addEventListener('deviceready', function () {
   }
 });
 document.addEventListener('resume', function () {
-  var conn = new WebSocket('ws://192.168.1.11:8080/');
+  var conn = new WebSocket('ws://223.202.124.144:20888/');
     //window.plugins.toast.showShortBottom('连接', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
 
   conn.onopen = function() {
