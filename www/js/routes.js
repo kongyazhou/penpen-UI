@@ -20,13 +20,11 @@ angular.module('penpen.routes', [])
             controller: "messageDetailCtrl"
         })
         .state('personDetail', {
-            //url: '/personDetail/:personId',
             url: '/personDetail',
             templateUrl: "templates/detail-person.html",
             controller: "personDetailCtrl"
         })
         .state('userDetail', {
-            //url: '/userDetail/:userId',
             url: '/userDetail',
             templateUrl: "templates/detail-user.html",
             controller: "userDetailCtrl"
@@ -38,6 +36,10 @@ angular.module('penpen.routes', [])
         })
         .state('tab.message', {
             url: '/message',
+            nativeTransitions: {
+                "type": "fade",
+                "duration": 200
+            },
             views: {
                 'tab-message': {
                     templateUrl: 'templates/tab-message.html',
@@ -47,6 +49,10 @@ angular.module('penpen.routes', [])
         })
         .state('tab.friends', {
             url: '/friends',
+            nativeTransitions: {
+                "type": "fade",
+                "duration": 200
+            },
             views: {
                 'tab-friends': {
                     templateUrl: 'templates/tab-friends.html',
@@ -56,6 +62,10 @@ angular.module('penpen.routes', [])
         })
         .state('tab.broadcast', {
             url: '/broadcast',
+            nativeTransitions: {
+                "type": "fade",
+                "duration": 200
+            },
             views: {
                 'tab-broadcast': {
                     templateUrl: 'templates/tab-broadcast.html',
@@ -65,6 +75,10 @@ angular.module('penpen.routes', [])
         })
         .state('tab.setting', {
             url: '/setting',
+            nativeTransitions: {
+                "type": "fade",
+                "duration": 200
+            },
             views: {
                 'tab-setting': {
                     templateUrl: 'templates/tab-setting.html',

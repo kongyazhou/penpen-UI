@@ -15,7 +15,7 @@
   <preference name="android-minSdkVersion" value="16"/>
   <preference name="BackupWebStorage" value="none"/>
   <!-- ionic-native-transitions -->
-<!--   <preference name="CrosswalkAnimatable" value="true" /> -->
+  <preference name="CrosswalkAnimatable" value="true" />
   <!-- Splash Screen -->
   <preference name="SplashScreen" value="screen"/>
   <preference name="AutoHideSplashScreen" value="true" />
