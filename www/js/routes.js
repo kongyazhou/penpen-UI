@@ -1,4 +1,4 @@
-angular.module('wechat.routes', [])
+angular.module('penpen.routes', [])
 
 .config(function($stateProvider, $urlRouterProvider) {
 

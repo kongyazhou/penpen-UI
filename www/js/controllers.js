@@ -1,4 +1,4 @@
-angular.module('wechat.controllers', [])
+angular.module('penpen.controllers', [])
 
 .controller('broadcastCtrl', function($scope, $state) {
     $scope.onSwipeLeft = function() {
@@ -161,7 +161,7 @@ angular.module('wechat.controllers', [])
                 var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
  
                 wsMsg.onopen = function() {
-                    this.send(Base64.encode(msg));
+                    this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
                 }
                 wsMsg.onclose = function(evt) {
                 }
@@ -199,4 +199,24 @@ angular.module('wechat.controllers', [])
 })
 .controller('loginCtrl', function($scope, $state) {
 
+    $scope.login = function (user,password) {
+        var conn = new WebSocket('ws://223.202.124.144:20888/');
+        //window.plugins.toast.showShortBottom('连接', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+
+        conn.onopen = function() {
+          window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+          msg='{"user":"'+user+'","password":"'+hex_md5(password)+'"}';
+          this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        }
+        //定义:onclose事件函数
+        conn.onclose = function(evt) {
+          window.plugins.toast.showLongBottom('服务器连接失败，请检查你的网络连接。', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        }
+        //定义:onmessage事件函数
+        conn.onmessage = function(evt) {
+          window.plugins.toast.showLongBottom('Recv: '+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        }
+        
+        
+    }
 })

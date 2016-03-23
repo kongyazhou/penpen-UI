@@ -1,4 +1,4 @@
-angular.module('wechat.services', [])
+angular.module('penpen.services', [])
 
 .factory("userService", function($http) {
     var users = [];
