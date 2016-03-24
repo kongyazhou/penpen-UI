@@ -161,7 +161,8 @@ angular.module('penpen.controllers', [])
                 var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
  
                 wsMsg.onopen = function() {
-                    this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+                    jsonMsg='{"from":"15228977313","to":"15669910253","type":"0","content":"' + Base64.encode(msg) + '"}';
+                    this.send('{"head":1110,"body":"'+Base64.encode(jsonMsg)+'","tail":"PENPEN 1.0"}');
                 }
                 wsMsg.onclose = function(evt) {
                 }
