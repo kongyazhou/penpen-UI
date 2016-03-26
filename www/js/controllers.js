@@ -130,22 +130,42 @@ angular.module('penpen.controllers', [])
         // console.log("enter");
         $scope.doRefresh = function() {
             // console.log("ok");
-            $scope.messageNum += 5;
+            messageService.messageNum += 5;
             $timeout(function() {
-                $scope.messageDetils = messageService.getAmountMessageById($scope.messageNum,
-                    $stateParams.messageId);
+                // $scope.messageDetils = messageService.getAmountMessageById($scope.messageNum,
+                    // $stateParams.messageId);
+                messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum,$stateParams.messageId);
                 $scope.$broadcast('scroll.refreshComplete');
             }, 200);
         };
-
+        $scope.addLocalMsg=function(msg) {
+            var obj={"isFromMe": true,"content": msg,"time": "2015-11-22 08:51:02"};
+            // $scope.messageDetils.push(obj);
+            messageService.messageDetails.push(obj);
+        }
+        $scope.del=function(idx){
+            // $scope.messageDetils.splice(idx,1);
+            messageService.messageDetails.splice(idx,1);
+        }
         $scope.$on("$ionicView.beforeEnter", function() {
-            $scope.message = messageService.getMessageById($stateParams.messageId);
-            $scope.message.noReadMessages = 0;
-            $scope.message.showHints = false;
-            messageService.updateMessage($scope.message);
-            $scope.messageNum = 10;
-            $scope.messageDetils = messageService.getAmountMessageById($scope.messageNum,
-                $stateParams.messageId);
+            // $scope.message = messageService.getMessageById($stateParams.messageId);
+            // $scope.message.noReadMessages = 0;
+            // $scope.message.showHints = false;
+            // messageService.updateMessage($scope.message);
+            // $scope.messageNum = 10;
+            // $scope.messageDetils = messageService.getAmountMessageById($scope.messageNum,
+            //     $stateParams.messageId);
+            // $timeout(function() {
+            //     viewScroll.scrollBottom();
+            // }, 0);
+            messageService.message = messageService.getMessageById($stateParams.messageId);
+            messageService.message.noReadMessages = 0;
+            messageService.message.showHints = false;
+            messageService.updateMessage(messageService.message);
+            messageService.messageNum = 10;
+            messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum,$stateParams.messageId);
+            $scope.messageDetails=messageService.messageDetails;
+            $scope.message=messageService.message;
             $timeout(function() {
                 viewScroll.scrollBottom();
             }, 0);
@@ -198,26 +218,33 @@ angular.module('penpen.controllers', [])
         $state.go("tab.setting");
     };
 })
-.controller('loginCtrl', function($scope, $state) {
+.controller('loginCtrl', ['$scope', '$state', 'messageService', 'WebSocketService',
+ function($scope, $state, messageService, WebSocketService) {
 
     $scope.login = function (user,password) {
-        var conn = new WebSocket('ws://223.202.124.144:20888/');
-        //window.plugins.toast.showShortBottom('连接', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        //该函数应当放在成功登陆以后执行
+        window.plugins.jPushPlugin.setAlias("penpen"+user);
+        //penpenMsgFactory.conn = new WebSocket('ws://223.202.124.144:20888/');
+        // $scope.conn = new WebSocket('ws://223.202.124.144:20888/');
+        window.plugins.toast.showShortBottom('login', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
 
-        conn.onopen = function() {
-          window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-          msg='{"user":"'+user+'","password":"'+hex_md5(password)+'"}';
-          this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
-        }
-        //定义:onclose事件函数
-        conn.onclose = function(evt) {
-          window.plugins.toast.showLongBottom('服务器连接失败，请检查你的网络连接。', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        }
-        //定义:onmessage事件函数
-        conn.onmessage = function(evt) {
-          window.plugins.toast.showLongBottom('Recv: '+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        }
+        // $scope.conn.onopen = function() {
+        // window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        //   msg='{"user":"'+user+'","password":"'+hex_md5(password)+'"}';
+        //   this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        // }
+        // //定义:onclose事件函数
+        // $scope.conn.onclose = function(evt) {
+        //   window.plugins.toast.showLongBottom('服务器连接失败，请检查你的网络连接。', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        // }
+        // //定义:onmessage事件函数
+        // $scope.conn.onmessage = function(evt) {
+        //     window.plugins.toast.showLongBottom('Recv: '+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        //     var obj={"isFromMe": false,"content": evt.data,"time": "2015-11-22 08:51:02"};
+        //     // $scope.messageDetils.push(obj);
+        //     messageService.messageDetails.push(obj);
+        // }
         
         
     }
-})
+}])

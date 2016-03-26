@@ -6,14 +6,14 @@
 </ion-header-bar>
 <ion-content class="rj-stable-content" delegate-handle="messageDetailsScroll" id="message-detail-content" on-swipe-right="onSwipeRight()">
 	<ion-refresher pulling-text="..." on-refresh="doRefresh()" pulling-icon=""></ion-refresher>
-    <div ng-repeat="item in messageDetils">
+    <div ng-repeat="item in messageDetails">
     	<p class="rj-message-time" ng-bind="item.time" ng-if="false"></p>
-        <div class="rj-message-wrap" ng-if="!item.isFromeMe">
+        <div class="rj-message-wrap" ng-if="!item.isFromMe">
             <img ng-src="{{message.pic}}" class="rj-head-pic">
             <span class="rj-triangle-left"></span>
             <p class="rj-message" ng-bind="item.content"></p>
         </div>
-        <div class="rj-message-wrap" ng-if="item.isFromeMe">
+        <div class="rj-message-wrap" ng-if="item.isFromMe">
             <img src="img/me.png" class="rj-head-pic-right">
             <span class="rj-triangle-right"></span>
             <p class="rj-message-right" ng-bind="item.content"></p>
@@ -40,7 +40,7 @@
             <button class="button button-icon icon ion-ios-plus-outline rj-footer-btn-left">
             </button>
         </div>
-        <div class="rj-send-button" ng-hide="!send_content || send_content === ''" ng-click="sendMessage(send_content);send_content =''">
+        <div class="rj-send-button" ng-hide="!send_content || send_content === ''" ng-click="addLocalMsg(send_content);sendMessage(send_content);send_content =''">
             <p>发送{{test}}</p>
         </div>
     </div>
