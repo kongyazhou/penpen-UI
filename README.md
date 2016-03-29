@@ -32,7 +32,7 @@ plugins.txt中记录了所有需要的插件
 
 ## 4月4号之后的打算
 
-整理开发资料。
+整理开发资料(AngularJS,Python,websocket等)。
 
 python爬虫，网站继续。
 

@@ -136,24 +136,7 @@ angular.module('penpen.services', [])
             message:{},
             messageNum:0,
             messageDetails:[],
-/*            conn:{},
-            //window.plugins.toast.showShortBottom('连接', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-            onopen:function() {
-              window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-              msg='{"user":"'+user+'","password":"'+hex_md5(password)+'"}';
-              this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
-            },
-            //定义:onclose事件函数
-            onclose:function(evt) {
-              window.plugins.toast.showLongBottom('服务器连接失败，请检查你的网络连接。', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-            },
-            //定义:onmessage事件函数
-            onmessage:function(evt) {
-                window.plugins.toast.showLongBottom('Recv: '+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                var obj={"isFromMe": false,"content": evt.data,"time": "2015-11-22 08:51:02"};
-                // $scope.messageDetils.push(obj);
-                messageService.messageDetails.push(obj);
-            },*/
+
             init: function(messages) {
                 var i = 0;
                 var length = 0;
@@ -253,30 +236,6 @@ angular.module('penpen.services', [])
         };
     }
 ])
-/*.factory('penpenMsgFactory', ['messageService',
-    function(messageService) {
-        return {
-            conn:{},
-            //window.plugins.toast.showShortBottom('连接', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-            conn.onopen:function() {
-              window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-              msg='{"user":"'+user+'","password":"'+hex_md5(password)+'"}';
-              this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
-            },
-            //定义:onclose事件函数
-            conn.onclose:function(evt) {
-              window.plugins.toast.showLongBottom('服务器连接失败，请检查你的网络连接。', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-            },
-            //定义:onmessage事件函数
-            conn.onmessage:function(evt) {
-                window.plugins.toast.showLongBottom('Recv: '+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                var obj={"isFromMe": false,"content": evt.data,"time": "2015-11-22 08:51:02"};
-                // $scope.messageDetils.push(obj);
-                messageService.messageDetails.push(obj);
-            }                
-        };
-    }
-])*/
 
 .service('WebSocketService', 
         ['$q', '$rootScope', function($q, $rootScope) {
@@ -292,9 +251,13 @@ angular.module('penpen.services', [])
     ws.onclose = function () {
         window.plugins.toast.showLongBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
-    
+    //????
     ws.onmessage = function(message) {
-        listener(JSON.parse(message.data));
+        $rootScope.$apply(function() {
+            window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        });
+        // listener(JSON.parse(message.data));
+        //$rootScope.$broadcast("onMessage",message.data);
         // window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
  
@@ -311,15 +274,15 @@ angular.module('penpen.services', [])
     }
     
  //????????
-    function listener(data) {
-      var messageObj = data;
-      if(callbacks.hasOwnProperty(messageObj.callbackId)) {//主动请求
-        $rootScope.$apply(callbacks[messageObj.callbackId].cb.resolve(messageObj));
-        delete callbacks[messageObj.callbackId];
-      }else{//服务端推送（广播给子scope）
-          $rootScope.$broadcast(messageObj.msgType, messageObj);
-      }
-    }
+    // function listener(data) {
+    //   var messageObj = data;
+    //   if(callbacks.hasOwnProperty(messageObj.callbackId)) {//主动请求
+    //     $rootScope.$apply(callbacks[messageObj.callbackId].cb.resolve(messageObj));
+    //     delete callbacks[messageObj.callbackId];
+    //   }else{//服务端推送（广播给子scope）
+    //       $rootScope.$broadcast("onMessage", messageObj);
+    //   }
+    // }
     
     function getCallbackId() {
       currentCallbackId += 1;
@@ -336,5 +299,7 @@ angular.module('penpen.services', [])
       var promise = sendRequest(request); 
       return promise;
     };
+
     return Service;
+
 }])
