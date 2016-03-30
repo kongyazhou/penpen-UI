@@ -131,8 +131,7 @@ angular.module('penpen.services', [])
     };
 }])
 
-.factory('messageService', ['localStorageService', 'dateService',
-    function(localStorageService, dateService) {
+.factory('messageService', ['localStorageService', 'dateService',function(localStorageService, dateService) {
         return {
             //TODO
             message:{},
@@ -235,18 +234,20 @@ angular.module('penpen.services', [])
                 }
             },
             recvMessage: function(msg) {
-                //TODO reflash too slow           
+                //TODO reflash too slow 
+                window.plugins.toast.showShortBottom('In recv func.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});          
                 var obj={"isFromMe": false,"content": msg,"time": "2015-11-22 08:51:02"};
+                // this.messageDetails.push(obj);
                 this.messageDetails.push(obj);
-
+                window.plugins.toast.showShortBottom('Msg pushed.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                // $window.location.reload(true);
             },
             sendMessage: function(msg) {
                 var obj={"isFromMe": true,"content": msg,"time": "2015-11-22 08:51:02"};
-                this.messageDetails.push(obj);
+                this.messageDetails.push(obj);                
             }
         };
-    }
-])
+}])
 
 .service('WebSocketService',['messageService',function(messageService) {
     var callbacks = {};
@@ -254,13 +255,13 @@ angular.module('penpen.services', [])
     var ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
 
     ws.onopen = function(){  
-        window.plugins.toast.showLongBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)}); 
+        // window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)}); 
     };    
     ws.onclose = function () {
-        window.plugins.toast.showLongBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        // window.plugins.toast.showShortBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
     ws.onmessage = function(message) {
-        window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        window.plugins.toast.showShortBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
         messageService.recvMessage(message.data);
     };
     this.sendMessage = function(msg){

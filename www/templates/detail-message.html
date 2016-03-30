@@ -6,6 +6,7 @@
 </ion-header-bar>
 <ion-content class="rj-stable-content" delegate-handle="messageDetailsScroll" id="message-detail-content" on-swipe-right="onSwipeRight()">
 	<ion-refresher pulling-text="..." on-refresh="doRefresh()" pulling-icon=""></ion-refresher>
+    <!-- Message part -->
     <div ng-repeat="item in messageDetails">
     	<p class="rj-message-time" ng-bind="item.time" ng-if="false"></p>
         <div class="rj-message-wrap" ng-if="!item.isFromMe">
@@ -19,6 +20,7 @@
             <p class="rj-message-right" ng-bind="item.content"></p>
         </div>
     </div>
+    <!--  -->
 </ion-content>
 <ion-footer-bar align-title="left" class="bar-light" resize-foot-bar>
     <!-- <div class="buttons rj-footer-buttons-left">

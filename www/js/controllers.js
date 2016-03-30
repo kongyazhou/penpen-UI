@@ -155,6 +155,22 @@ angular.module('penpen.controllers', [])
         $scope.onSwipeRight = function() {
             $state.go("tab.message");
         };
+/*        $scope.updateMessageDetails = function(){
+            $scope.messageDetails=messageService.messageDetails;
+        };*/
+        // $scope.$watchCollection('messageService.messageDetails', function (newVal, oldVal, scope) {
+        $scope.$watchCollection('messageDetails', function () {
+                // $scope.updateMessageDetails();
+                // $scope.$digest();
+                // $window.location.reload(true);
+                window.plugins.toast.showShortBottom('Scope Msg Changed.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        });
+        $scope.$watchCollection('messageService.messageDetails', function () {
+                // $scope.updateMessageDetails();
+                // $scope.$digest();
+                // $window.location.reload(true);
+                window.plugins.toast.showLongBottom('Service Msg Changed.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        });
  
         $scope.sendMessage= function(msg) {
             if (window["WebSocket"]) {
@@ -219,4 +235,11 @@ angular.module('penpen.controllers', [])
         WebSocketService.sendMessage(msg);
 
     };
+/*    //测试
+    $scope.test = function () {
+        // $scope.apply(function () {
+            $scope.send_user="aa";
+            $scope.apply();
+        // });
+    };*/
 }])
