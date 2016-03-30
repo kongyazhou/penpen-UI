@@ -13,8 +13,7 @@ angular.module('penpen.controllers', [])
     $scope.$on("$ionicView.beforeEnter", function(){
         // console.log($scope.messages);
         $scope.messages = messageService.getBroadcast();
-    });
-  
+    }); 
 })
 
 .controller('messageCtrl', function($scope, $state, $ionicPopup, localStorageService, messageService) {
@@ -80,7 +79,6 @@ angular.module('penpen.controllers', [])
             index: 0
         };
     });
-
 })
 
 .controller('friendsCtrl', function($scope, $state) {
@@ -127,37 +125,20 @@ angular.module('penpen.controllers', [])
     'messageService', '$ionicScrollDelegate', '$timeout', 'WebSocketService',
     function($scope, $rootScope,$state, $stateParams, messageService, $ionicScrollDelegate, $timeout, WebSocketService) {
         var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
-        // console.log("enter");
         $scope.doRefresh = function() {
-            // console.log("ok");
             messageService.messageNum += 5;
             $timeout(function() {
-                // $scope.messageDetils = messageService.getAmountMessageById($scope.messageNum,
-                    // $stateParams.messageId);
                 messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum,$stateParams.messageId);
                 $scope.$broadcast('scroll.refreshComplete');
             }, 200);
         };
         $scope.addLocalMsg=function(msg) {
-            var obj={"isFromMe": true,"content": msg,"time": "2015-11-22 08:51:02"};
-            // $scope.messageDetils.push(obj);
-            messageService.messageDetails.push(obj);
+            messageService.sendMessage(msg);
         };
         $scope.del=function(idx){
-            // $scope.messageDetils.splice(idx,1);
             messageService.messageDetails.splice(idx,1);
         };
         $scope.$on("$ionicView.beforeEnter", function() {
-            // $scope.message = messageService.getMessageById($stateParams.messageId);
-            // $scope.message.noReadMessages = 0;
-            // $scope.message.showHints = false;
-            // messageService.updateMessage($scope.message);
-            // $scope.messageNum = 10;
-            // $scope.messageDetils = messageService.getAmountMessageById($scope.messageNum,
-            //     $stateParams.messageId);
-            // $timeout(function() {
-            //     viewScroll.scrollBottom();
-            // }, 0);
             messageService.message = messageService.getMessageById($stateParams.messageId);
             messageService.message.noReadMessages = 0;
             messageService.message.showHints = false;
@@ -177,7 +158,6 @@ angular.module('penpen.controllers', [])
  
         $scope.sendMessage= function(msg) {
             if (window["WebSocket"]) {
-                //var wsMsg = new WebSocket('ws://192.168.1.11:8080/');
                 var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
  
                 wsMsg.onopen = function() {
@@ -194,11 +174,6 @@ angular.module('penpen.controllers', [])
                 window.plugins.toast.showLongBottom('Your browser does not support WebSockets.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
             }
         };
-        $scope.$on("onMessage", function(event,data) {
-            window.plugins.toast.showLongBottom('收到:'+data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-
-        }); 
-
 
         window.addEventListener("native.keyboardshow", function(e){
             viewScroll.scrollBottom();
@@ -211,6 +186,7 @@ angular.module('penpen.controllers', [])
         $state.go("tab.friends");
     };
 })
+
 .controller('userDetailCtrl', function($scope, $state) {
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
@@ -222,6 +198,7 @@ angular.module('penpen.controllers', [])
         $state.go("tab.setting");
     };
 })
+
 .controller('loginCtrl', ['$scope', '$rootScope', '$state', 'messageService', 'WebSocketService','loginService',
  function($scope,$rootScope, $state, messageService, WebSocketService,loginService) {
 

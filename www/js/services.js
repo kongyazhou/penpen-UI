@@ -14,6 +14,7 @@ angular.module('penpen.services', [])
         }
     };
 })
+
 .factory('localStorageService', [function() {
         return {
             get: function localStorageServiceGet(key, defaultValue) {
@@ -38,6 +39,7 @@ angular.module('penpen.services', [])
             }
         };
 }])
+
 .factory('dateService', [function() {
     return {
         handleMessageDate: function(messages) {
@@ -128,6 +130,7 @@ angular.module('penpen.services', [])
         }
     };
 }])
+
 .factory('messageService', ['localStorageService', 'dateService',
     function(localStorageService, dateService) {
         return {
@@ -230,12 +233,22 @@ angular.module('penpen.services', [])
                     id = message.id;
                     localStorageService.clear("message_" + id);
                 }
-            }
+            },
+            recvMessage: function(msg) {
+                //TODO reflash too slow           
+                var obj={"isFromMe": false,"content": msg,"time": "2015-11-22 08:51:02"};
+                this.messageDetails.push(obj);
 
+            },
+            sendMessage: function(msg) {
+                var obj={"isFromMe": true,"content": msg,"time": "2015-11-22 08:51:02"};
+                this.messageDetails.push(obj);
+            }
         };
     }
 ])
-.service('WebSocketService',[function() {
+
+.service('WebSocketService',['messageService',function(messageService) {
     var callbacks = {};
     var currentCallbackId = 0;
     var ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
@@ -248,12 +261,14 @@ angular.module('penpen.services', [])
     };
     ws.onmessage = function(message) {
         window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        messageService.recvMessage(message.data);
     };
     this.sendMessage = function(msg){
         ws.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
         //ws.send(msg);
     };
 }])
+
 .service('loginService',[function() {
     var user ="";
     var password="";
