@@ -222,8 +222,8 @@ angular.module('penpen.controllers', [])
         $state.go("tab.setting");
     };
 })
-.controller('loginCtrl', ['$scope', '$rootScope', '$state', 'messageService', 'WebSocketService',
- function($scope,$rootScope, $state, messageService, WebSocketService) {
+.controller('loginCtrl', ['$scope', '$rootScope', '$state', 'messageService', 'WebSocketService','loginService',
+ function($scope,$rootScope, $state, messageService, WebSocketService,loginService) {
 
     $scope.$on("onMessage", function(event,data) {
         window.plugins.toast.showLongBottom('收到:'+data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
@@ -232,27 +232,14 @@ angular.module('penpen.controllers', [])
     $scope.login = function (user,password) {
         //该函数应当放在成功登陆以后执行
         window.plugins.jPushPlugin.setAlias("penpen"+user);
-        //penpenMsgFactory.conn = new WebSocket('ws://223.202.124.144:20888/');
-        // $scope.conn = new WebSocket('ws://223.202.124.144:20888/');
-        window.plugins.toast.showShortBottom('login', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
 
-        // $scope.conn.onopen = function() {
-        // window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        //   msg='{"user":"'+user+'","password":"'+hex_md5(password)+'"}';
-        //   this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
-        // }
-        // //定义:onclose事件函数
-        // $scope.conn.onclose = function(evt) {
-        //   window.plugins.toast.showLongBottom('服务器连接失败，请检查你的网络连接。', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        // }
-        // //定义:onmessage事件函数
-        // $scope.conn.onmessage = function(evt) {
-        //     window.plugins.toast.showLongBottom('Recv: '+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        //     var obj={"isFromMe": false,"content": evt.data,"time": "2015-11-22 08:51:02"};
-        //     // $scope.messageDetils.push(obj);
-        //     messageService.messageDetails.push(obj);
-        // }
+        loginService.setUser(user);
+        loginService.setPassword(password);
+        var msg=loginService.getLoginMsg();
+
+        window.plugins.toast.showShortBottom(msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
         
-        
-    }
+        WebSocketService.sendMessage(msg);
+
+    };
 }])

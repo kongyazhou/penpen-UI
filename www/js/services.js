@@ -14,7 +14,6 @@ angular.module('penpen.services', [])
         }
     };
 })
-
 .factory('localStorageService', [function() {
         return {
             get: function localStorageServiceGet(key, defaultValue) {
@@ -38,7 +37,7 @@ angular.module('penpen.services', [])
                 localStorage.removeItem(key);
             }
         };
-    }])
+}])
 .factory('dateService', [function() {
     return {
         handleMessageDate: function(messages) {
@@ -236,70 +235,36 @@ angular.module('penpen.services', [])
         };
     }
 ])
-
-.service('WebSocketService', 
-        ['$q', '$rootScope', function($q, $rootScope) {
-    var Service = {};
+.service('WebSocketService',[function() {
     var callbacks = {};
     var currentCallbackId = 0;
-    var ws = new WebSocket('ws://223.202.124.144:20888/');
-    
+    var ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
+
     ws.onopen = function(){  
         window.plugins.toast.showLongBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)}); 
-    };
-    
+    };    
     ws.onclose = function () {
         window.plugins.toast.showLongBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
-    //????
     ws.onmessage = function(message) {
-        $rootScope.$apply(function() {
-            window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        });
-        // listener(JSON.parse(message.data));
-        //$rootScope.$broadcast("onMessage",message.data);
-        // window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
- 
-    function sendRequest(request) {
-      var defer = $q.defer();
-      var callbackId = getCallbackId();
-      callbacks[callbackId] = {
-        time: new Date(),
-        cb:defer
-      };
-      request.callbackId = callbackId;
-      ws.send(JSON.stringify(request));
-      return defer.promise;
-    }
-    
- //????????
-    // function listener(data) {
-    //   var messageObj = data;
-    //   if(callbacks.hasOwnProperty(messageObj.callbackId)) {//主动请求
-    //     $rootScope.$apply(callbacks[messageObj.callbackId].cb.resolve(messageObj));
-    //     delete callbacks[messageObj.callbackId];
-    //   }else{//服务端推送（广播给子scope）
-    //       $rootScope.$broadcast("onMessage", messageObj);
-    //   }
-    // }
-    
-    function getCallbackId() {
-      currentCallbackId += 1;
-      if(currentCallbackId > 10000) {
-        currentCallbackId = 0;
-      }
-      return currentCallbackId;
-    }
- 
-    Service.sendMessage = function(message){
-      var request = {
-        message:message
-      }
-      var promise = sendRequest(request); 
-      return promise;
+    this.sendMessage = function(msg){
+        ws.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        //ws.send(msg);
     };
-
-    return Service;
-
+}])
+.service('loginService',[function() {
+    var user ="";
+    var password="";
+    this.setUser = function(arg) {
+        user=arg;
+    };
+    this.setPassword = function(arg) {
+        password=hex_md5(arg);
+    };
+    this.getLoginMsg = function(arg) {
+        var msg='{"user":"'+user+'","password":"'+password+'"}';
+        return msg;
+    };
 }])
