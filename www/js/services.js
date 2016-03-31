@@ -236,11 +236,12 @@ angular.module('penpen.services', [])
             recvMessage: function(msg) {
                 //TODO reflash too slow 
                 window.plugins.toast.showShortBottom('In recv func.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});          
-                var obj={"isFromMe": false,"content": msg,"time": "2015-11-22 08:51:02"};
+/*                var obj={"isFromMe": false,"content": msg,"time": "2015-11-22 08:51:02"};
                 // this.messageDetails.push(obj);
                 this.messageDetails.push(obj);
+                this.$digest();
                 window.plugins.toast.showShortBottom('Msg pushed.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                // $window.location.reload(true);
+                // $window.location.reload(true);*/
             },
             sendMessage: function(msg) {
                 var obj={"isFromMe": true,"content": msg,"time": "2015-11-22 08:51:02"};
@@ -252,20 +253,20 @@ angular.module('penpen.services', [])
 .service('WebSocketService',['messageService',function(messageService) {
     var callbacks = {};
     var currentCallbackId = 0;
-    var ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
+    this.ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
 
-    ws.onopen = function(){  
+    this.ws.onopen = function(){  
         // window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)}); 
     };    
-    ws.onclose = function () {
+    this.ws.onclose = function () {
         // window.plugins.toast.showShortBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
-    ws.onmessage = function(message) {
-        window.plugins.toast.showShortBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+    this.ws.onmessage = function(message) {
+        window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
         messageService.recvMessage(message.data);
     };
     this.sendMessage = function(msg){
-        ws.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        this.ws.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
         //ws.send(msg);
     };
 }])

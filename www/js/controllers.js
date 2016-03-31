@@ -16,7 +16,7 @@ angular.module('penpen.controllers', [])
     }); 
 })
 
-.controller('messageCtrl', function($scope, $state, $ionicPopup, localStorageService, messageService) {
+.controller('messageCtrl', ['$scope', '$state', '$ionicPopup', 'localStorageService', 'messageService', 'WebSocketService',function($scope, $state, $ionicPopup, localStorageService, messageService, WebSocketService) {
     
     // $scope.messages = messageService.getAllMessages();
     // console.log($scope.messages);
@@ -79,7 +79,10 @@ angular.module('penpen.controllers', [])
             index: 0
         };
     });
-})
+    WebSocketService.ws.onmessage=function(message) {
+            window.plugins.toast.showShortBottom('tab msg!：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+    };
+}])
 
 .controller('friendsCtrl', function($scope, $state) {
     $scope.onSwipeLeft = function() {
@@ -152,6 +155,20 @@ angular.module('penpen.controllers', [])
             }, 0);
         });
 
+        //这是受到数据的函数
+        //Override ws.onmessage
+        WebSocketService.ws.onmessage=function(message) {
+            window.plugins.toast.showShortBottom('contrllor!：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            $scope.$apply(function() {
+                var obj={"isFromMe": false,"content": message.data,"time": "2015-11-22 08:51:02"};
+                $scope.messageDetails.push(obj);
+                $timeout(function() {
+                    viewScroll.scrollBottom();
+            }, 0);
+            });
+        }
+
+
         $scope.onSwipeRight = function() {
             $state.go("tab.message");
         };
@@ -160,10 +177,10 @@ angular.module('penpen.controllers', [])
         };*/
         // $scope.$watchCollection('messageService.messageDetails', function (newVal, oldVal, scope) {
         $scope.$watchCollection('messageDetails', function () {
-                // $scope.updateMessageDetails();
-                // $scope.$digest();
-                // $window.location.reload(true);
+            var timer = $timeout(function() {
                 window.plugins.toast.showShortBottom('Scope Msg Changed.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            },2000);
+                // window.plugins.toast.showShortBottom('Scope Msg Changed.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
         });
         $scope.$watchCollection('messageService.messageDetails', function () {
                 // $scope.updateMessageDetails();
