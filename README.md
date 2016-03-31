@@ -31,15 +31,24 @@ plugins.txt中记录了所有需要的插件
 
 ## 4月4号之后的打算
 
-整理开发资料(AngularJS,Python,websocket等)。
+```
+先把华为平板修好了
+然后打扫下房间=。=
+```
 
-python爬虫，网站继续。
+整理所有开发资料(包括但不限于AngularJS,Python,websocket等)，并做成学习网站V1.0。
 
-16年4月**软考**报名 5月考
+**16年4月18日，阿里天池大数据比赛。**
 
-16年4月10日报名截止，开始[Google Jam](http://www.saikr.com/GCJ/2016)
+python爬虫，资讯类网站继续。
+
+**16年4月**软考**报名 5月考**
+
+**16年4月10日报名截止，开始[Google Jam](http://www.saikr.com/GCJ/2016)（重在参与）**
 
 16年03月01日 16年05月31日 23时59分[tco16](http://tco16.topcoder.com/) 
 
 16年9月[codercup]()？？
+
+注册电气基础
 

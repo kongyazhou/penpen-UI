@@ -233,16 +233,6 @@ angular.module('penpen.services', [])
                     localStorageService.clear("message_" + id);
                 }
             },
-            recvMessage: function(msg) {
-                //TODO reflash too slow 
-                window.plugins.toast.showShortBottom('In recv func.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});          
-/*                var obj={"isFromMe": false,"content": msg,"time": "2015-11-22 08:51:02"};
-                // this.messageDetails.push(obj);
-                this.messageDetails.push(obj);
-                this.$digest();
-                window.plugins.toast.showShortBottom('Msg pushed.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                // $window.location.reload(true);*/
-            },
             sendMessage: function(msg) {
                 var obj={"isFromMe": true,"content": msg,"time": "2015-11-22 08:51:02"};
                 this.messageDetails.push(obj);                
@@ -250,20 +240,20 @@ angular.module('penpen.services', [])
         };
 }])
 
-.service('WebSocketService',['messageService',function(messageService) {
+.service('WebSocketService',[function() {
     var callbacks = {};
     var currentCallbackId = 0;
-    this.ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
+    this.ws = new ReconnectingWebSocket('ws://223.202.124.144:28888/');
 
-    this.ws.onopen = function(){  
-        // window.plugins.toast.showShortBottom('连接成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)}); 
+    this.ws.onopen = function(){
+    //若处于登陆状态，则发送账号信息   
+        if (true) {}
     };    
     this.ws.onclose = function () {
         // window.plugins.toast.showShortBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
     this.ws.onmessage = function(message) {
         window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        messageService.recvMessage(message.data);
     };
     this.sendMessage = function(msg){
         this.ws.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
@@ -274,8 +264,18 @@ angular.module('penpen.services', [])
 .service('loginService',[function() {
     var user ="";
     var password="";
+    var login=false;
+
     this.setUser = function(arg) {
         user=arg;
+    };
+    this.getUser = function() {
+        //可以考虑添加个上次登陆时间
+        if (login) {
+            return user;
+        } else {
+            return '0';
+        } 
     };
     this.setPassword = function(arg) {
         password=hex_md5(arg);
@@ -283,5 +283,20 @@ angular.module('penpen.services', [])
     this.getLoginMsg = function(arg) {
         var msg='{"user":"'+user+'","password":"'+password+'"}';
         return msg;
+    };
+    this.logined = function() {
+        login=true;
+    };
+}])
+
+.service('parser',[function() {
+    /*
+    本服务将消息包body部分解码
+    并转换成对象返回
+    */
+    this.parseMsg=function (msg) {
+        var msgObj=eval(msg);
+        var msgBodyUncoded=eval(Base64.decode(msgObj.body));
+        return msgBodyUncoded;
     };
 }])
