@@ -82,7 +82,7 @@ angular.module('penpen.controllers', [])
         };
     });
     WebSocketService.ws.onmessage=function(message) {
-            window.plugins.toast.showShortBottom('tab msg!：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        window.plugins.toast.showShortBottom('tab msg!：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
 }])
 
@@ -126,9 +126,9 @@ angular.module('penpen.controllers', [])
     };
 })
 
-.controller('messageDetailCtrl', ['$scope', '$rootScope', '$state','$stateParams',
- 'messageService', '$ionicScrollDelegate', '$timeout', 'WebSocketService',
- function($scope, $rootScope,$state, $stateParams, messageService, $ionicScrollDelegate, $timeout, WebSocketService) {
+.controller('messageDetailCtrl', ['$scope', '$state','$stateParams',
+ 'messageService', '$ionicScrollDelegate', '$timeout', 'WebSocketService','parser',
+ function($scope,$state, $stateParams, messageService, $ionicScrollDelegate, $timeout, WebSocketService, parser) {
     var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
     $scope.doRefresh = function() {
         messageService.messageNum += 5;
@@ -157,24 +157,31 @@ angular.module('penpen.controllers', [])
         }, 0);
     });
 
-    //这是收到数据的函数
+    //这是收到消息的函数
     //Override ws.onmessage
-    WebSocketService.ws.onmessage=function(message) {
-        window.plugins.toast.showShortBottom('controller!：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+    WebSocketService.ws.onmessage=function(evt) {
+        // window.plugins.toast.showShortBottom('controller!：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        var msg=parser.parseMsg(evt.data);
+        //TODO 判断消息是否属于本聊天
+        if (true) {}
+        window.plugins.toast.showShortBottom('msg：'+msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        window.plugins.toast.showLongBottom('content：'+msg.content, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        
+        //将消息添加到聊天界面
         $scope.$apply(function() {
-            var obj={"isFromMe": false,"content": message.data,"time": "2015-11-22 08:51:02"};
+            var obj={"isFromMe": false,"content": msg.content,"time": "2015-11-22 08:51:02"};
             $scope.messageDetails.push(obj);
             $timeout(function() {
                 viewScroll.scrollBottom(true);
-        }, 0);
+            }, 0);
         });
-    }
+    };
 
 
     $scope.onSwipeRight = function() {
         $state.go("tab.message");
     };
-
+    //这是发送消息的函数
     $scope.sendMessage= function(msg) {
         if (window["WebSocket"]) {
             var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
@@ -250,11 +257,14 @@ angular.module('penpen.controllers', [])
             if (result.state==11) {
                 //登录成功
                 window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                
                 window.plugins.jPushPlugin.setAlias("penpen"+user);
+                loginService.logined();
                 $scope.$apply(function() {
                     $scope.logining=false;
                     $location.path('/tab/message');
                 });
+
             }
             else if (result.state==12) {
                 window.plugins.toast.showLongBottom('登录失败', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
