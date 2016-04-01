@@ -248,7 +248,7 @@ angular.module('penpen.controllers', [])
                 //登录成功
                 window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
                 window.plugins.jPushPlugin.setAlias("penpen"+user);
-                $location.path('/tab/message');
+                $scope.$apply(function() {$location.path('/tab/message');})
             }
             else{
                 window.plugins.toast.showShortBottom('登录失败', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});

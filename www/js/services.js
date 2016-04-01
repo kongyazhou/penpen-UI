@@ -295,8 +295,8 @@ angular.module('penpen.services', [])
     并转换成对象返回
     */
     this.parseMsg=function (msg) {
-        var msgObj=eval(msg);
-        var msgBodyUncoded=eval(Base64.decode(msgObj.body));
+        var msgObj=eval('('+msg+')');
+        var msgBodyUncoded=eval('('+Base64.decode(msgObj.body)+')');
         return msgBodyUncoded;
     };
 }])
