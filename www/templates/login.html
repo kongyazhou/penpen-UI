@@ -2,8 +2,8 @@
     <h1 class="title">登录</h1>
 </ion-header-bar>
 <ion-view title="登录">
-    <ion-content overflow-scroll="true" padding="true" scroll="false" class="has-header">
-        
+    <!-- <ion-content overflow-scroll="true" padding="true" scroll="false" class="has-header"> -->
+        <ion-content overflow-scroll="true" padding="true" class="has-header">
 
             <div class="spacer" style="width: 300px; height: 31px;"></div>
             <div style="text-align:center;">
@@ -14,16 +14,20 @@
             <ion-list>
                 <label class="item item-input">
                     <span class="input-label">账号</span>
-                    <input type="tel" placeholder="" ng-model="send_user">
+                    <input type="tel" placeholder="" ng-model="send_user" ng-disabled="logining">
                 </label>
+
                 <label class="item item-input">
                     <span class="input-label">密码</span>
-                    <input type="password" placeholder="" ng-model="send_password">
+                    <input type="password" ng-model="send_password" ng-disabled="logining">
                 </label>
             </ion-list>
             <div class="spacer" style="width: 300px; height: 34px;"></div>
-            <a class="button button-balanced  button-block" ng-click="login(send_user,send_password)" native-options="{type: 'slide', direction:'left'}" ng-disabled="false" placeholder="请输入您的手机号">登录</a>
+            <a class="button button-balanced  button-block" ng-click="login(send_user,send_password)" native-options="{type: 'slide', direction:'left'}" ng-disabled="logining" placeholder="请输入您的手机号">登录</a>
 
         </form>
+        <ion-infinite-scroll ng-show="logining">
+        </ion-infinite-scroll>
     </ion-content>
 </ion-view>
+

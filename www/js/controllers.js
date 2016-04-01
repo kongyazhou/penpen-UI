@@ -153,7 +153,7 @@ angular.module('penpen.controllers', [])
         $scope.messageDetails=messageService.messageDetails;
         $scope.message=messageService.message;
         $timeout(function() {
-            viewScroll.scrollBottom();
+            viewScroll.scrollBottom(true);
         }, 0);
     });
 
@@ -165,7 +165,7 @@ angular.module('penpen.controllers', [])
             var obj={"isFromMe": false,"content": message.data,"time": "2015-11-22 08:51:02"};
             $scope.messageDetails.push(obj);
             $timeout(function() {
-                viewScroll.scrollBottom();
+                viewScroll.scrollBottom(true);
         }, 0);
         });
     }
@@ -227,8 +227,11 @@ angular.module('penpen.controllers', [])
     1、成功，跳转页面至联系人
     2、失败，留在页面，按钮reabled
     */
+
+
+    $scope.logining=false;
     $scope.login = function (user,password) {
-        
+        $scope.logining=true;
         loginService.setUser(user);
         loginService.setPassword(password);
 
@@ -241,17 +244,24 @@ angular.module('penpen.controllers', [])
 
         }
         wsLogin.onmessage = function(evt) {
-            window.plugins.toast.showShortBottom('收到：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            // window.plugins.toast.showShortBottom('收到：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
             var result=parser.parseMsg(evt.data);
-            window.plugins.toast.showLongBottom('state：'+result.state, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            window.plugins.toast.showShortBottom('state：'+result.state, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
             if (result.state==11) {
                 //登录成功
                 window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
                 window.plugins.jPushPlugin.setAlias("penpen"+user);
-                $scope.$apply(function() {$location.path('/tab/message');})
+                $scope.$apply(function() {
+                    $scope.logining=false;
+                    $location.path('/tab/message');
+                });
             }
-            else{
-                window.plugins.toast.showShortBottom('登录失败', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            else if (result.state==12) {
+                window.plugins.toast.showLongBottom('登录失败', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                $scope.$apply(function() {$scope.logining=false;});
+            }else{
+                window.plugins.toast.showLongBottom('登录异常', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                $scope.$apply(function() {$scope.logining=false;});
             }
         }
 
