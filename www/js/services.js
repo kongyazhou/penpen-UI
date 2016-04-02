@@ -240,34 +240,32 @@ angular.module('penpen.services', [])
         };
 }])
 
-.service('WebSocketService',['loginService',function(loginService) {
+.service('wsService',['loginService',function(loginService) {
     var callbacks = {};
     var currentCallbackId = 0;
-    this.ws = new ReconnectingWebSocket('ws://223.202.124.144:40888/');
+    //初始化ws对象
+    this.ws = {};
 
     this.ws.onopen = function(){
-    //若处于登陆状态，则发送账号信息   
-        if (loginService.isLogged()) {
-            window.plugins.toast.showShortBottom('发送账号信息', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-            var userMsg='{"user":"'+user+'"}';
-            this.sendMessage(userMsg);
-        }else{
-            window.plugins.toast.showShortBottom('登录状态异常', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-            var userMsg='{"user":"0"}';
-            this.sendMessage(userMsg);
-        }
+        //各controller自己复写该方法以实现功能
     };    
+
     this.ws.onclose = function () {
+        //各controller自己复写该方法以实现功能
         // window.plugins.toast.showShortBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
+
     this.ws.onmessage = function(message) {
         //各controller自己复写该方法以实现功能
         window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
+
     this.sendMessage = function(msg){
+        //各controller自己复写该方法以实现功能
         this.ws.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
         //ws.send(msg);
     };
+
 }])
 
 .service('loginService',[function() {
@@ -312,4 +310,8 @@ angular.module('penpen.services', [])
         var msgBodyUncoded=eval('('+Base64.decode(msgObj.body)+')');
         return msgBodyUncoded;
     };
+    this.parseCotent=function (content) {
+        return Base64.decode(content);
+    };
+
 }])
