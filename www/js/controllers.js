@@ -54,7 +54,10 @@ angular.module('penpen.controllers', [])
         };
         $scope.messageDetails = function(message) {
             $state.go("messageDetail", {
-                "messageId": message.id
+                "name": message.name,
+                "user": message.user,
+                "icon": message.icon,
+                "job" : message.job 
             });
         };
         $scope.$on("$ionicView.beforeEnter", function() {
@@ -81,16 +84,12 @@ angular.module('penpen.controllers', [])
                 $scope.$broadcast('scroll.refreshComplete');
             }, 200);
         };
-        $scope.addLocalMsg = function(msg) {
-            messageService.sendMessage(msg);
-            mp3Service.playMessage();
-            //TODO 更新lastMessage表的lastMessage和lastTime
-            //TODO 将message插入联系人的allMessage表
-        };
+
         $scope.del = function(idx) {
             messageService.messageDetails.splice(idx, 1);
         };
         $scope.$on("$ionicView.beforeEnter", function() {
+            $scope.contact=$stateParams;
             // messageService.message = messageService.getMessageById($stateParams.messageId);
             // messageService.message.noReadMessages = 0;
             // messageService.message.showHints = false;
@@ -99,7 +98,7 @@ angular.module('penpen.controllers', [])
             // messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum,$stateParams.messageId);
             // $scope.messageDetails=messageService.messageDetails;
             // $scope.message=messageService.message;
-            messageService.message = messageService.getMessageByUser($stateParams.User);
+            // messageService.message = messageService.getMessageByUser($stateParams.User);
             //TODO 设置所有消息unread为0 unreadNo为0
             messageService.message.showHints = false;
             $timeout(function() {
@@ -141,6 +140,12 @@ angular.module('penpen.controllers', [])
             $state.go("tab.message");
         };
         //这是发送消息的函数
+        $scope.addLocalMsg = function(msg) {
+            messageService.sendMessage(msg);
+            mp3Service.playMessage();
+            //TODO 更新lastMessage表的lastMessage和lastTime
+            //TODO 将message插入联系人的allMessage表
+        };
         $scope.sendMessage = function(msg) {
             if (window["WebSocket"]) {
                 var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
@@ -206,9 +211,10 @@ angular.module('penpen.controllers', [])
                     },
                     function(db) {
                         db.transaction(function(tx) {
-                            tx.executeSql("select count(id) as cnt from test_table;", [], function(tx, res) {
-                                window.plugins.toast.showShortBottom(res.rows.length);
-                                window.plugins.toast.showLongBottom(res.rows.item(0).cnt);
+                            tx.executeSql("select data from test_table;", [], function(tx, res) {
+                                // window.plugins.toast.showShortBottom(res.rows.length);
+                                window.plugins.toast.showLongBottom(res.rows.item(0).data);
+                                // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
                                 // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
                                 // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
                             });
@@ -349,4 +355,5 @@ angular.module('penpen.controllers', [])
         $state.go("tab.broadcast");
     };
     $scope.contact = loginService.getUserContact();
+    // $scope.contact = contactService.getContact("12345678900");
 }])

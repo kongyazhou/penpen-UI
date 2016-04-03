@@ -1,7 +1,7 @@
 <ion-header-bar class="bar-calm">
     <button class="button button-icon ion-ios-arrow-back" native-ui-sref="tab.message" native-options="{type: 'slide', direction:'right'}">
     </button>
-    <h1 class="title" ng-bind="message.name">未知</h1>
+    <h1 class="title" ng-bind="contact.name">未知</h1>
     <button class="button button-icon icon ion-person"></button>
 </ion-header-bar>
 <ion-content class="rj-stable-content" delegate-handle="messageDetailsScroll" id="message-detail-content" on-swipe-right="onSwipeRight()">
@@ -10,7 +10,7 @@
     <div ng-repeat="item in messageDetails">
     	<p class="rj-message-time" ng-bind="item.time" ng-if="false"></p>
         <div class="rj-message-wrap" ng-if="!item.isFromMe">
-            <img ng-src="{{message.pic}}" class="rj-head-pic">
+            <img ng-src="{{contact.icon}}" class="rj-head-pic">
             <span class="rj-triangle-left"></span>
             <p class="rj-message" ng-bind="item.content"></p>
         </div>

@@ -287,12 +287,7 @@ angular.module('penpen.services', [])
         }
     };
     this.getUserContact = function() {
-        //可以考虑添加个上次登陆时间
-        if (login) {
-            return contactService.getContact(user);
-        } else {
-            return '0';
-        }
+        return contactService.getContact(user);
     };
     this.setPassword = function(arg) {
         password = hex_md5(arg);
@@ -391,7 +386,7 @@ angular.module('penpen.services', [])
     };*/
 }])
 
-.service('contactService', ['$timeout', function($timeout) {
+.service('contactService', [function() {
     var groups = [{
         "show": true,
         "department": "总经理",
@@ -514,10 +509,112 @@ angular.module('penpen.services', [])
         return groups;
     };
     this.getContact = function(user) {
-        for (contact in contacts) {
-            if (contact.user == user) {
-                return contact;
+        //TODO ?
+        var i=0;
+        for (i in contacts) {
+            if (contacts[i].user == user) {
+                return contacts[i];
             }
         }
+    };
+}])
+
+.service('sqliteService', [function() {
+    var dbPenpen = window.sqlitePlugin.openDatabase({
+        name: 'penpen.msg',
+        iosDatabaseLocation: 'default'
+    });
+
+    this.updateLastMessageSend = function(msg) {
+        dbPenpen.transaction(function(tx) {
+            //判断表是否存在，不存在则创建
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
+            //判断条目是否存在
+            tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.to], function(tx, res) {
+                // 如果没有则创建,有则更新
+                if (res.rows.item(0).cnt != 0) {
+                    //存在则更新
+                    //TODO msg.time
+                    tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, 0, msg.to]);
+                } else {
+                    //不存在则创建条目
+                    tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.to, msg.content, msg.time, 0]);
+                }
+            });
+            //
+
+        });
+    };
+
+    this.addNewMessageSend = function(msg) {
+        dbPenpen.transaction(function(tx) {
+            //判断表是否存在，不存在则创建
+            tx.executeSql('CREATE TABLE IF NOT EXISTS ? (id integer primary key,isFromMe integer, message text, time text, unread integer);', [msg.to]);
+            //添加新消息条目
+            tx.executeSql('INSERT INTO ? (isFromMe, message, time, unread) VALUES (?,?,?,?);', [1, msg.content, "2016-4-4 3:24:00", 0]);
+        });
+    };
+
+    this.updateLastMessageRecv = function(msg) {
+        //判断表是否存在，不存在则创建
+        tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
+        //判断条目是否存在
+        tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
+            // 如果没有则创建,有则更新
+            if (res.rows.item(0).cnt != 0) {
+                //存在则更新最后消息，并使未读消息数目+1
+                tx.executeSql('select unreadNo from lastMessage where user=?;', [msg.from], function(tx, res) {
+                    tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, res.rows.item(0).unreadNo + 1, msg.from]);
+                });
+            } else {
+                //不存在则创建条目
+                tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.from, msg.content, msg.time, 1]);
+            }
+        });
+    };
+
+    this.addNewMessageRecv = function(msg) {
+        dbPenpen.transaction(function(tx) {
+            //判断表是否存在，不存在则创建
+            tx.executeSql('CREATE TABLE IF NOT EXISTS ? (id integer primary key,isFromMe integer, message text, time text, unread integer);', [msg.from]);
+            //添加新消息条目
+            tx.executeSql('INSERT INTO ? (isFromMe, message, time, unread) values (?,?,?,?);', [0, msg.content, msg.time, 1]);
+        });
+    };
+
+    //收到并读过消息
+    this.updateLastMessageRecvReaded = function(msg) {
+        //判断表是否存在，不存在则创建
+        tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
+        //判断条目是否存在
+        tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
+            // 如果没有则创建,有则更新
+            if (res.rows.item(0).cnt != 0) {
+                //存在则更新
+                tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, 0, msg.from]);
+            } else {
+                //不存在则创建条目
+                tx.executeSql('select unreadNo from lastMessage where user=?;', [msg.from], function(tx, res) {
+                    tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.from, msg.content, msg.time, 0]);
+                });
+            }
+        });
+    };
+
+    this.addNewMessageRecvReaded = function(msg) {
+        dbPenpen.transaction(function(tx) {
+            //判断表是否存在，不存在则创建
+            tx.executeSql('CREATE TABLE IF NOT EXISTS ? (id integer primary key,isFromMe integer, message text, time text, unread integer);', [msg.from]);
+            //添加新消息条目
+            tx.executeSql('INSERT INTO ? (isFromMe, message, time, unread) values (?,?,?,?);', [0, msg.content, msg.time, 0]);
+        });
+    };
+
+    this.getContactMessages = function(argument) {
+        // body...
+    };
+
+    this.getLastMessages = function(argument) {
+        // body...
     };
 }])

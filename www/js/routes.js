@@ -15,7 +15,7 @@ angular.module('penpen.routes', [])
             controller: "aboutCtrl"
         })
         .state('messageDetail', {
-            url: '/messageDetail/:messageId',
+            url: '/messageDetail/:name:user:icon:job',
             templateUrl: "templates/detail-message.html",
             controller: "messageDetailCtrl"
         })
