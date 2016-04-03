@@ -293,6 +293,12 @@ angular.module('penpen.services', [])
     };
     this.logined = function() {
         login=true;
+        ws = new WebSocket('ws://223.202.124.144:33888/');
+        ws.onopen = function(){
+            user=loginService.getUser();
+            msg='{"user":"'+user+'","state":1}';
+            this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        };      
     };
     this.isLogged = function() {
         return login;
@@ -314,4 +320,43 @@ angular.module('penpen.services', [])
         return Base64.decode(content);
     };
 
+}])
+
+.service('activeState',['loginService',function(loginService) {
+    /*
+    本服务将消息包body部分解码
+    并转换成对象返回
+    */
+    //TODO* 判断编码方式，检查协议版本
+
+    document.addEventListener('resume', function () {
+        ws = new WebSocket('ws://223.202.124.144:33888/');
+
+        ws.onopen = function(){
+            user=loginService.getUser();
+            msg='{"user":"'+user+'","state":1}';
+            this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        };    
+
+        ws.onclose = function () {
+        };
+
+        ws.onmessage = function(message) {
+        };
+    });
+    document.addEventListener('pause', function () {
+        ws = new WebSocket('ws://223.202.124.144:33888/');
+
+        ws.onopen = function(){
+            user=loginService.getUser();
+            msg='{"user":"'+user+'","state":2}';
+            this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        };    
+
+        ws.onclose = function () {
+        };
+
+        ws.onmessage = function(message) {
+        };
+    });
 }])

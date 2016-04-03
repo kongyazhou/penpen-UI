@@ -1,8 +1,8 @@
 angular.module('penpen.controllers', [])
 
 .controller('messageCtrl', ['$scope', '$state', '$ionicPopup', 'localStorageService',
- 'messageService',
- function($scope, $state, $ionicPopup, localStorageService, messageService) {
+ 'messageService', 'activeState',
+ function($scope, $state, $ionicPopup, localStorageService, messageService, activeState) {
     
     // $scope.messages = messageService.getAllMessages();
     // console.log($scope.messages);
@@ -168,10 +168,42 @@ angular.module('penpen.controllers', [])
             $scope.$apply(function() {
                 //TODO 为什么没有跳转？超级用户无效....
                 $scope.logining=false;
-                $location.path('/tab/message');
+                // $location.path('/tab/message');
             });
-            window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        } else {            
+            var db = window.sqlitePlugin.openDatabase({name: 'penpen.msg', iosDatabaseLocation: 'default'},
+                function(db) {
+                    window.plugins.toast.showShortBottom('打开数据库成功');
+                    db.transaction(function(tx) {
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS test_table (id integer primary key, data text,  data_num integer)');
+                        tx.executeSql("INSERT INTO test_table (data, data_num) VALUES (?,?)", ["R U OK?", 100]);
+                    });
+                },function(db) {
+                    window.plugins.toast.showShortBottom('打开数据库失败');
+                }
+            );
+            // window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        }else if(user=="12345678910"){
+            var db = window.sqlitePlugin.openDatabase({name: 'penpen.msg', iosDatabaseLocation: 'default'},
+                function(db) {                
+                    db.transaction(function(tx) {
+                        tx.executeSql("select count(id) as cnt from test_table;", [], function(tx, res) {
+                            window.plugins.toast.showShortBottom(res.rows.length);
+                            window.plugins.toast.showLongBottom(res.rows.item(0).cnt);
+                            // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
+                            // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
+                        });
+                    });
+                },function(db) {
+                    window.plugins.toast.showShortBottom('打开数据库失败');
+                }
+            );
+            $scope.$apply(function() {
+                //TODO 为什么没有跳转？超级用户无效....
+                $scope.logining=false;
+                // $location.path('/tab/message');
+            });
+        }
+         else {            
             loginService.setUser(user);
             loginService.setPassword(password);
 
@@ -211,7 +243,7 @@ angular.module('penpen.controllers', [])
             }
         }
 
-    };
+    }
 }])
 
 .controller('friendsCtrl', function($scope, $state) {
@@ -221,20 +253,85 @@ angular.module('penpen.controllers', [])
     $scope.onSwipeRight = function() {
         $state.go("tab.message");
     };
-    $scope.contacts_right_bar_swipe = function(e){
+/*    $scope.contacts_right_bar_swipe = function(e){
         console.log(e);
-    };
-    $scope.groups = [];
-    for (var i=0; i<3; i++) {
-        $scope.groups[i] = {
-            name: '部门',
-            items: [],
-            show: true
-        };
-        for (var j=0; j<3; j++) {
-            $scope.groups[i].items.push(j);
-        }
-    }
+    };*/
+    $scope.groups = [{
+        "department":"总经理",
+        "contacts": [
+        {
+            "user": "12345678900",
+            "name": "郑总",
+            "icon": "img/0.jpg",
+            "job" : "总经理"
+        }]
+    },
+    {
+        "department":"技术部",
+        "contacts": [
+        {
+            "user": "12345678901",
+            "name": "李明",
+            "icon": "img/1.jpg",
+            "job" : "部长"
+        },
+        {
+            "user": "12345678902",
+            "name": "刘翔",
+            "icon": "img/2.jpg",
+            "job" : "软件工程师"
+        },
+        {
+            "user": "12345678903",
+            "name": "张涛",
+            "icon": "img/3.jpg",
+            "job" : "硬件工程师"
+        },
+        {
+            "user": "12345678904",
+            "name": "顾城",
+            "icon": "img/4.jpg",
+            "job" : "机械工程师"
+        }]
+    },
+    {
+        "department":"市场部",
+        "contacts": [
+        {
+            "user": "12345678905",
+            "name": "朱薇",
+            "icon": "img/5.jpg",
+            "job" : "部长"
+        },
+        {
+            "user": "12345678906",
+            "name": "郭思琪",
+            "icon": "img/6.jpg",
+            "job" : "销售经理"
+        },
+        {
+            "user": "12345678907",
+            "name": "沈紫",
+            "icon": "img/7.jpg",
+            "job" : "销售经理"
+        }]
+    },
+    {
+        "department":"财务部",
+        "contacts": [
+        {
+            "user": "12345678908",
+            "name": "汪美琴",
+            "icon": "img/8.jpg",
+            "job" : "部长"
+        },
+        {
+            "user": "12345678909",
+            "name": "刘斌",
+            "icon": "img/9.jpg",
+            "job" : "副部长"
+        }]
+    }];
       
     /*
     * if given group is the selected group, deselect it
