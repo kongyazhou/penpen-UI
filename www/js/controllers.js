@@ -54,10 +54,7 @@ angular.module('penpen.controllers', [])
         };
         $scope.messageDetails = function(message) {
             $state.go("messageDetail", {
-                "name": message.name,
-                "user": message.user,
-                "icon": message.icon,
-                "job" : message.job 
+                "user": message.user
             });
         };
         $scope.$on("$ionicView.beforeEnter", function() {
@@ -74,22 +71,28 @@ angular.module('penpen.controllers', [])
 ])
 
 .controller('messageDetailCtrl', ['$scope', '$state', '$stateParams',
-    'messageService', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service',
-    function($scope, $state, $stateParams, messageService, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service) {
+    'messageService', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService',
+    function($scope, $state, $stateParams, messageService, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService) {
         var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
-        $scope.doRefresh = function() {
-            messageService.messageNum += 5;
-            $timeout(function() {
-                messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum, $stateParams.messageId);
-                $scope.$broadcast('scroll.refreshComplete');
-            }, 200);
+        /*        $scope.doRefresh = function() {
+                    messageService.messageNum += 5;
+                    $timeout(function() {
+                        messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum, $stateParams.messageId);
+                        $scope.$broadcast('scroll.refreshComplete');
+                    }, 200);
+                };*/
+
+        $scope.onSwipeRight = function() {
+            $state.go("tab.message");
         };
 
-        $scope.del = function(idx) {
-            messageService.messageDetails.splice(idx, 1);
-        };
+        /*        $scope.del = function(idx) {
+                    messageService.messageDetails.splice(idx, 1);
+                };*/
+        $scope.contact = contactService.getContact($stateParams.user);
+        $scope.messageDetails = {};
         $scope.$on("$ionicView.beforeEnter", function() {
-            $scope.contact=$stateParams;
+            // $scope.contact = contactService.getContact($stateParams.user);
             // messageService.message = messageService.getMessageById($stateParams.messageId);
             // messageService.message.noReadMessages = 0;
             // messageService.message.showHints = false;
@@ -100,58 +103,71 @@ angular.module('penpen.controllers', [])
             // $scope.message=messageService.message;
             // messageService.message = messageService.getMessageByUser($stateParams.User);
             //TODO 设置所有消息unread为0 unreadNo为0
-            messageService.message.showHints = false;
+            // messageService.message.showHints = false;
             $timeout(function() {
                 viewScroll.scrollBottom(true);
             }, 0);
         });
+
+        //连接断开时重发登陆消息
         wsService.ws.onopen = function() {
-                wsService.sendMessage(loginService.getLoginMsg());
-            }
-            //这是收到消息的函数
-            //TODO 收到消息的提示音
-            //Override ws.onmessage
+            wsService.sendMessage(loginService.getLoginMsg());
+        }
+
+        //这是收到消息的函数
+
+        //Override ws.onmessage
         wsService.ws.onmessage = function(evt) {
             // window.plugins.toast.showShortBottom('controller!：'+evt.data);
             var msg = parser.parseMsg(evt.data);
-            //TODO 判断消息是否属于本聊天
-            if (true) {}
-            // window.plugins.toast.showShortBottom('msg：'+msg);
-            window.plugins.toast.showLongBottom('content：' + msg.content);
-            //TODO 更新lastMessage表的lastMessage和lastTime
-            //TODO 将message插入联系人的allMessage表
-            //将消息添加到聊天界面
-            $scope.$apply(function() {
-                var obj = {
-                    "isFromMe": false,
-                    "content": parser.parseCotent(msg.content),
-                    "time": "2015-11-22 08:51:02"
-                };
-                $scope.messageDetails.push(obj);
-                mp3Service.playMessage();
-                $timeout(function() {
-                    viewScroll.scrollBottom(true);
-                }, 0);
-            });
+            // 判断消息是否属于本聊天
+            var date = new Date();
+            if (msg.from == contact.user) {
+                // window.plugins.toast.showShortBottom('msg：'+msg);
+                window.plugins.toast.showLongBottom('content：' + msg.content);
+                // 更新lastMessage表的lastMessage和lastTime
+                sqliteService.updateLastMessageRecvReaded(msg);
+                // 将message插入联系人的allMessage表
+                sqliteService.addNewMessageRecvReaded(msg);
+                //将消息添加到聊天界面
+                $scope.$apply(function() {
+                    var obj = {
+                        "isFromMe": 0,
+                        "content": parser.parseCotent(msg.content),
+                        "time": date
+                    };
+                    $scope.messageDetails.push(obj);
+                    // 收到消息的提示音
+                    mp3Service.playMessage();
+                    $timeout(function() {
+                        viewScroll.scrollBottom(true);
+                    }, 0);
+                });
+            } else {
+                // 更新lastMessage表的lastMessage和lastTime
+                sqliteService.updateLastMessageRecv(msg);
+                // 将message插入联系人的allMessage表
+                sqliteService.addNewMessageRecv(msg);
+            }
         };
 
-
-        $scope.onSwipeRight = function() {
-            $state.go("tab.message");
-        };
         //这是发送消息的函数
         $scope.addLocalMsg = function(msg) {
-            messageService.sendMessage(msg);
+            msgObj = messageService.sendMessage(msg);
+            msgObj["to"] = $scope.contact.user;
+            // 发送消息的提示音
             mp3Service.playMessage();
             //TODO 更新lastMessage表的lastMessage和lastTime
+            sqliteService.updateLastMessageSend(msgObj);
             //TODO 将message插入联系人的allMessage表
+            // sqliteService.addNewMessageSend(msgObj);
         };
         $scope.sendMessage = function(msg) {
             if (window["WebSocket"]) {
                 var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
 
                 wsMsg.onopen = function() {
-                    jsonMsg = '{"from":"15228977313","to":"15669910253","type":"0","content":"' + Base64.encode(msg) + '"}';
+                    jsonMsg = '{"from":"' + loginService.getUser() + '","to":"' + $scope.contact.user + '","type":"0","content":"' + Base64.encode(msg) + '"}';
                     this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
                 }
                 wsMsg.onclose = function(evt) {}
@@ -163,9 +179,9 @@ angular.module('penpen.controllers', [])
             }
         };
 
-        window.addEventListener("native.keyboardshow", function(e) {
-            viewScroll.scrollBottom();
-        });
+        /*        window.addEventListener("native.keyboardshow", function(e) {
+                    viewScroll.scrollBottom();
+                });*/
     }
 ])
 
@@ -206,22 +222,36 @@ angular.module('penpen.controllers', [])
                 // window.plugins.toast.showShortBottom('登录成功');
             } else if (user == "12345678910") {
                 var db = window.sqlitePlugin.openDatabase({
-                        name: 'penpen.msg',
+                        name: 'penpen.12345678905',
                         iosDatabaseLocation: 'default'
-                    },
-                    function(db) {
+                    },function(db) {
+                        window.plugins.toast.showShortBottom('打开数据库成功');
                         db.transaction(function(tx) {
-                            tx.executeSql("select data from test_table;", [], function(tx, res) {
+                            tx.executeSql("select message from penpen12345678901;", [], function(tx, res) {
+                                window.plugins.toast.showLongBottom('查询成功');
                                 // window.plugins.toast.showShortBottom(res.rows.length);
-                                window.plugins.toast.showLongBottom(res.rows.item(0).data);
+                                window.plugins.toast.showShortBottom(res.rows.item(0).message);
+                                window.plugins.toast.showLongBottom(res.rows.item(1).message);
                                 // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
                                 // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
                                 // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
+                            },function(err) {
+                                window.plugins.toast.showLongBottom('查询失败'+err.message);
                             });
+/*                            tx.executeSql("select lastMessage from lastMessage;", [], function(tx, res) {
+                                // window.plugins.toast.showLongBottom('lastmessage成功');
+                                // window.plugins.toast.showShortBottom(res.rows.length);
+                                window.plugins.toast.showLongBottom(res.rows.item(0).lastMessage);
+                                window.plugins.toast.showLongBottom(res.rows.item(1).lastMessage);
+                                // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
+                                // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
+                                // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
+                            },function(err) {
+                                window.plugins.toast.showLongBottom('lastmessage失败'+err.message);
+                            });*/
                         });
-                    },
-                    function(db) {
-                        window.plugins.toast.showShortBottom('打开数据库失败');
+                    },function(db) {
+                        window.plugins.toast.showLongBottom('打开数据库失败');
                     });
                 $scope.$apply(function() {
                     //TODO 为什么没有跳转？超级用户无效....
@@ -316,7 +346,7 @@ angular.module('penpen.controllers', [])
     $scope.messageDetails = function(user) {
         //TODO 更新lastMessage表的lastTime
         $state.go("messageDetail", {
-            "messageId": 7
+            "user": user
         });
     };
 }])
