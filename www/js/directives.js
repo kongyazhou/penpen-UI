@@ -34,7 +34,7 @@ angular.module('penpen.directives', [])
             }
         };
     }])
-    .directive('resizeFootBar', ['$ionicScrollDelegate', function($ionicScrollDelegate){
+    .directive('resizeFootBar', ['$ionicScrollDelegate', function($ionicScrollDelegate) {
         // Runs during compile
         return {
             replace: false,
@@ -55,14 +55,14 @@ angular.module('penpen.directives', [])
             }
         };
     }])
-    .directive('rjPositionMiddle', ['$window', function($window){
-        return{
+    .directive('rjPositionMiddle', ['$window', function($window) {
+        return {
             replace: false,
-            link: function(scope, iElm, iAttrs, controller){
+            link: function(scope, iElm, iAttrs, controller) {
                 var height = $window.innerHeight - 44 - 49 - iElm[0].offsetHeight;
                 if (height >= 0) {
                     iElm[0].style.top = (height / 2 + 44) + 'px';
-                }else{
+                } else {
                     iElm[0].style.top = 44 + 'px';
                 }
             }

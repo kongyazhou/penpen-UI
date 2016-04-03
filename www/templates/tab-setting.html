@@ -7,9 +7,9 @@
 
         	<ion-item class="item-divider">个人资料</ion-item>
             <ion-item class="item-thumbnail-left item-icon-right" ui-sref="userDetail">
-                <img>
-                <h2>姓名</h2>
-                <p>部门</p>
+                <img ng-src="{{contact.icon}}">
+                <h2 ng-bind="contact.name"></h2>
+                <p ng-bind="contact.job"></p>
                 <i class="icon ion-ios-arrow-right"></i>
             </ion-item>
 

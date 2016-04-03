@@ -16,28 +16,28 @@ angular.module('penpen.services', [])
 })
 
 .factory('localStorageService', [function() {
-        return {
-            get: function localStorageServiceGet(key, defaultValue) {
-                var stored = localStorage.getItem(key);
-                try {
-                    stored = angular.fromJson(stored);
-                } catch (error) {
-                    stored = null;
-                }
-                if (defaultValue && stored === null) {
-                    stored = defaultValue;
-                }
-                return stored;
-            },
-            update: function localStorageServiceUpdate(key, value) {
-                if (value) {
-                    localStorage.setItem(key, angular.toJson(value));
-                }
-            },
-            clear: function localStorageServiceClear(key) {
-                localStorage.removeItem(key);
+    return {
+        get: function localStorageServiceGet(key, defaultValue) {
+            var stored = localStorage.getItem(key);
+            try {
+                stored = angular.fromJson(stored);
+            } catch (error) {
+                stored = null;
             }
-        };
+            if (defaultValue && stored === null) {
+                stored = defaultValue;
+            }
+            return stored;
+        },
+        update: function localStorageServiceUpdate(key, value) {
+            if (value) {
+                localStorage.setItem(key, angular.toJson(value));
+            }
+        },
+        clear: function localStorageServiceClear(key) {
+            localStorage.removeItem(key);
+        }
+    };
 }])
 
 .factory('dateService', [function() {
@@ -54,7 +54,7 @@ angular.module('penpen.services', [])
                 length = messages.length;
                 for (i = 0; i < length; i++) {
                     messageDate = this.getMessageDate(messages[i]);
-                    if(!messageDate){
+                    if (!messageDate) {
                         return null;
                     }
                     if (nowDate.year - messageDate.year > 0) {
@@ -131,149 +131,152 @@ angular.module('penpen.services', [])
     };
 }])
 
-.factory('messageService', ['localStorageService', 'dateService',function(localStorageService, dateService) {
-        return {
-            //TODO
-            message:{},
-            messageNum:0,
-            messageDetails:[],
+.factory('messageService', ['localStorageService', 'dateService', function(localStorageService, dateService) {
+    return {
+        //TODO
+        message: {},
+        messageNum: 0,
+        messageDetails: [],
 
-            init: function(messages) {
-                var i = 0;
-                var length = 0;
-                var messageID = new Array();
-                var date = null;
-                var messageDate = null;
-                if (messages) {
-                    length = messages.length;
-                    for (; i < length; i++) {
-                        messageDate = dateService.getMessageDate(messages[i]);
-                        if(!messageDate){
-                            return null;
-                        }
-                        date = new Date(messageDate.year, messageDate.month,
-                            messageDate.day, messageDate.hour, messageDate.minute,
-                            messageDate.second);
-                        messages[i].lastMessage.timeFrome1970 = date.getTime();
-                        messageID[i] = {
-                            id: messages[i].id
-                        };
+        init: function(messages) {
+            var i = 0;
+            var length = 0;
+            var messageID = new Array();
+            var date = null;
+            var messageDate = null;
+            if (messages) {
+                length = messages.length;
+                for (; i < length; i++) {
+                    messageDate = dateService.getMessageDate(messages[i]);
+                    if (!messageDate) {
+                        return null;
+                    }
+                    date = new Date(messageDate.year, messageDate.month,
+                        messageDate.day, messageDate.hour, messageDate.minute,
+                        messageDate.second);
+                    messages[i].lastMessage.timeFrome1970 = date.getTime();
+                    messageID[i] = {
+                        id: messages[i].id
+                    };
 
-                    }
-                    localStorageService.update("messageID", messageID);
-                    for (i = 0; i < length; i++) {
-                        localStorageService.update("message_" + messages[i].id, messages[i]);
-                    }
                 }
-            },
-            getAllMessages: function() {
-                var messages = new Array();
-                var i = 0;
-                var messageID = localStorageService.get("messageID");
-                var length = 0;
-                var message = null;
-                if (messageID) {
-                    length = messageID.length;
-
-                    for (; i < length; i++) {
-                        message = localStorageService.get("message_" + messageID[i].id);
-                        if(message){
-                            messages.push(message);
-                        }
-                    }
-                    dateService.handleMessageDate(messages);
-                    return messages;
+                localStorageService.update("messageID", messageID);
+                for (i = 0; i < length; i++) {
+                    localStorageService.update("message_" + messages[i].id, messages[i]);
                 }
-                return null;
-
-            },
-            getMessageById: function(id){
-                return localStorageService.get("message_" + id);
-            },
-            getAmountMessageById: function(num, id){
-                var messages = [];
-                var message = localStorageService.get("message_" + id).message;
-                var length = 0;
-                if(num < 0 || !message) return;
-                length = message.length;
-                if(num < length){
-                    messages = message.splice(length - num, length); 
-                    return messages;  
-                }else{
-                    return message;
-                }
-            },
-            updateMessage: function(message) {
-                var id = 0;
-                if (message) {
-                    id = message.id;
-                    localStorageService.update("message_" + id, message);
-                }
-            },
-            deleteMessageId: function(id){
-                var messageId = localStorageService.get("messageID");
-                var length = 0;
-                var i = 0;
-                if(!messageId){
-                    return null;
-                }
-                length = messageId.length;
-                for(; i < length; i++){
-                    if(messageId[i].id === id){
-                        messageId.splice(i, 1);
-                        break;
-                    }
-                }
-                localStorageService.update("messageID", messageId);
-            },
-            clearMessage: function(message) {
-                var id = 0;
-                if (message) {
-                    id = message.id;
-                    localStorageService.clear("message_" + id);
-                }
-            },
-            sendMessage: function(msg) {
-                var obj={"isFromMe": true,"content": msg,"time": "2015-11-22 08:51:02"};
-                this.messageDetails.push(obj);                
             }
-        };
+        },
+        getAllMessages: function() {
+            var messages = new Array();
+            var i = 0;
+            var messageID = localStorageService.get("messageID");
+            var length = 0;
+            var message = null;
+            if (messageID) {
+                length = messageID.length;
+
+                for (; i < length; i++) {
+                    message = localStorageService.get("message_" + messageID[i].id);
+                    if (message) {
+                        messages.push(message);
+                    }
+                }
+                dateService.handleMessageDate(messages);
+                return messages;
+            }
+            return null;
+
+        },
+        getMessageById: function(id) {
+            return localStorageService.get("message_" + id);
+        },
+        getAmountMessageById: function(num, id) {
+            var messages = [];
+            var message = localStorageService.get("message_" + id).message;
+            var length = 0;
+            if (num < 0 || !message) return;
+            length = message.length;
+            if (num < length) {
+                messages = message.splice(length - num, length);
+                return messages;
+            } else {
+                return message;
+            }
+        },
+        updateMessage: function(message) {
+            var id = 0;
+            if (message) {
+                id = message.id;
+                localStorageService.update("message_" + id, message);
+            }
+        },
+        deleteMessageId: function(id) {
+            var messageId = localStorageService.get("messageID");
+            var length = 0;
+            var i = 0;
+            if (!messageId) {
+                return null;
+            }
+            length = messageId.length;
+            for (; i < length; i++) {
+                if (messageId[i].id === id) {
+                    messageId.splice(i, 1);
+                    break;
+                }
+            }
+            localStorageService.update("messageID", messageId);
+        },
+        clearMessage: function(message) {
+            var id = 0;
+            if (message) {
+                id = message.id;
+                localStorageService.clear("message_" + id);
+            }
+        },
+        sendMessage: function(msg) {
+            var obj = {
+                "isFromMe": true,
+                "content": msg,
+                "time": "2015-11-22 08:51:02"
+            };
+            this.messageDetails.push(obj);
+        }
+    };
 }])
 
-.service('wsService',['loginService',function(loginService) {
+.service('wsService', ['loginService', function(loginService) {
     var callbacks = {};
     var currentCallbackId = 0;
     //初始化ws对象
     this.ws = {};
 
-    this.ws.onopen = function(){
+    this.ws.onopen = function() {
         //各controller自己复写该方法以实现功能
-    };    
+    };
 
-    this.ws.onclose = function () {
+    this.ws.onclose = function() {
         //各controller自己复写该方法以实现功能
-        // window.plugins.toast.showShortBottom('连接关闭', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
     };
 
     this.ws.onmessage = function(message) {
         //各controller自己复写该方法以实现功能
-        window.plugins.toast.showLongBottom('收到：'+message.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        window.plugins.toast.showLongBottom('收到：' + message.data);
     };
 
-    this.sendMessage = function(msg){
+    this.sendMessage = function(msg) {
         //各controller自己复写该方法以实现功能
-        this.ws.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
+        this.ws.send('{"head":1110,"body":"' + Base64.encode(msg) + '","tail":"PENPEN 1.0"}');
         //ws.send(msg);
     };
 }])
 
-.service('loginService',[function() {
-    var user ="";
-    var password="";
-    var login=false;
+.service('loginService', ['contactService', function(contactService) {
+    var user = "";
+    var password = "";
+    var login = false;
 
     this.setUser = function(arg) {
-        user=arg;
+        user = arg;
     };
     this.getUser = function() {
         //可以考虑添加个上次登陆时间
@@ -281,92 +284,96 @@ angular.module('penpen.services', [])
             return user;
         } else {
             return '0';
-        } 
+        }
+    };
+    this.getUserContact = function() {
+        //可以考虑添加个上次登陆时间
+        if (login) {
+            return contactService.getContact(user);
+        } else {
+            return '0';
+        }
     };
     this.setPassword = function(arg) {
-        password=hex_md5(arg);
+        password = hex_md5(arg);
     };
     this.getLoginMsg = function(arg) {
-        var msg='{"user":"'+user+'","password":"'+password+'"}';
+        var msg = '{"user":"' + user + '","password":"' + password + '"}';
         return msg;
     };
     this.logined = function() {
-        login=true;
+        login = true;
         ws = new WebSocket('ws://223.202.124.144:33888/');
-        ws.onopen = function(){
-            user=loginService.getUser();
-            msg='{"user":"'+user+'","state":1}';
-            this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
-        };      
+        ws.onopen = function() {
+            user = loginService.getUser();
+            msg = '{"user":"' + user + '","state":1}';
+            this.send('{"head":1110,"body":"' + Base64.encode(msg) + '","tail":"PENPEN 1.0"}');
+        };
     };
     this.isLogged = function() {
         return login;
     };
 }])
 
-.service('parser',[function() {
+.service('parser', [function() {
     /*
     本服务将消息包body部分解码
     并转换成对象返回
     */
     //TODO* 判断编码方式，检查协议版本
-    this.parseMsg=function (msg) {
-        var msgObj=eval('('+msg+')');
-        var msgBodyUncoded=eval('('+Base64.decode(msgObj.body)+')');
+    this.parseMsg = function(msg) {
+        var msgObj = eval('(' + msg + ')');
+        var msgBodyUncoded = eval('(' + Base64.decode(msgObj.body) + ')');
         return msgBodyUncoded;
     };
-    this.parseCotent=function (content) {
+    this.parseCotent = function(content) {
         return Base64.decode(content);
     };
 }])
 
-.service('activeState',['loginService',function(loginService) {
+.service('activeState', ['loginService', function(loginService) {
     /*
     本服务将消息包body部分解码
     并转换成对象返回
     */
     //TODO* 判断编码方式，检查协议版本
 
-    document.addEventListener('resume', function () {
+    document.addEventListener('resume', function() {
         ws = new WebSocket('ws://223.202.124.144:33888/');
 
-        ws.onopen = function(){
-            user=loginService.getUser();
-            msg='{"user":"'+user+'","state":1}';
-            this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
-        };    
-
-        ws.onclose = function () {
+        ws.onopen = function() {
+            user = loginService.getUser();
+            msg = '{"user":"' + user + '","state":1}';
+            this.send('{"head":1110,"body":"' + Base64.encode(msg) + '","tail":"PENPEN 1.0"}');
         };
 
-        ws.onmessage = function(message) {
-        };
+        ws.onclose = function() {};
+
+        ws.onmessage = function(message) {};
     });
-    document.addEventListener('pause', function () {
+    document.addEventListener('pause', function() {
         ws = new WebSocket('ws://223.202.124.144:33888/');
 
-        ws.onopen = function(){
-            user=loginService.getUser();
-            msg='{"user":"'+user+'","state":2}';
-            this.send('{"head":1110,"body":"'+Base64.encode(msg)+'","tail":"PENPEN 1.0"}');
-        };    
-
-        ws.onclose = function () {
+        ws.onopen = function() {
+            user = loginService.getUser();
+            msg = '{"user":"' + user + '","state":2}';
+            this.send('{"head":1110,"body":"' + Base64.encode(msg) + '","tail":"PENPEN 1.0"}');
         };
 
-        ws.onmessage = function(message) {
-        };
+        ws.onclose = function() {};
+
+        ws.onmessage = function(message) {};
     });
 }])
 
-.service('mp3Service',[function() {
-    var mp3Message = new Media("/android_asset/www/mp3/message.mp3",function() {
+.service('mp3Service', [function() {
+    var mp3Message = new Media("/android_asset/www/mp3/message.mp3", function() {
             // window.plugins.toast.showShortBottom('打开音乐成功');
         },
         function(err) {
             // window.plugins.toast.showShortBottom('打开音乐失败');
         });
-    this.playMessage = function(){
+    this.playMessage = function() {
         mp3Message.play();
     };
     /*    this.playLogin = function(){
@@ -384,146 +391,133 @@ angular.module('penpen.services', [])
     };*/
 }])
 
-.service('contactService',['$timeout',function($timeout) {
+.service('contactService', ['$timeout', function($timeout) {
     var groups = [{
-        "show":true,
-        "department":"总经理",
-        "contacts": [
-        {
+        "show": true,
+        "department": "总经理",
+        "contacts": [{
             "user": "12345678900",
             "name": "郑总",
             "icon": "img/0.jpg",
-            "job" : "总经理"
+            "job": "总经理"
         }]
-    },
-    {
-        "show":true,
-        "department":"技术部",
-        "contacts": [
-        {
+    }, {
+        "show": true,
+        "department": "技术部",
+        "contacts": [{
             "user": "12345678901",
             "name": "李明",
             "icon": "img/1.jpg",
-            "job" : "部长"
-        },
-        {
+            "job": "部长"
+        }, {
             "user": "12345678902",
             "name": "刘翔",
             "icon": "img/2.jpg",
-            "job" : "软件工程师"
-        },
-        {
+            "job": "软件工程师"
+        }, {
             "user": "12345678903",
             "name": "张涛",
             "icon": "img/3.jpg",
-            "job" : "硬件工程师"
-        },
-        {
+            "job": "硬件工程师"
+        }, {
             "user": "12345678904",
             "name": "顾城",
             "icon": "img/4.jpg",
-            "job" : "机械工程师"
+            "job": "机械工程师"
         }]
-    },
-    {
-        "show":true,
-        "department":"市场部",
-        "contacts": [
-        {
+    }, {
+        "show": true,
+        "department": "市场部",
+        "contacts": [{
             "user": "12345678905",
             "name": "朱薇",
             "icon": "img/5.jpg",
-            "job" : "部长"
-        },
-        {
+            "job": "部长"
+        }, {
             "user": "12345678906",
             "name": "郭思琪",
             "icon": "img/6.jpg",
-            "job" : "销售经理"
-        },
-        {
+            "job": "销售经理"
+        }, {
             "user": "12345678907",
             "name": "沈紫",
             "icon": "img/7.jpg",
-            "job" : "销售经理"
+            "job": "销售经理"
         }]
-    },
-    {
-        "show":true,
-        "department":"财务部",
-        "contacts": [
-        {
+    }, {
+        "show": true,
+        "department": "财务部",
+        "contacts": [{
             "user": "12345678908",
             "name": "汪美琴",
             "icon": "img/8.jpg",
-            "job" : "部长"
-        },
-        {
+            "job": "部长"
+        }, {
             "user": "12345678909",
             "name": "刘斌",
             "icon": "img/9.jpg",
-            "job" : "副部长"
+            "job": "副部长"
         }]
     }];
     var contacts = [{
-            "user": "12345678900",
-            "name": "郑总",
-            "icon": "img/0.jpg",
-            "job" : "总经理"
-        },{
-            "user": "12345678901",
-            "name": "李明",
-            "icon": "img/1.jpg",
-            "job" : "部长"
-        },{
-            "user": "12345678902",
-            "name": "刘翔",
-            "icon": "img/2.jpg",
-            "job" : "软件工程师"
-        },{
-            "user": "12345678903",
-            "name": "张涛",
-            "icon": "img/3.jpg",
-            "job" : "硬件工程师"
-        },{
-            "user": "12345678904",
-            "name": "顾城",
-            "icon": "img/4.jpg",
-            "job" : "机械工程师"
-        },{
-            "user": "12345678905",
-            "name": "朱薇",
-            "icon": "img/5.jpg",
-            "job" : "部长"
-        },{
-            "user": "12345678906",
-            "name": "郭思琪",
-            "icon": "img/6.jpg",
-            "job" : "销售经理"
-        },{
-            "user": "12345678907",
-            "name": "沈紫",
-            "icon": "img/7.jpg",
-            "job" : "销售经理"
-        },{
-            "user": "12345678908",
-            "name": "汪美琴",
-            "icon": "img/8.jpg",
-            "job" : "部长"
-        },{
-            "user": "12345678909",
-            "name": "刘斌",
-            "icon": "img/9.jpg",
-            "job" : "副部长"
-        }];
-    this.getGroups = function () {
+        "user": "12345678900",
+        "name": "郑总",
+        "icon": "img/0.jpg",
+        "job": "总经理"
+    }, {
+        "user": "12345678901",
+        "name": "李明",
+        "icon": "img/1.jpg",
+        "job": "部长"
+    }, {
+        "user": "12345678902",
+        "name": "刘翔",
+        "icon": "img/2.jpg",
+        "job": "软件工程师"
+    }, {
+        "user": "12345678903",
+        "name": "张涛",
+        "icon": "img/3.jpg",
+        "job": "硬件工程师"
+    }, {
+        "user": "12345678904",
+        "name": "顾城",
+        "icon": "img/4.jpg",
+        "job": "机械工程师"
+    }, {
+        "user": "12345678905",
+        "name": "朱薇",
+        "icon": "img/5.jpg",
+        "job": "部长"
+    }, {
+        "user": "12345678906",
+        "name": "郭思琪",
+        "icon": "img/6.jpg",
+        "job": "销售经理"
+    }, {
+        "user": "12345678907",
+        "name": "沈紫",
+        "icon": "img/7.jpg",
+        "job": "销售经理"
+    }, {
+        "user": "12345678908",
+        "name": "汪美琴",
+        "icon": "img/8.jpg",
+        "job": "部长"
+    }, {
+        "user": "12345678909",
+        "name": "刘斌",
+        "icon": "img/9.jpg",
+        "job": "副部长"
+    }];
+    this.getGroups = function() {
         return groups;
     };
-    this.getContact = function (user) {
+    this.getContact = function(user) {
         for (contact in contacts) {
-            if (contact.user==user) {
-                return contact
-            }    
+            if (contact.user == user) {
+                return contact;
+            }
         }
     };
 }])

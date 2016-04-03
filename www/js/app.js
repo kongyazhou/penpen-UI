@@ -13,7 +13,7 @@ angular.module('penpen', ['ionic', 'penpen.controllers', 'penpen.routes',
 
 }])
 
-.config(function($ionicNativeTransitionsProvider){
+.config(function($ionicNativeTransitionsProvider) {
     $ionicNativeTransitionsProvider.setDefaultOptions({
         duration: 400, // in milliseconds (ms), default 400,
         slowdownfactor: 4, // overlap views (higher number is more) or no overlap (1), default 4
@@ -34,6 +34,7 @@ angular.module('penpen', ['ionic', 'penpen.controllers', 'penpen.routes',
         direction: 'right'
     });
 })
+
 .run(function($ionicPlatform, $http, messageService, dateService) {
 
     var url = "";
@@ -43,14 +44,14 @@ angular.module('penpen', ['ionic', 'penpen.controllers', 'penpen.routes',
 
     // if (localStorage.getItem("messageID") === null) {
 
-        $http.get(url + "data/json/messages.json").then(function(response) {
-            // localStorageService.update("messages", response.data.messages);
-            messageService.init(response.data.messages);
+    $http.get(url + "data/json/messages.json").then(function(response) {
+        // localStorageService.update("messages", response.data.messages);
+        messageService.init(response.data.messages);
 
-        });
-        $http.get(url + "data/json/friends.json").then(function(response){
-            console.log(response.data.results);
-        });
+    });
+    $http.get(url + "data/json/friends.json").then(function(response) {
+        console.log(response.data.results);
+    });
     // }
     $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
