@@ -101,6 +101,7 @@ angular.module('penpen.controllers', [])
         wsService.sendMessage(loginService.getLoginMsg());
     }
     //这是收到消息的函数
+    //TODO 收到消息的提示音
     //Override ws.onmessage
     wsService.ws.onmessage=function(evt) {
         // window.plugins.toast.showShortBottom('controller!：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
@@ -160,14 +161,17 @@ angular.module('penpen.controllers', [])
     */
     $scope.logining=false;
     $scope.login = function (user,password) {
+        //TODO 网络异常，无法建立连接时的处理
+        $scope.logining=true;
         if (user=="15669910253") {
-            window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            window.plugins.jPushPlugin.setAlias("penpen"+user);            
             $scope.$apply(function() {
-                //为什么没有跳转？超级用户无效....
+                //TODO 为什么没有跳转？超级用户无效....
+                $scope.logining=false;
                 $location.path('/tab/message');
             });
-        } else {
-            $scope.logining=true;
+            window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        } else {            
             loginService.setUser(user);
             loginService.setPassword(password);
 
@@ -197,9 +201,11 @@ angular.module('penpen.controllers', [])
                 }
                 else if (result.state==12) {
                     window.plugins.toast.showLongBottom('登录失败', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    wsService.ws.close();
                     $scope.$apply(function() {$scope.logining=false;});
                 }else{
                     window.plugins.toast.showLongBottom('登录异常', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    wsService.ws.close();
                     $scope.$apply(function() {$scope.logining=false;});
                 }
             }
