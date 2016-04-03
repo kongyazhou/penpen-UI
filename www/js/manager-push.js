@@ -1,12 +1,12 @@
 document.addEventListener('deviceready', function () {
-  //navigator.splashscreen.show();
-  window.plugins.jPushPlugin.init();
+    //navigator.splashscreen.show();
+    window.plugins.jPushPlugin.init();
 });
 
 document.addEventListener('resume', function () {
-  JPushInterface.onResume(this);
+    window.plugins.jPushPlugin.resumePush();
 });
 
 document.addEventListener('pause', function () {
-  JPushInterface.onPause(this);
+    // JPushInterface.onPause(this);
 });

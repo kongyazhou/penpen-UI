@@ -1,7 +1,6 @@
 document.addEventListener('deviceready', function () {
-  window.plugins.toast.showLongBottom('deviceready');
+    window.plugins.toast.showLongBottom('deviceready');
 });
 document.addEventListener('resume', function () {
-  window.plugins.toast.showLongBottom('resume');
-
+    window.plugins.toast.showLongBottom('resume');
 });

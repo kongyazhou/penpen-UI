@@ -58,6 +58,8 @@ angular.module('penpen.controllers', [])
         });
     };
     $scope.$on("$ionicView.beforeEnter", function(){
+        //TODO 从服务器同步离线未读消息存入sqlite
+        //TODO 从lastMessage表读取消息
         // console.log($scope.messages);
         $scope.messages = messageService.getAllMessages();
         $scope.popup = {
@@ -81,19 +83,24 @@ angular.module('penpen.controllers', [])
     $scope.addLocalMsg=function(msg) {
         messageService.sendMessage(msg);
         mp3Service.playMessage();
+        //TODO 更新lastMessage表的lastMessage和lastTime
+        //TODO 将message插入联系人的allMessage表
     };
     $scope.del=function(idx){
         messageService.messageDetails.splice(idx,1);
     };
     $scope.$on("$ionicView.beforeEnter", function() {
-        messageService.message = messageService.getMessageById($stateParams.messageId);
-        messageService.message.noReadMessages = 0;
+        // messageService.message = messageService.getMessageById($stateParams.messageId);
+        // messageService.message.noReadMessages = 0;
+        // messageService.message.showHints = false;
+        // messageService.updateMessage(messageService.message);
+        // messageService.messageNum = 10;
+        // messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum,$stateParams.messageId);
+        // $scope.messageDetails=messageService.messageDetails;
+        // $scope.message=messageService.message;
+        messageService.message = messageService.getMessageByUser($stateParams.User);
+        //TODO 设置所有消息unread为0 unreadNo为0
         messageService.message.showHints = false;
-        messageService.updateMessage(messageService.message);
-        messageService.messageNum = 10;
-        messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum,$stateParams.messageId);
-        $scope.messageDetails=messageService.messageDetails;
-        $scope.message=messageService.message;
         $timeout(function() {
             viewScroll.scrollBottom(true);
         }, 0);
@@ -111,7 +118,8 @@ angular.module('penpen.controllers', [])
         if (true) {}
         // window.plugins.toast.showShortBottom('msg：'+msg);
         window.plugins.toast.showLongBottom('content：'+msg.content);
-        
+        //TODO 更新lastMessage表的lastMessage和lastTime
+        //TODO 将message插入联系人的allMessage表
         //将消息添加到聊天界面
         $scope.$apply(function() {
             var obj={"isFromMe": false,"content": parser.parseCotent(msg.content),"time": "2015-11-22 08:51:02"};
@@ -152,8 +160,8 @@ angular.module('penpen.controllers', [])
     });
 }])
 
-.controller('loginCtrl', ['$scope','$location', '$state', 'loginService', 'parser', 'wsService',
- function($scope, $location, $state, loginService, parser, wsService) {
+.controller('loginCtrl', ['$scope','$location', '$state', 'loginService', 'parser', 'wsService', 'contactService',
+ function($scope, $location, $state, loginService, parser, wsService, contactService) {
     /*
     输入用户名密码后，点击按钮发送登陆消息包
     等待返回结果，同时登录按钮disabled
@@ -256,86 +264,7 @@ angular.module('penpen.controllers', [])
     /*$scope.contacts_right_bar_swipe = function(e){
         console.log(e);
     };*/
-    $scope.groups = [{
-        "show":true,
-        "department":"总经理",
-        "contacts": [
-        {
-            "user": "12345678900",
-            "name": "郑总",
-            "icon": "img/0.jpg",
-            "job" : "总经理"
-        }]
-    },
-    {
-        "show":true,
-        "department":"技术部",
-        "contacts": [
-        {
-            "user": "12345678901",
-            "name": "李明",
-            "icon": "img/1.jpg",
-            "job" : "部长"
-        },
-        {
-            "user": "12345678902",
-            "name": "刘翔",
-            "icon": "img/2.jpg",
-            "job" : "软件工程师"
-        },
-        {
-            "user": "12345678903",
-            "name": "张涛",
-            "icon": "img/3.jpg",
-            "job" : "硬件工程师"
-        },
-        {
-            "user": "12345678904",
-            "name": "顾城",
-            "icon": "img/4.jpg",
-            "job" : "机械工程师"
-        }]
-    },
-    {
-        "show":true,
-        "department":"市场部",
-        "contacts": [
-        {
-            "user": "12345678905",
-            "name": "朱薇",
-            "icon": "img/5.jpg",
-            "job" : "部长"
-        },
-        {
-            "user": "12345678906",
-            "name": "郭思琪",
-            "icon": "img/6.jpg",
-            "job" : "销售经理"
-        },
-        {
-            "user": "12345678907",
-            "name": "沈紫",
-            "icon": "img/7.jpg",
-            "job" : "销售经理"
-        }]
-    },
-    {
-        "show":true,
-        "department":"财务部",
-        "contacts": [
-        {
-            "user": "12345678908",
-            "name": "汪美琴",
-            "icon": "img/8.jpg",
-            "job" : "部长"
-        },
-        {
-            "user": "12345678909",
-            "name": "刘斌",
-            "icon": "img/9.jpg",
-            "job" : "副部长"
-        }]
-    }];
+
     $scope.personDetail = function(contact) {
         $state.go("personDetail", {
             "name": contact.name,
@@ -344,6 +273,7 @@ angular.module('penpen.controllers', [])
             "job" : contact.job
         });
     };  
+    $scope.groups=contactsService.getGroups();
     /*
     * if given group is the selected group, deselect it
     * else, select the given group
@@ -362,6 +292,7 @@ angular.module('penpen.controllers', [])
     };
     $scope.contact = $stateParams;
     $scope.messageDetails = function(user) {
+        //TODO 更新lastMessage表的lastTime
         $state.go("messageDetail", {
             "messageId": 7
         });
