@@ -360,3 +360,28 @@ angular.module('penpen.services', [])
         };
     });
 }])
+
+.service('mp3Service',['$timeout',function($timeout) {
+    var mp3Message = new Media("/android_asset/www/mp3/message.mp3",function() {
+            // window.plugins.toast.showShortBottom('打开音乐成功');
+        },
+        function(err) {
+            // window.plugins.toast.showShortBottom('打开音乐失败');
+        });
+    this.playMessage = function(){
+        mp3Message.play();
+    };
+/*    this.playLogin = function(){
+        var mp3Login = new Media("/android_asset/www/mp3/samsung.mp3",function() {
+            mp3Login.play();
+            $timeout(function() {
+            mp3Login.release();
+        }, 5000);
+        },
+        function(err) {
+            mp3Message.play();
+        });
+
+
+    };*/
+}])

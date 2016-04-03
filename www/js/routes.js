@@ -20,7 +20,7 @@ angular.module('penpen.routes', [])
             controller: "messageDetailCtrl"
         })
         .state('personDetail', {
-            url: '/personDetail',
+            url: '/personDetail/:name:user:icon:job',
             templateUrl: "templates/detail-person.html",
             controller: "personDetailCtrl"
         })

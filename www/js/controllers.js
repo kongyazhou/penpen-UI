@@ -68,8 +68,8 @@ angular.module('penpen.controllers', [])
 }])
 
 .controller('messageDetailCtrl', ['$scope', '$state','$stateParams',
- 'messageService', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService','loginService',
- function($scope,$state, $stateParams, messageService, $ionicScrollDelegate, $timeout, parser, wsService,loginService) {
+ 'messageService', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService','loginService','mp3Service',
+ function($scope,$state, $stateParams, messageService, $ionicScrollDelegate, $timeout, parser, wsService,loginService,mp3Service) {
     var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
     $scope.doRefresh = function() {
         messageService.messageNum += 5;
@@ -80,6 +80,7 @@ angular.module('penpen.controllers', [])
     };
     $scope.addLocalMsg=function(msg) {
         messageService.sendMessage(msg);
+        mp3Service.playMessage();
     };
     $scope.del=function(idx){
         messageService.messageDetails.splice(idx,1);
@@ -104,17 +105,18 @@ angular.module('penpen.controllers', [])
     //TODO 收到消息的提示音
     //Override ws.onmessage
     wsService.ws.onmessage=function(evt) {
-        // window.plugins.toast.showShortBottom('controller!：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        // window.plugins.toast.showShortBottom('controller!：'+evt.data);
         var msg=parser.parseMsg(evt.data);
         //TODO 判断消息是否属于本聊天
         if (true) {}
-        // window.plugins.toast.showShortBottom('msg：'+msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-        window.plugins.toast.showLongBottom('content：'+msg.content, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+        // window.plugins.toast.showShortBottom('msg：'+msg);
+        window.plugins.toast.showLongBottom('content：'+msg.content);
         
         //将消息添加到聊天界面
         $scope.$apply(function() {
             var obj={"isFromMe": false,"content": parser.parseCotent(msg.content),"time": "2015-11-22 08:51:02"};
             $scope.messageDetails.push(obj);
+            mp3Service.playMessage();
             $timeout(function() {
                 viewScroll.scrollBottom(true);
             }, 0);
@@ -137,11 +139,11 @@ angular.module('penpen.controllers', [])
             wsMsg.onclose = function(evt) {
             }
             wsMsg.onmessage = function(evt) {
-                window.plugins.toast.showLongBottom('收到信息：'+evt.data+'\n'+Base64.decode(evt.data), function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                window.plugins.toast.showLongBottom('收到信息：'+evt.data+'\n'+Base64.decode(evt.data));
             }
         }
         else {
-            window.plugins.toast.showLongBottom('Your browser does not support WebSockets.', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+            window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
         }
     };
 
@@ -179,9 +181,8 @@ angular.module('penpen.controllers', [])
                     });
                 },function(db) {
                     window.plugins.toast.showShortBottom('打开数据库失败');
-                }
-            );
-            // window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                });
+            // window.plugins.toast.showShortBottom('登录成功');
         }else if(user=="12345678910"){
             var db = window.sqlitePlugin.openDatabase({name: 'penpen.msg', iosDatabaseLocation: 'default'},
                 function(db) {                
@@ -195,15 +196,13 @@ angular.module('penpen.controllers', [])
                     });
                 },function(db) {
                     window.plugins.toast.showShortBottom('打开数据库失败');
-                }
-            );
+                });
             $scope.$apply(function() {
                 //TODO 为什么没有跳转？超级用户无效....
                 $scope.logining=false;
                 // $location.path('/tab/message');
             });
-        }
-         else {            
+        }else {            
             loginService.setUser(user);
             loginService.setPassword(password);
 
@@ -211,20 +210,21 @@ angular.module('penpen.controllers', [])
 
             wsService.ws.onopen = function() {
                 wsService.sendMessage(loginService.getLoginMsg());
-            }
+            };
             wsService.ws.onclose = function(evt) {
 
-            }
+            };
             wsService.ws.onmessage = function(evt) {
-                // window.plugins.toast.showShortBottom('收到：'+evt.data, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                // window.plugins.toast.showShortBottom('收到：'+evt.data);
                 var result=parser.parseMsg(evt.data);
-                window.plugins.toast.showShortBottom('state：'+result.state, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                // window.plugins.toast.showShortBottom('state：'+result.state);
                 if (result.state==11) {
                     //登录成功
-                    window.plugins.toast.showShortBottom('登录成功', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    window.plugins.toast.showShortBottom('登录成功');
                     
                     window.plugins.jPushPlugin.setAlias("penpen"+user);
                     loginService.logined();
+                    // mp3Service.playLogin();
                     $scope.$apply(function() {
                         $scope.logining=false;
                         $location.path('/tab/message');
@@ -232,18 +232,18 @@ angular.module('penpen.controllers', [])
 
                 }
                 else if (result.state==12) {
-                    window.plugins.toast.showLongBottom('登录失败', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    window.plugins.toast.showLongBottom('登录失败');
                     wsService.ws.close();
                     $scope.$apply(function() {$scope.logining=false;});
                 }else{
-                    window.plugins.toast.showLongBottom('登录异常', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    window.plugins.toast.showLongBottom('登录异常');
                     wsService.ws.close();
                     $scope.$apply(function() {$scope.logining=false;});
                 }
-            }
+            };
         }
 
-    }
+    };
 }])
 
 .controller('friendsCtrl', function($scope, $state) {
@@ -253,10 +253,11 @@ angular.module('penpen.controllers', [])
     $scope.onSwipeRight = function() {
         $state.go("tab.message");
     };
-/*    $scope.contacts_right_bar_swipe = function(e){
+    /*$scope.contacts_right_bar_swipe = function(e){
         console.log(e);
     };*/
     $scope.groups = [{
+        "show":true,
         "department":"总经理",
         "contacts": [
         {
@@ -267,6 +268,7 @@ angular.module('penpen.controllers', [])
         }]
     },
     {
+        "show":true,
         "department":"技术部",
         "contacts": [
         {
@@ -295,6 +297,7 @@ angular.module('penpen.controllers', [])
         }]
     },
     {
+        "show":true,
         "department":"市场部",
         "contacts": [
         {
@@ -317,6 +320,7 @@ angular.module('penpen.controllers', [])
         }]
     },
     {
+        "show":true,
         "department":"财务部",
         "contacts": [
         {
@@ -332,7 +336,14 @@ angular.module('penpen.controllers', [])
             "job" : "副部长"
         }]
     }];
-      
+    $scope.personDetail = function(contact) {
+        $state.go("personDetail", {
+            "name": contact.name,
+            "user": contact.user,
+            "icon": contact.icon,
+            "job" : contact.job
+        });
+    };  
     /*
     * if given group is the selected group, deselect it
     * else, select the given group
@@ -344,6 +355,18 @@ angular.module('penpen.controllers', [])
         return group.show;
     };
 })
+
+.controller('personDetailCtrl', ['$scope', '$state', '$stateParams',function($scope, $state, $stateParams) {
+    $scope.onSwipeRight = function() {
+        $state.go("tab.friends");
+    };
+    $scope.contact = $stateParams;
+    $scope.messageDetails = function(user) {
+        $state.go("messageDetail", {
+            "messageId": 7
+        });
+    };
+}])
 
 .controller('broadcastCtrl', function($scope, $state) {
     $scope.onSwipeLeft = function() {
@@ -364,12 +387,6 @@ angular.module('penpen.controllers', [])
 .controller('aboutCtrl', function($scope, $state) {
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
-    };
-})
-
-.controller('personDetailCtrl', function($scope, $state) {
-    $scope.onSwipeRight = function() {
-        $state.go("tab.friends");
     };
 })
 

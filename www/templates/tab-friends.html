@@ -15,7 +15,7 @@
           <ion-item class="item-avatar"
                     ng-repeat="contact in group.contacts"
                     ng-show="isGroupShown(group)"
-                    ui-sref="personDetail">
+                    ng-click="personDetail(contact)">
                     <img ng-src="{{contact.icon}}">
                     <h2 ng-bind="contact.name"></h2>
                     <span class="badge badge-balanced" ng-bind="contact.job"></span>

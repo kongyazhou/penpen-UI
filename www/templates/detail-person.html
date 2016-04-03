@@ -10,15 +10,15 @@
             <ion-item class="item-divider">基本资料</ion-item>
                        
             <ion-item class="item-thumbnail-left">
-                <img>
-                <h2>姓名</h2>
-                <p>部门</p>
-                <p>职位</p>
+                <img ng-src="{{contact.icon}}">
+                <h2 ng-bind="contact.name"></h2>
+                <!-- <p ng-bind="contact.name">部门</p> -->
+                <p ng-bind="contact.job"></p>
             </ion-item>
 
             <ion-item class="item-divider"></ion-item>
 
-            <ion-item>联系电话</ion-item>
+            <ion-item ng-bind="contact.user">联系电话</ion-item>
             <ion-item>个性签名</ion-item>  
             <ion-item>备注</ion-item>       
             
@@ -35,12 +35,12 @@
 
             <ion-item class="item-divider"></ion-item>  
 
-            <button id="page9-button7" class="button button-balanced button-block">发送消息</button>
+            <button class="button button-balanced button-block" ng-click="messageDetails(contact.user)">发送消息</button>
 
             <ion-item class="item-divider"></ion-item>
         
-            <button id="page9-button8" class="button button-calm  button-block">同步聊天记录</button>
-            <button id="page9-button9" class="button button-assertive  button-block">清空聊天记录</button>
+            <button class="button button-calm  button-block">同步聊天记录</button>
+            <button class="button button-assertive  button-block">清空聊天记录</button>
         </ion-list>
         <div class="spacer" style="width: 283px; height: 20px;"></div>
     </ion-content>
