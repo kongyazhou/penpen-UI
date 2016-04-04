@@ -76,38 +76,16 @@ angular.module('penpen.controllers', [])
     'messageService', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService',
     function($scope, $state, $stateParams, messageService, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService) {
         var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
-        /*        $scope.doRefresh = function() {
-                    messageService.messageNum += 5;
-                    $timeout(function() {
-                        messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum, $stateParams.messageId);
-                        $scope.$broadcast('scroll.refreshComplete');
-                    }, 200);
-                };*/
 
         $scope.onSwipeRight = function() {
             $state.go("tab.message");
         };
 
-        /*        $scope.del = function(idx) {
-                    messageService.messageDetails.splice(idx, 1);
-                };*/
-
         $scope.$on("$ionicView.beforeEnter", function() {
             $scope.contact = contactService.getContact($stateParams.user);
             $scope.messageDetails = sqliteService.getContactMessages($scope.contact.user);
             $scope.self = loginService.getUserContact();
-            // $scope.contact = contactService.getContact($stateParams.user);
-            // messageService.message = messageService.getMessageById($stateParams.messageId);
-            // messageService.message.noReadMessages = 0;
-            // messageService.message.showHints = false;
-            // messageService.updateMessage(messageService.message);
-            // messageService.messageNum = 10;
-            // messageService.messageDetails = messageService.getAmountMessageById(messageService.messageNum,$stateParams.messageId);
-            // $scope.messageDetails=messageService.messageDetails;
-            // $scope.message=messageService.message;
-            // messageService.message = messageService.getMessageByUser($stateParams.User);
-            //TODO 设置所有消息unread为0 unreadNo为0
-            // messageService.message.showHints = false;
+            sqliteService.setReaded($scope.contact.user);
             $timeout(function() {
                 viewScroll.scrollBottom(true);
             }, 0);
@@ -119,38 +97,36 @@ angular.module('penpen.controllers', [])
         }
 
         //这是收到消息的函数
-
         //Override ws.onmessage
         wsService.ws.onmessage = function(evt) {
             // window.plugins.toast.showShortBottom('controller!：'+evt.data);
             var msg = parser.parseMsg(evt.data);
+            // window.plugins.toast.showShortBottom('msg:' + msg);
+            var msgObj = {
+                "from": msg.from,
+                "isFromMe": 0,
+                "content": parser.parseCotent(msg.content),
+                "time": msg.time
+            };
             // 判断消息是否属于本聊天
-            var date = new Date();
-            if (msg.from == contact.user) {
+            if (msg.from == $scope.contact.user) {
                 // window.plugins.toast.showShortBottom('msg：'+msg);
-                window.plugins.toast.showLongBottom('content：' + msg.content);
+                // window.plugins.toast.showShortBottom('content:' + msg.content);
+                //将消息添加到聊天界面                
+                $scope.messageDetails.push(msgObj);
+                // 播放收到消息提示音
+                mp3Service.playMessage();
+                $timeout(function() {
+                    viewScroll.scrollBottom(true);
+                }, 0);
 
-                //将消息添加到聊天界面
-                $scope.$apply(function() {
-                    var msgObj = {
-                        "from": msg.from,
-                        "isFromMe": 0,
-                        "content": parser.parseCotent(msg.content),
-                        "time": date
-                    };
-                    $scope.messageDetails.push(msgObj);
-                    // 播放收到消息提示音
-                    mp3Service.playMessage();
-                    $timeout(function() {
-                        viewScroll.scrollBottom(true);
-                    }, 0);
 
-                });
                 // 将message存入sqlite
                 sqliteService.addNewMessageRecvReaded(msgObj);
             } else {
+                // window.plugins.toast.showShortBottom('Else msg:' + msg);
                 // 将message存入sqlite
-                sqliteService.addNewMessageRecv(msg);
+                sqliteService.addNewMessageRecv(msgObj);
             }
         };
 
@@ -183,16 +159,13 @@ angular.module('penpen.controllers', [])
                 }
                 wsMsg.onclose = function(evt) {}
                 wsMsg.onmessage = function(evt) {
-                    window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
+                    // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
                 }
             } else {
-                window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
+                // window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
             }
         };
 
-        /*        window.addEventListener("native.keyboardshow", function(e) {
-                    viewScroll.scrollBottom();
-                });*/
     }
 ])
 
@@ -209,110 +182,110 @@ angular.module('penpen.controllers', [])
         $scope.login = function(user, password) {
             //TODO 网络异常，无法建立连接时的处理
             $scope.logining = true;
-            if (user == "15669910253") {
-                window.plugins.jPushPlugin.setAlias("penpen" + user);
-                $scope.$apply(function() {
-                    //TODO 为什么没有跳转？超级用户无效....
-                    $scope.logining = false;
-                    // $location.path('/tab/message');
-                });
-                var db = window.sqlitePlugin.openDatabase({
-                        name: 'penpen.msg',
-                        iosDatabaseLocation: 'default'
-                    },
-                    function(db) {
-                        window.plugins.toast.showShortBottom('打开数据库成功');
-                        db.transaction(function(tx) {
-                            tx.executeSql('CREATE TABLE IF NOT EXISTS test_table (id integer primary key, data text,  data_num integer)');
-                            tx.executeSql("INSERT INTO test_table (data, data_num) VALUES (?,?)", ["R U OK?", 100]);
-                        });
-                    },
-                    function(db) {
-                        window.plugins.toast.showShortBottom('打开数据库失败');
-                    });
-                // window.plugins.toast.showShortBottom('登录成功');
-            } else if (user == "12345678910") {
-                var db = window.sqlitePlugin.openDatabase({
-                    name: 'penpen.12345678905',
-                    iosDatabaseLocation: 'default'
-                }, function(db) {
-                    window.plugins.toast.showShortBottom('打开数据库成功');
-                    db.transaction(function(tx) {
-                        tx.executeSql("select message from penpen12345678901;", [], function(tx, res) {
-                            window.plugins.toast.showLongBottom('查询成功');
-                            // window.plugins.toast.showShortBottom(res.rows.length);
-                            window.plugins.toast.showShortBottom(res.rows.item(0).message);
-                            window.plugins.toast.showLongBottom(res.rows.item(1).message);
-                            // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
-                            // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
-                            // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
-                        }, function(err) {
-                            window.plugins.toast.showLongBottom('查询失败' + err.message);
-                        });
-                        tx.executeSql("select lastMessage from lastMessage;", [], function(tx, res) {
-                                // window.plugins.toast.showLongBottom('lastmessage成功');
-                                // window.plugins.toast.showShortBottom(res.rows.length);
-                                window.plugins.toast.showLongBottom(res.rows.item(0).lastMessage);
-                                window.plugins.toast.showLongBottom(res.rows.item(1).lastMessage);
-                                // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
-                                // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
-                                // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
-                            },
-                            function(err) {
-                                window.plugins.toast.showLongBottom('lastmessage失败' + err.message);
+            /*            if (user == "15669910253") {
+                            window.plugins.jPushPlugin.setAlias("penpen" + user);
+                            $scope.$apply(function() {
+                                //TODO 为什么没有跳转？超级用户无效....
+                                $scope.logining = false;
+                                // $location.path('/tab/message');
                             });
+                            var db = window.sqlitePlugin.openDatabase({
+                                    name: 'penpen.msg',
+                                    iosDatabaseLocation: 'default'
+                                },
+                                function(db) {
+                                    // window.plugins.toast.showShortBottom('打开数据库成功');
+                                    db.transaction(function(tx) {
+                                        tx.executeSql('CREATE TABLE IF NOT EXISTS test_table (id integer primary key, data text,  data_num integer)');
+                                        tx.executeSql("INSERT INTO test_table (data, data_num) VALUES (?,?)", ["R U OK?", 100]);
+                                    });
+                                },
+                                function(db) {
+                                    // window.plugins.toast.showShortBottom('打开数据库失败');
+                                });
+                            // window.plugins.toast.showShortBottom('登录成功');
+                        } else if (user == "12345678910") {
+                            var db = window.sqlitePlugin.openDatabase({
+                                name: 'penpen.12345678905',
+                                iosDatabaseLocation: 'default'
+                            }, function(db) {
+                                window.plugins.toast.showShortBottom('打开数据库成功');
+                                db.transaction(function(tx) {
+                                    tx.executeSql("select message from penpen12345678901;", [], function(tx, res) {
+                                        window.plugins.toast.showLongBottom('查询成功');
+                                        // window.plugins.toast.showShortBottom(res.rows.length);
+                                        window.plugins.toast.showShortBottom(res.rows.item(0).message);
+                                        window.plugins.toast.showLongBottom(res.rows.item(1).message);
+                                        // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
+                                        // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
+                                        // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
+                                    }, function(err) {
+                                        window.plugins.toast.showLongBottom('查询失败' + err.message);
+                                    });
+                                    tx.executeSql("select lastMessage from lastMessage;", [], function(tx, res) {
+                                            // window.plugins.toast.showLongBottom('lastmessage成功');
+                                            // window.plugins.toast.showShortBottom(res.rows.length);
+                                            window.plugins.toast.showLongBottom(res.rows.item(0).lastMessage);
+                                            window.plugins.toast.showLongBottom(res.rows.item(1).lastMessage);
+                                            // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
+                                            // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
+                                            // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
+                                        },
+                                        function(err) {
+                                            window.plugins.toast.showLongBottom('lastmessage失败' + err.message);
+                                        });
+                                });
+                            }, function(db) {
+                                window.plugins.toast.showLongBottom('打开数据库失败');
+                            });
+                            $scope.$apply(function() {
+                                //TODO 为什么没有跳转？超级用户无效....
+                                $scope.logining = false;
+                                // $location.path('/tab/message');
+                            });
+                        } else {*/
+            loginService.setUser(user);
+            loginService.setPassword(password);
+
+            wsService.ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
+
+            wsService.ws.onopen = function() {
+                wsService.sendMessage(loginService.getLoginMsg());
+            };
+            wsService.ws.onclose = function(evt) {
+
+            };
+            wsService.ws.onmessage = function(evt) {
+                // window.plugins.toast.showShortBottom('收到：'+evt.data);
+                var result = parser.parseMsg(evt.data);
+                // window.plugins.toast.showShortBottom('state：'+result.state);
+                if (result.state == 11) {
+                    //登录成功
+                    window.plugins.toast.showShortBottom('登录成功');
+
+                    window.plugins.jPushPlugin.setAlias("penpen" + user);
+                    loginService.logined();
+                    // mp3Service.playLogin();
+                    $scope.$apply(function() {
+                        $scope.logining = false;
+                        $location.path('/tab/message');
                     });
-                }, function(db) {
-                    window.plugins.toast.showLongBottom('打开数据库失败');
-                });
-                $scope.$apply(function() {
-                    //TODO 为什么没有跳转？超级用户无效....
-                    $scope.logining = false;
-                    // $location.path('/tab/message');
-                });
-            } else {
-                loginService.setUser(user);
-                loginService.setPassword(password);
 
-                wsService.ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
-
-                wsService.ws.onopen = function() {
-                    wsService.sendMessage(loginService.getLoginMsg());
-                };
-                wsService.ws.onclose = function(evt) {
-
-                };
-                wsService.ws.onmessage = function(evt) {
-                    // window.plugins.toast.showShortBottom('收到：'+evt.data);
-                    var result = parser.parseMsg(evt.data);
-                    // window.plugins.toast.showShortBottom('state：'+result.state);
-                    if (result.state == 11) {
-                        //登录成功
-                        window.plugins.toast.showShortBottom('登录成功');
-
-                        window.plugins.jPushPlugin.setAlias("penpen" + user);
-                        loginService.logined();
-                        // mp3Service.playLogin();
-                        $scope.$apply(function() {
-                            $scope.logining = false;
-                            $location.path('/tab/message');
-                        });
-
-                    } else if (result.state == 12) {
-                        window.plugins.toast.showLongBottom('登录失败');
-                        wsService.ws.close();
-                        $scope.$apply(function() {
-                            $scope.logining = false;
-                        });
-                    } else {
-                        window.plugins.toast.showLongBottom('登录异常');
-                        wsService.ws.close();
-                        $scope.$apply(function() {
-                            $scope.logining = false;
-                        });
-                    }
-                };
-            }
+                } else if (result.state == 12) {
+                    window.plugins.toast.showLongBottom('登录失败');
+                    wsService.ws.close();
+                    $scope.$apply(function() {
+                        $scope.logining = false;
+                    });
+                } else {
+                    window.plugins.toast.showLongBottom('登录异常');
+                    wsService.ws.close();
+                    $scope.$apply(function() {
+                        $scope.logining = false;
+                    });
+                }
+            };
+            // }
 
         };
     }

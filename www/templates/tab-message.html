@@ -6,7 +6,7 @@
         <ion-list rj-close-back-drop>
             <ion-item class="item-avatar" ng-class="{'rj-item-top': message.isTop}" on-hold="popupMessageOpthins(message)" rj-hold-active ng-repeat="message in messages | orderBy:['isTop', 'lastMessage.timeFrome1970']:true" ng-click="messageDetails(message.user)">
                 <img ng-src="{{message.icon}}">
-                <span class="rj-sm-red-icon" ng-show="message.showHints"><p ng-bind="message.unreadNo"></p></span>
+                <span class="rj-sm-red-icon" ng-show="message.unreadNo"><p ng-bind="message.unreadNo"></p></span>
                 <h2 ng-bind="message.name"></h2>
                 <p class="rj-list-p" ng-bind="message.lastMessage"></p>
                 <span class="rj-push-right" ng-bind="message.lastTime" ng-show="false"></span>

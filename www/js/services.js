@@ -262,7 +262,7 @@ angular.module('penpen.services', [])
 
     this.ws.onmessage = function(message) {
         //各controller自己复写该方法以实现功能
-        window.plugins.toast.showLongBottom('收到：' + message.data);
+        // window.plugins.toast.showLongBottom('收到：' + message.data);
     };
 
     this.sendMessage = function(msg) {
@@ -533,7 +533,7 @@ angular.module('penpen.services', [])
     }, function(db) {
         // window.plugins.toast.showLongBottom('打开数据库成功' + dbName);
     }, function(err) {
-        window.plugins.toast.showLongBottom('打开数据库失败' + err);
+        // window.plugins.toast.showLongBottom('打开数据库失败' + err);
     });
 
     this.addNewMessageSend = function(msg) {
@@ -546,18 +546,18 @@ angular.module('penpen.services', [])
             tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
-                window.plugins.toast.showLongBottom('创建表失败' + err.message);
+                // window.plugins.toast.showLongBottom('创建表失败' + err.message);
             });
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.to], function(tx, res) {
                 // 如果没有则创建,有则更新
                 if (res.rows.item(0).cnt != 0) {
                     //存在则更新
-                    window.plugins.toast.showLongBottom('条目存在');
+                    // window.plugins.toast.showLongBottom('条目存在');
                     tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?  WHERE user=?;", [msg.content, msg.time, msg.to]);
                 } else {
                     //不存在则创建条目
-                    window.plugins.toast.showLongBottom('条目不存在');
+                    // window.plugins.toast.showLongBottom('条目不存在');
                     tx.executeSql("INSERT INTO lastMessage( user, name, icon, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?,?);", [msg.to, contact.name, contact.icon, msg.content, msg.time, 0]);
                 }
             });
@@ -568,14 +568,14 @@ angular.module('penpen.services', [])
             tx.executeSql(stmt, [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
-                window.plugins.toast.showLongBottom('创建表失败' + err.message);
+                // window.plugins.toast.showLongBottom('创建表失败' + err.message);
             });
             //添加新消息条目
             stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
             tx.executeSql(stmt, [1, msg.content, msg.time, 0], function(tx, res) {
                 // window.plugins.toast.showLongBottom('添加新消息成功');
             }, function(err) {
-                window.plugins.toast.showLongBottom('添加新消息失败' + err.message);
+                // window.plugins.toast.showLongBottom('添加新消息失败' + err.message);
             });
 
         });
@@ -645,7 +645,7 @@ angular.module('penpen.services', [])
                 count = res.rows.item(0).cnt;
                 // window.plugins.toast.showShortBottom('Count:' + count);
             }, function(err) {
-                window.plugins.toast.showShortBottom('Count失败');
+                // window.plugins.toast.showShortBottom('Count失败');
             });
             stmt = 'select * from penpen' + user + ';';
             tx.executeSql(stmt, [], function(tx, res) {
@@ -663,6 +663,20 @@ angular.module('penpen.services', [])
         });
         return messages;
     };
+    
+    this.setReaded = function(user) {
+        // var contact = contactService.getContact(user);
+        var messages = [];
+        var count = 0;
+        dbPenpen.transaction(function(tx) {
+            stmt = 'UPDATE lastMessage SET unreadNo=0  WHERE user=' + user + ';';
+            tx.executeSql(stmt, [], function(tx, res) {
+                // window.plugins.toast.showShortBottom('Count:' + count);
+            }, function(err) {
+                // window.plugins.toast.showShortBottom('setReaded失败');
+            });
+        });
+    };
 
 
     this.getLastMessages = function() {
@@ -676,7 +690,7 @@ angular.module('penpen.services', [])
                 // window.plugins.toast.showShortBottom('Count:' + count);
                 // window.plugins.toast.showLongBottom('Length:' + length);
             }, function(err) {
-                window.plugins.toast.showShortBottom('Count失败');
+                // window.plugins.toast.showShortBottom('Count失败');
             });
 
             tx.executeSql('select * from lastMessage;', [], function(tx, res) {
@@ -699,7 +713,7 @@ angular.module('penpen.services', [])
                 }
 
             }, function(err) {
-                window.plugins.toast.showLongBottom('读取lastMessage失败' + err.message);
+                // window.plugins.toast.showLongBottom('读取lastMessage失败' + err.message);
             });
         });
         return messages;
