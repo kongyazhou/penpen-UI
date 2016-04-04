@@ -15,7 +15,7 @@
             <p class="rj-message" ng-bind="item.content"></p>
         </div>
         <div class="rj-message-wrap" ng-if="item.isFromMe">
-            <img src="img/me.png" class="rj-head-pic-right">
+            <img ng-src="{{self.icon}}" class="rj-head-pic-right">
             <span class="rj-triangle-right"></span>
             <p class="rj-message-right" ng-bind="item.content"></p>
         </div>

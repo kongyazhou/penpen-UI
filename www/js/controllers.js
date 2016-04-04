@@ -91,9 +91,11 @@ angular.module('penpen.controllers', [])
         /*        $scope.del = function(idx) {
                     messageService.messageDetails.splice(idx, 1);
                 };*/
-        $scope.contact = contactService.getContact($stateParams.user);
-        $scope.messageDetails = {};
+
         $scope.$on("$ionicView.beforeEnter", function() {
+            $scope.contact = contactService.getContact($stateParams.user);
+            $scope.messageDetails = sqliteService.getContactMessages($scope.contact.user);
+            $scope.self = loginService.getUserContact();
             // $scope.contact = contactService.getContact($stateParams.user);
             // messageService.message = messageService.getMessageById($stateParams.messageId);
             // messageService.message.noReadMessages = 0;
@@ -127,22 +129,25 @@ angular.module('penpen.controllers', [])
             if (msg.from == contact.user) {
                 // window.plugins.toast.showShortBottom('msg：'+msg);
                 window.plugins.toast.showLongBottom('content：' + msg.content);
-                // 将message存入sqlite
-                sqliteService.addNewMessageRecvReaded(msg);
+
                 //将消息添加到聊天界面
                 $scope.$apply(function() {
-                    var obj = {
+                    var msgObj = {
+                        "from": msg.from,
                         "isFromMe": 0,
                         "content": parser.parseCotent(msg.content),
                         "time": date
                     };
-                    $scope.messageDetails.push(obj);
+                    $scope.messageDetails.push(msgObj);
                     // 播放收到消息提示音
                     mp3Service.playMessage();
                     $timeout(function() {
                         viewScroll.scrollBottom(true);
                     }, 0);
+
                 });
+                // 将message存入sqlite
+                sqliteService.addNewMessageRecvReaded(msgObj);
             } else {
                 // 将message存入sqlite
                 sqliteService.addNewMessageRecv(msg);
@@ -151,14 +156,22 @@ angular.module('penpen.controllers', [])
 
         //这是发送消息的函数
         $scope.addLocalMsg = function(msg) {
-            msgObj = messageService.sendMessage(msg);
-            msgObj["to"] = $scope.contact.user;
+            var date = new Date();
+            var msgObj = {
+                "to": $scope.contact.user,
+                "isFromMe": true,
+                "content": msg,
+                "time": date
+            };
+
+            $scope.messageDetails.push(msgObj);
+
             // 发送消息的提示音
             mp3Service.playMessage();
-            //TODO 更新lastMessage表的lastMessage和lastTime
-            // sqliteService.updateLastMessageSend(msgObj);
-            //TODO 将message插入联系人的allMessage表
+            // 更新lastMessage表的lastMessage和lastTime
+            // 将message插入联系人的allMessage表
             sqliteService.addNewMessageSend(msgObj);
+
         };
         $scope.sendMessage = function(msg) {
             if (window["WebSocket"]) {
@@ -370,14 +383,14 @@ angular.module('penpen.controllers', [])
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
     };
-    $scope.test = function() {
-        $scope.obj = sqliteService.getLastMessages();
-        $scope.lastMessage = $scope.obj[1].lastMessage;
-        $scope.data = $scope.obj[1].user;
-        $scope.$apply(function() {});
-        // body...
-        window.plugins.toast.showShortBottom($scope.lastMessage);
-    };
+    /*    $scope.test = function() {
+            $scope.obj = sqliteService.getLastMessages();
+            $scope.lastMessage = $scope.obj[1].lastMessage;
+            $scope.data = $scope.obj[1].user;
+            $scope.$apply(function() {});
+            // body...
+            window.plugins.toast.showShortBottom($scope.lastMessage);
+        };*/
 }])
 
 .controller('userDetailCtrl', ['$scope', '$state', 'loginService', function($scope, $state, loginService) {

@@ -523,7 +523,7 @@ angular.module('penpen.services', [])
     };
 }])
 
-.service('sqliteService', ['loginService','contactService', function(loginService,contactService) {
+.service('sqliteService', ['loginService', 'contactService', function(loginService, contactService) {
     var dbName = 'penpen.' + loginService.getUser();
     // var dbName = 'penpen.12345678905';
     var stmt = "";
@@ -564,14 +564,14 @@ angular.module('penpen.services', [])
 
             //添加到账号记录中
             //若不存在则创建表
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key,isFromMe integer, message text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key,isFromMe integer, content text, time text, unread integer);';
             tx.executeSql(stmt, [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
                 window.plugins.toast.showLongBottom('创建表失败' + err.message);
             });
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, message, time, unread) VALUES (?,?,?,?);';
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
             tx.executeSql(stmt, [1, msg.content, msg.time, 0], function(tx, res) {
                 // window.plugins.toast.showLongBottom('添加新消息成功');
             }, function(err) {
@@ -582,9 +582,10 @@ angular.module('penpen.services', [])
     };
 
     this.addNewMessageRecv = function(msg) {
+        var contact = contactService.getContact(msg.from);
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime text, unreadNo integer);');
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
                 // 如果没有则创建,有则更新
@@ -595,14 +596,14 @@ angular.module('penpen.services', [])
                     });
                 } else {
                     //不存在则创建条目
-                    tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.from, msg.content, msg.time, 1]);
+                    tx.executeSql("INSERT INTO lastMessage( user, name, icon, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?,?);", [msg.from, contact.name, contact.icon, msg.content, msg.time, 1]);
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, message text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time text, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, message, time, unread) VALUES (?,?,?,?);';
+            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
             tx.executeSql(stmt, [0, msg.content, msg.time, 1]);
 
         });
@@ -610,9 +611,10 @@ angular.module('penpen.services', [])
 
     //收到读过消息
     this.addNewMessageRecvReaded = function(msg) {
+        var contact = contactService.getContact(msg.from);
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime text, unreadNo integer);');
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
                 // 如果没有则创建,有则更新
@@ -621,30 +623,56 @@ angular.module('penpen.services', [])
                     tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, 0, msg.from]);
                 } else {
                     //不存在则创建条目
-                    tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.from, msg.content, msg.time, 0]);
+                    tx.executeSql("INSERT INTO lastMessage( user, name, icon, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?,?);", [msg.from, contact.name, contact.icon, msg.content, msg.time, 0]);
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, message text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time text, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, message, time, unread) VALUES (?,?,?,?);';
+            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
             tx.executeSql(stmt, [0, msg.content, msg.time, 0]);
         });
     };
 
-    this.getContactMessages = function(argument) {
-        // body...
+    this.getContactMessages = function(user) {
+        // var contact = contactService.getContact(user);
+        var messages = [];
+        var count = 0;
+        dbPenpen.transaction(function(tx) {
+            stmt = 'select count(content) as cnt from penpen' + user + ';';
+            tx.executeSql(stmt, [], function(tx, res) {
+                count = res.rows.item(0).cnt;
+                // window.plugins.toast.showShortBottom('Count:' + count);
+            }, function(err) {
+                window.plugins.toast.showShortBottom('Count失败');
+            });
+            stmt = 'select * from penpen' + user + ';';
+            tx.executeSql(stmt, [], function(tx, res) {
+                var i = 0;
+                for (i = 0; i < count; i++) {
+                    // window.plugins.toast.showShortBottom(res.rows.item(i).user);
+                    var obj = {
+                        "isFromMe": res.rows.item(i).isFromMe,
+                        "content": res.rows.item(i).content,
+                        "time": res.rows.item(i).time
+                    };
+                    messages.push(obj);
+                }
+            });
+        });
+        return messages;
     };
-    var count = 0;
-    var length = 0;
+
 
     this.getLastMessages = function() {
         var messages = [];
+        var count = 0;
+        // var length = 0;
         dbPenpen.transaction(function(tx) {
             tx.executeSql("select count(user) as cnt from lastMessage;", [], function(tx, res) {
                 count = res.rows.item(0).cnt;
-                length = res.rows.item.length;
+                // length = res.rows.item.length;
                 // window.plugins.toast.showShortBottom('Count:' + count);
                 // window.plugins.toast.showLongBottom('Length:' + length);
             }, function(err) {
