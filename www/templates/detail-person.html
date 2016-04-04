@@ -19,15 +19,15 @@
             <ion-item class="item-divider"></ion-item>
 
             <ion-item ng-bind="contact.user">联系电话</ion-item>
-            <ion-item>个性签名</ion-item>  
-            <ion-item>备注</ion-item>       
+            <ion-item ng-disabled="true">个性签名</ion-item>  
+            <ion-item ng-disabled="true">备注</ion-item>       
             
             <ion-item class="item-divider">个性设置</ion-item> 
 
-            <ion-toggle toggle-class="toggle-calm">定制提示音</ion-toggle>
+            <ion-toggle toggle-class="toggle-calm" ng-disabled="true">定制提示音</ion-toggle>
             <label class="item item-select" ng-disabled="true">
-                <span class="input-label">消息提示音</span>
-                <select>
+                <span class="input-label" ng-disabled="true">消息提示音</span>
+                <select ng-disabled="true">
                     <option>叮咚</option>
                     <option>滴答</option>
                 </select>
