@@ -1,8 +1,8 @@
 angular.module('penpen.controllers', [])
 
 .controller('messageCtrl', ['$scope', '$state', '$ionicPopup', 'localStorageService',
-    'messageService', 'activeState',
-    function($scope, $state, $ionicPopup, localStorageService, messageService, activeState) {
+    'messageService', 'activeState', 'sqliteService',
+    function($scope, $state, $ionicPopup, localStorageService, messageService, activeState, sqliteService, contactService) {
 
         // $scope.messages = messageService.getAllMessages();
         // console.log($scope.messages);
@@ -54,14 +54,16 @@ angular.module('penpen.controllers', [])
         };
         $scope.messageDetails = function(message) {
             $state.go("messageDetail", {
-                "user": message.user
+                "user": message
             });
         };
+        var i = 0;
         $scope.$on("$ionicView.beforeEnter", function() {
             //TODO 从服务器同步离线未读消息存入sqlite
             //TODO 从lastMessage表读取消息
             // console.log($scope.messages);
-            $scope.messages = messageService.getAllMessages();
+            $scope.messages = sqliteService.getLastMessages();
+            // $scope.messages = messageService.getAllMessages();
             $scope.popup = {
                 isPopup: false,
                 index: 0
@@ -125,9 +127,7 @@ angular.module('penpen.controllers', [])
             if (msg.from == contact.user) {
                 // window.plugins.toast.showShortBottom('msg：'+msg);
                 window.plugins.toast.showLongBottom('content：' + msg.content);
-                // 更新lastMessage表的lastMessage和lastTime
-                sqliteService.updateLastMessageRecvReaded(msg);
-                // 将message插入联系人的allMessage表
+                // 将message存入sqlite
                 sqliteService.addNewMessageRecvReaded(msg);
                 //将消息添加到聊天界面
                 $scope.$apply(function() {
@@ -137,16 +137,14 @@ angular.module('penpen.controllers', [])
                         "time": date
                     };
                     $scope.messageDetails.push(obj);
-                    // 收到消息的提示音
+                    // 播放收到消息提示音
                     mp3Service.playMessage();
                     $timeout(function() {
                         viewScroll.scrollBottom(true);
                     }, 0);
                 });
             } else {
-                // 更新lastMessage表的lastMessage和lastTime
-                sqliteService.updateLastMessageRecv(msg);
-                // 将message插入联系人的allMessage表
+                // 将message存入sqlite
                 sqliteService.addNewMessageRecv(msg);
             }
         };
@@ -158,9 +156,9 @@ angular.module('penpen.controllers', [])
             // 发送消息的提示音
             mp3Service.playMessage();
             //TODO 更新lastMessage表的lastMessage和lastTime
-            sqliteService.updateLastMessageSend(msgObj);
+            // sqliteService.updateLastMessageSend(msgObj);
             //TODO 将message插入联系人的allMessage表
-            // sqliteService.addNewMessageSend(msgObj);
+            sqliteService.addNewMessageSend(msgObj);
         };
         $scope.sendMessage = function(msg) {
             if (window["WebSocket"]) {
@@ -222,23 +220,23 @@ angular.module('penpen.controllers', [])
                 // window.plugins.toast.showShortBottom('登录成功');
             } else if (user == "12345678910") {
                 var db = window.sqlitePlugin.openDatabase({
-                        name: 'penpen.12345678905',
-                        iosDatabaseLocation: 'default'
-                    },function(db) {
-                        window.plugins.toast.showShortBottom('打开数据库成功');
-                        db.transaction(function(tx) {
-                            tx.executeSql("select message from penpen12345678901;", [], function(tx, res) {
-                                window.plugins.toast.showLongBottom('查询成功');
-                                // window.plugins.toast.showShortBottom(res.rows.length);
-                                window.plugins.toast.showShortBottom(res.rows.item(0).message);
-                                window.plugins.toast.showLongBottom(res.rows.item(1).message);
-                                // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
-                                // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
-                                // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
-                            },function(err) {
-                                window.plugins.toast.showLongBottom('查询失败'+err.message);
-                            });
-/*                            tx.executeSql("select lastMessage from lastMessage;", [], function(tx, res) {
+                    name: 'penpen.12345678905',
+                    iosDatabaseLocation: 'default'
+                }, function(db) {
+                    window.plugins.toast.showShortBottom('打开数据库成功');
+                    db.transaction(function(tx) {
+                        tx.executeSql("select message from penpen12345678901;", [], function(tx, res) {
+                            window.plugins.toast.showLongBottom('查询成功');
+                            // window.plugins.toast.showShortBottom(res.rows.length);
+                            window.plugins.toast.showShortBottom(res.rows.item(0).message);
+                            window.plugins.toast.showLongBottom(res.rows.item(1).message);
+                            // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
+                            // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
+                            // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
+                        }, function(err) {
+                            window.plugins.toast.showLongBottom('查询失败' + err.message);
+                        });
+                        tx.executeSql("select lastMessage from lastMessage;", [], function(tx, res) {
                                 // window.plugins.toast.showLongBottom('lastmessage成功');
                                 // window.plugins.toast.showShortBottom(res.rows.length);
                                 window.plugins.toast.showLongBottom(res.rows.item(0).lastMessage);
@@ -246,13 +244,14 @@ angular.module('penpen.controllers', [])
                                 // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
                                 // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
                                 // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
-                            },function(err) {
-                                window.plugins.toast.showLongBottom('lastmessage失败'+err.message);
-                            });*/
-                        });
-                    },function(db) {
-                        window.plugins.toast.showLongBottom('打开数据库失败');
+                            },
+                            function(err) {
+                                window.plugins.toast.showLongBottom('lastmessage失败' + err.message);
+                            });
                     });
+                }, function(db) {
+                    window.plugins.toast.showLongBottom('打开数据库失败');
+                });
                 $scope.$apply(function() {
                     //TODO 为什么没有跳转？超级用户无效....
                     $scope.logining = false;
@@ -367,11 +366,19 @@ angular.module('penpen.controllers', [])
     });
 })
 
-.controller('aboutCtrl', function($scope, $state) {
+.controller('aboutCtrl', ['$scope', '$state', 'sqliteService', function($scope, $state, sqliteService) {
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
     };
-})
+    $scope.test = function() {
+        $scope.obj = sqliteService.getLastMessages();
+        $scope.lastMessage = $scope.obj[1].lastMessage;
+        $scope.data = $scope.obj[1].user;
+        $scope.$apply(function() {});
+        // body...
+        window.plugins.toast.showShortBottom($scope.lastMessage);
+    };
+}])
 
 .controller('userDetailCtrl', ['$scope', '$state', 'loginService', function($scope, $state, loginService) {
     $scope.onSwipeRight = function() {

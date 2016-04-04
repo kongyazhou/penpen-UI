@@ -9,11 +9,11 @@
         <div class="spacer" style="width: 283px; height: 37px;"></div>
         <div>
         
-            <p>Version : 0.1.0</p>
+            <p ng-bind="data">Version : 0.1.0</p>
 
-            <p>Copyright@郑张宽 2016</p>
+            <p ng-bind="lastMessage">Copyright@郑张宽 2016</p>
         </div>
-        <button id="page10-button10" class="button button-calm  button-block">检查更新</button>
+        <button id="page10-button10" class="button button-calm  button-block" ng-click="test()">检查更新</button>
         
         <button class="button button-calm  button-block" onclick="window.plugins.toast.showShortTop('Hello there!', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)})">Toast showShortTop</button>
         <button class="button button-calm  button-block" onclick="window.plugins.toast.showLongBottom('Hello there!', function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)})">Toast showLongBottom</button>

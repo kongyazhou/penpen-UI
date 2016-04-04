@@ -523,48 +523,57 @@ angular.module('penpen.services', [])
     };
 }])
 
-.service('sqliteService', ['loginService', function(loginService) {
+.service('sqliteService', ['loginService','contactService', function(loginService,contactService) {
     var dbName = 'penpen.' + loginService.getUser();
+    // var dbName = 'penpen.12345678905';
+    var stmt = "";
     var dbPenpen = window.sqlitePlugin.openDatabase({
         name: dbName,
         iosDatabaseLocation: 'default'
     }, function(db) {
-        window.plugins.toast.showLongBottom('打开数据库成功' + dbName);
+        // window.plugins.toast.showLongBottom('打开数据库成功' + dbName);
     }, function(err) {
         window.plugins.toast.showLongBottom('打开数据库失败' + err);
     });
 
-    this.updateLastMessageSend = function(msg) {
+    this.addNewMessageSend = function(msg) {
         // window.plugins.toast.showShortBottom(msg.content);
+
+        var contact = contactService.getContact(msg.to);
         dbPenpen.transaction(function(tx) {
+            //更新lastMessage
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
-                // window.plugins.toast.showLongBottom('创建表失败' + err.message);
+                window.plugins.toast.showLongBottom('创建表失败' + err.message);
             });
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.to], function(tx, res) {
                 // 如果没有则创建,有则更新
                 if (res.rows.item(0).cnt != 0) {
                     //存在则更新
-                    // window.plugins.toast.showLongBottom('条目存在');
-                    tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, 0, msg.to]);
+                    window.plugins.toast.showLongBottom('条目存在');
+                    tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?  WHERE user=?;", [msg.content, msg.time, msg.to]);
                 } else {
                     //不存在则创建条目
-                    // window.plugins.toast.showLongBottom('条目不存在');
-                    tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.to, msg.content, msg.time, 0]);
+                    window.plugins.toast.showLongBottom('条目不存在');
+                    tx.executeSql("INSERT INTO lastMessage( user, name, icon, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?,?);", [msg.to, contact.name, contact.icon, msg.content, msg.time, 0]);
                 }
             });
-            //
-            tx.executeSql('CREATE TABLE IF NOT EXISTS penpen12345678901 (id integer primary key,isFromMe integer, message text, time text, unread integer);', [], function(argument) {
-                window.plugins.toast.showLongBottom('创建表成功');
+
+            //添加到账号记录中
+            //若不存在则创建表
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key,isFromMe integer, message text, time text, unread integer);';
+            tx.executeSql(stmt, [], function(argument) {
+                // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
                 window.plugins.toast.showLongBottom('创建表失败' + err.message);
             });
             //添加新消息条目
-            tx.executeSql('INSERT INTO penpen12345678901 (isFromMe, message, time, unread) VALUES (?,?,?,?);', [ 1, msg.content, msg.time, 0], function(tx, res) {
-                window.plugins.toast.showLongBottom('添加新消息成功');
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, message, time, unread) VALUES (?,?,?,?);';
+            tx.executeSql(stmt, [1, msg.content, msg.time, 0], function(tx, res) {
+                // window.plugins.toast.showLongBottom('添加新消息成功');
             }, function(err) {
                 window.plugins.toast.showLongBottom('添加新消息失败' + err.message);
             });
@@ -572,25 +581,7 @@ angular.module('penpen.services', [])
         });
     };
 
-/*    this.addNewMessageSend = function(msg) {
-        dbPenpen.transaction(function(tx) {
-            var tbName = 'penpen' + msg.to;
-            //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS ? (id integer primary key,isFromMe integer, message text, time text, unread integer);', [tbName], function(tx, res) {
-                window.plugins.toast.showLongBottom('创建表成功');
-            }, function(err) {
-                window.plugins.toast.showLongBottom('创建表失败' + err.message);
-            });
-            //添加新消息条目
-            tx.executeSql('INSERT INTO ? (isFromMe, message, time, unread) VALUES (?,?,?,?);', ['penpen' + msg.to, 1, msg.content, msg.time, 0], function(tx, res) {
-                window.plugins.toast.showLongBottom('添加新消息成功');
-            }, function(err) {
-                window.plugins.toast.showLongBottom('添加新消息失败' + err.message);
-            });
-        });
-    };*/
-
-    this.updateLastMessageRecv = function(msg) {
+    this.addNewMessageRecv = function(msg) {
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
             tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
@@ -607,51 +598,82 @@ angular.module('penpen.services', [])
                     tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.from, msg.content, msg.time, 1]);
                 }
             });
-        });
-    };
-
-    this.addNewMessageRecv = function(msg) {
-        dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS ? (id integer primary key,isFromMe integer, message text, time text, unread integer);', ['penpen' + msg.from]);
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, message text, time text, unread integer);';
+            tx.executeSql(stmt, []);
             //添加新消息条目
-            tx.executeSql('INSERT INTO ? (isFromMe, message, time, unread) values (?,?,?,?);', ['penpen' + msg.from, 0, msg.content, msg.time, 1]);
+            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, message, time, unread) VALUES (?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.content, msg.time, 1]);
+
         });
     };
 
-    //收到并读过消息
-    this.updateLastMessageRecvReaded = function(msg) {
-        //判断表是否存在，不存在则创建
-        tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
-        //判断条目是否存在
-        tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
-            // 如果没有则创建,有则更新
-            if (res.rows.item(0).cnt != 0) {
-                //存在则更新
-                tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, 0, msg.from]);
-            } else {
-                //不存在则创建条目
-                tx.executeSql('select unreadNo from lastMessage where user=?;', [msg.from], function(tx, res) {
-                    tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.from, msg.content, msg.time, 0]);
-                });
-            }
-        });
-    };
-
+    //收到读过消息
     this.addNewMessageRecvReaded = function(msg) {
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS ? (id integer primary key,isFromMe integer, message text, time text, unread integer);', ['penpen' + msg.from]);
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, lastMessage text, lastTime text, unreadNo integer);');
+            //判断条目是否存在
+            tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
+                // 如果没有则创建,有则更新
+                if (res.rows.item(0).cnt != 0) {
+                    //存在则更新
+                    tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, 0, msg.from]);
+                } else {
+                    //不存在则创建条目
+                    tx.executeSql("INSERT INTO lastMessage( user, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?);", [msg.from, msg.content, msg.time, 0]);
+                }
+            });
+            //判断表是否存在，不存在则创建
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, message text, time text, unread integer);';
+            tx.executeSql(stmt, []);
             //添加新消息条目
-            tx.executeSql('INSERT INTO ? (isFromMe, message, time, unread) values (?,?,?,?);', ['penpen' + msg.from, 0, msg.content, msg.time, 0]);
+            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, message, time, unread) VALUES (?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.content, msg.time, 0]);
         });
     };
 
     this.getContactMessages = function(argument) {
         // body...
     };
+    var count = 0;
+    var length = 0;
 
-    this.getLastMessages = function(argument) {
-        // body...
+    this.getLastMessages = function() {
+        var messages = [];
+        dbPenpen.transaction(function(tx) {
+            tx.executeSql("select count(user) as cnt from lastMessage;", [], function(tx, res) {
+                count = res.rows.item(0).cnt;
+                length = res.rows.item.length;
+                // window.plugins.toast.showShortBottom('Count:' + count);
+                // window.plugins.toast.showLongBottom('Length:' + length);
+            }, function(err) {
+                window.plugins.toast.showShortBottom('Count失败');
+            });
+
+            tx.executeSql('select * from lastMessage;', [], function(tx, res) {
+                // window.plugins.toast.showShortBottom('读取lastMessage成功');
+                // window.plugins.toast.showLongBottom(res.rows.item(0).user);
+
+                var i = 0;
+                for (i = 0; i < count; i++) {
+                    // window.plugins.toast.showShortBottom(res.rows.item(i).user);
+                    var obj = {
+                        "user": res.rows.item(i).user,
+                        "name": res.rows.item(i).name,
+                        "icon": res.rows.item(i).icon,
+                        "lastMessage": res.rows.item(i).lastMessage,
+                        "lastTime": res.rows.item(i).lastTime,
+                        "unreadNo": res.rows.item(i).unreadNo
+
+                    };
+                    messages.push(obj);
+                }
+
+            }, function(err) {
+                window.plugins.toast.showLongBottom('读取lastMessage失败' + err.message);
+            });
+        });
+        return messages;
     };
 }])
