@@ -1,8 +1,8 @@
 angular.module('penpen.controllers', [])
 
-.controller('messageCtrl', ['$scope', '$state', '$ionicPopup', 'localStorageService',
-    'messageService', 'activeState', 'sqliteService',
-    function($scope, $state, $ionicPopup, localStorageService, messageService, activeState, sqliteService, contactService) {
+.controller('messageCtrl', ['$scope', '$state', '$timeout', '$ionicPopup', 'localStorageService',
+    'messageService', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'activeState',
+    function($scope, $state,$timeout, $ionicPopup, localStorageService, messageService, parser, wsService, loginService, mp3Service, contactService, sqliteService, activeState) {
 
         // $scope.messages = messageService.getAllMessages();
         // console.log($scope.messages);
@@ -57,6 +57,34 @@ angular.module('penpen.controllers', [])
                 "user": message
             });
         };
+
+        wsService.ws.onopen = function() {
+            wsService.sendMessage(loginService.getLoginMsg());
+        }
+
+        wsService.ws.onmessage = function(evt) {
+            // window.plugins.toast.showShortBottom('controller!：'+evt.data);
+            var msg = parser.parseMsg(evt.data);
+            // window.plugins.toast.showShortBottom('msg:' + msg);
+            var msgObj = {
+                "from": msg.from,
+                "isFromMe": 0,
+                "content": parser.parseCotent(msg.content),
+                "time": msg.time
+            };
+            // 判断消息是否属于本聊
+            // window.plugins.toast.showShortBottom('Else msg:' + msg);
+            // 将message存入sqlite
+            sqliteService.addNewMessageRecv(msgObj);
+            //更新界面
+            $scope.messages = sqliteService.getLastMessages();
+            $timeout(function() {
+                $scope.$apply(function() {
+                    // $scope.messages=$scope.messages;
+                });
+            }, 200);
+        };
+
         var i = 0;
         $scope.$on("$ionicView.beforeEnter", function() {
             //TODO 从服务器同步离线未读消息存入sqlite
@@ -119,8 +147,6 @@ angular.module('penpen.controllers', [])
                 $timeout(function() {
                     viewScroll.scrollBottom(true);
                 }, 0);
-
-
                 // 将message存入sqlite
                 sqliteService.addNewMessageRecvReaded(msgObj);
             } else {
