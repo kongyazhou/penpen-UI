@@ -1,8 +1,7 @@
 angular.module('penpen.controllers', [])
 
-.controller('messageCtrl', ['$scope', '$state', '$timeout', '$ionicPopup', 'localStorageService',
-    'messageService', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'activeState',
-    function($scope, $state,$timeout, $ionicPopup, localStorageService, messageService, parser, wsService, loginService, mp3Service, contactService, sqliteService, activeState) {
+.controller('messageCtrl', ['$scope', '$state', '$timeout', '$ionicPopup', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'activeState',
+    function($scope, $state,$timeout, $ionicPopup, parser, wsService, loginService, mp3Service, contactService, sqliteService, activeState) {
 
         // $scope.messages = messageService.getAllMessages();
         // console.log($scope.messages);
@@ -99,9 +98,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams',
-    'messageService', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService',
-    function($scope, $state, $stateParams, messageService, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService) {
+.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService',
+    function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService) {
         var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
 
         $scope.onSwipeRight = function() {
@@ -361,7 +359,7 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('broadcastCtrl', function($scope, $state) {
+.controller('broadcastCtrl',['$scope', '$state', function($scope, $state) {
     $scope.onSwipeLeft = function() {
         $state.go("tab.setting");
     };
@@ -375,7 +373,7 @@ angular.module('penpen.controllers', [])
         // console.log($scope.messages);
         $scope.messages = messageService.getBroadcast();
     });
-})
+}])
 
 .controller('aboutCtrl', ['$scope', '$state', 'sqliteService', function($scope, $state, sqliteService) {
     $scope.onSwipeRight = function() {
