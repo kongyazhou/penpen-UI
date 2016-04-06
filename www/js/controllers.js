@@ -60,7 +60,7 @@ angular.module('penpen.controllers', [])
 
         wsService.ws.onopen = function() {
             wsService.sendMessage(loginService.getLoginMsg());
-        }
+        };
 
         wsService.ws.onmessage = function(evt) {
             // window.plugins.toast.showShortBottom('controller!：'+evt.data);
@@ -85,7 +85,6 @@ angular.module('penpen.controllers', [])
             }, 200);
         };
 
-        var i = 0;
         $scope.$on("$ionicView.beforeEnter", function() {
             //TODO 从服务器同步离线未读消息存入sqlite
             //TODO 从lastMessage表读取消息
@@ -122,7 +121,7 @@ angular.module('penpen.controllers', [])
         //连接断开时重发登陆消息
         wsService.ws.onopen = function() {
             wsService.sendMessage(loginService.getLoginMsg());
-        }
+        };
 
         //这是收到消息的函数
         //Override ws.onmessage
@@ -176,17 +175,17 @@ angular.module('penpen.controllers', [])
 
         };
         $scope.sendMessage = function(msg) {
-            if (window["WebSocket"]) {
+            if (window.WebSocket) {
                 var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
 
                 wsMsg.onopen = function() {
                     jsonMsg = '{"from":"' + loginService.getUser() + '","to":"' + $scope.contact.user + '","type":"0","content":"' + Base64.encode(msg) + '"}';
                     this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
-                }
-                wsMsg.onclose = function(evt) {}
+                };
+                wsMsg.onclose = function(evt) {};
                 wsMsg.onmessage = function(evt) {
                     // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
-                }
+                };
             } else {
                 // window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
             }
@@ -405,4 +404,4 @@ angular.module('penpen.controllers', [])
     };
     $scope.contact = loginService.getUserContact();
     // $scope.contact = contactService.getContact("12345678900");
-}])
+}]);

@@ -551,7 +551,7 @@ angular.module('penpen.services', [])
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.to], function(tx, res) {
                 // 如果没有则创建,有则更新
-                if (res.rows.item(0).cnt != 0) {
+                if (res.rows.item(0).cnt !== 0) {
                     //存在则更新
                     // window.plugins.toast.showLongBottom('条目存在');
                     tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?  WHERE user=?;", [msg.content, msg.time, msg.to]);
@@ -589,7 +589,7 @@ angular.module('penpen.services', [])
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
                 // 如果没有则创建,有则更新
-                if (res.rows.item(0).cnt != 0) {
+                if (res.rows.item(0).cnt !== 0) {
                     //存在则更新最后消息，并使未读消息数目+1
                     tx.executeSql('select unreadNo from lastMessage where user=?;', [msg.from], function(tx, res) {
                         tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, res.rows.item(0).unreadNo + 1, msg.from]);
@@ -618,7 +618,7 @@ angular.module('penpen.services', [])
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
                 // 如果没有则创建,有则更新
-                if (res.rows.item(0).cnt != 0) {
+                if (res.rows.item(0).cnt !== 0) {
                     //存在则更新
                     tx.executeSql("UPDATE lastMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE user=?;", [msg.content, msg.time, 0, msg.from]);
                 } else {
@@ -718,4 +718,4 @@ angular.module('penpen.services', [])
         });
         return messages;
     };
-}])
+}]);
