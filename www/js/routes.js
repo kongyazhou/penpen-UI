@@ -38,7 +38,7 @@ angular.module('penpen.routes', [])
             url: '/message',
             nativeTransitions: {
                 "type": "fade",
-                "duration": 200
+                "duration": 100
             },
             views: {
                 'tab-message': {
@@ -51,7 +51,7 @@ angular.module('penpen.routes', [])
             url: '/friends',
             nativeTransitions: {
                 "type": "fade",
-                "duration": 200
+                "duration": 100
             },
             views: {
                 'tab-friends': {
@@ -64,7 +64,7 @@ angular.module('penpen.routes', [])
             url: '/broadcast',
             nativeTransitions: {
                 "type": "fade",
-                "duration": 200
+                "duration": 100
             },
             views: {
                 'tab-broadcast': {
@@ -77,7 +77,7 @@ angular.module('penpen.routes', [])
             url: '/setting',
             nativeTransitions: {
                 "type": "fade",
-                "duration": 200
+                "duration": 100
             },
             views: {
                 'tab-setting': {

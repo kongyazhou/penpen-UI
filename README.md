@@ -112,6 +112,19 @@ Chrome的Batarang插件。
 
 **Jasmine**写测试用例
 
+#### 构建工具
+
+**cordova/ionic**：本地编译构建，《[Ionic toturial for building a release.apk](https://forum.ionicframework.com/t/ionic-toturial-for-building-a-release-apk/15758)》
+
+[**phonegap build**](https://build.phonegap.com)：在线编译构建
+
+```
+目前未找到可用的混淆压缩方案，试了下minify，结果白屏。
+考虑下从"其他工具"中找到解决办法吧。
+不过看了混淆后的代码，似乎意义不大，只不过是变成一行了..
+要找更完整更强大的解决方法，实在不行就自己做个工具。
+```
+
 ## 系统功能
 
 ```
