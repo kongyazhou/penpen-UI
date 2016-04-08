@@ -1,8 +1,6 @@
 angular.module('penpen.services', [])
 
 .service('wsService', ['loginService', function(loginService) {
-    var callbacks = {};
-    var currentCallbackId = 0;
     //初始化ws对象
     this.ws = {};
 
@@ -20,7 +18,6 @@ angular.module('penpen.services', [])
     };
 
     this.sendMessage = function(msg) {
-        //各controller自己复写该方法以实现功能
         this.ws.send('{"head":1110,"body":"' + Base64.encode(msg) + '","tail":"PENPEN 1.0"}');
         //ws.send(msg);
     };
@@ -55,7 +52,7 @@ angular.module('penpen.services', [])
         return msg;
     };
     this.logined = function() {
-        login = true;
+        login = true;        
         ws = new WebSocket('ws://223.202.124.144:33888/');
         ws.onopen = function() {
             user = loginService.getUser();
@@ -65,6 +62,11 @@ angular.module('penpen.services', [])
     };
     this.isLogged = function() {
         return login;
+    };
+    this.logoff = function() {
+        user = "";
+        password = "";
+        login = false;
     };
 }])
 
@@ -278,17 +280,28 @@ angular.module('penpen.services', [])
 }])
 
 .service('sqliteService', ['loginService', 'contactService', function(loginService, contactService) {
-    var dbName = 'penpen.' + loginService.getUser();
+    var dbName = "";
     // var dbName = 'penpen.12345678905';
     var stmt = "";
-    var dbPenpen = window.sqlitePlugin.openDatabase({
-        name: dbName,
-        iosDatabaseLocation: 'default'
-    }, function(db) {
-        // window.plugins.toast.showLongBottom('打开数据库成功' + dbName);
-    }, function(err) {
-        // window.plugins.toast.showLongBottom('打开数据库失败' + err);
-    });
+    var dbPenpen = {};
+    this.openDatabase = function() {
+        dbName = 'penpen.' + loginService.getUser();
+        dbPenpen = window.sqlitePlugin.openDatabase({
+            name: dbName,
+            iosDatabaseLocation: 'default'
+        }, function(db) {
+            // window.plugins.toast.showLongBottom('打开数据库成功' + dbName);
+        }, function(err) {
+            // window.plugins.toast.showLongBottom('打开数据库失败' + err);
+        });
+    };
+    this.closeDatabase = function() {
+        dbPenpen.close(function() {
+            // window.plugins.toast.showLongBottom('database is closed ok');
+        }, function(error) {
+            // window.plugins.toast.showLongBottom('ERROR closing database');
+        });
+    };
 
     this.addNewMessageSend = function(msg) {
         // window.plugins.toast.showShortBottom(msg.content);
@@ -417,7 +430,7 @@ angular.module('penpen.services', [])
         });
         return messages;
     };
-    
+
     this.setReaded = function(user) {
         // var contact = contactService.getContact(user);
         var messages = [];

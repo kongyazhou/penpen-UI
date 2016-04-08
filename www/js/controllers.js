@@ -1,7 +1,7 @@
 angular.module('penpen.controllers', [])
 
 .controller('messageCtrl', ['$scope', '$state', '$timeout', '$ionicPopup', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'activeState',
-    function($scope, $state,$timeout, $ionicPopup, parser, wsService, loginService, mp3Service, contactService, sqliteService, activeState) {
+    function($scope, $state, $timeout, $ionicPopup, parser, wsService, loginService, mp3Service, contactService, sqliteService, activeState) {
 
         // $scope.messages = messageService.getAllMessages();
         // console.log($scope.messages);
@@ -192,8 +192,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('loginCtrl', ['$scope', '$location', '$state', 'loginService', 'parser', 'wsService',
-    function($scope, $location, $state, loginService, parser, wsService) {
+.controller('loginCtrl', ['$scope', '$location', '$state', 'loginService', 'parser', 'wsService', 'sqliteService',
+    function($scope, $location, $state, loginService, parser, wsService, sqliteService) {
         /*
         输入用户名密码后，点击按钮发送登陆消息包
         等待返回结果，同时登录按钮disabled
@@ -205,74 +205,13 @@ angular.module('penpen.controllers', [])
         $scope.login = function(user, password) {
             //TODO 网络异常，无法建立连接时的处理
             $scope.logining = true;
-            /*            if (user == "15669910253") {
-                            window.plugins.jPushPlugin.setAlias("penpen" + user);
-                            $scope.$apply(function() {
-                                //TODO 为什么没有跳转？超级用户无效....
-                                $scope.logining = false;
-                                // $location.path('/tab/message');
-                            });
-                            var db = window.sqlitePlugin.openDatabase({
-                                    name: 'penpen.msg',
-                                    iosDatabaseLocation: 'default'
-                                },
-                                function(db) {
-                                    // window.plugins.toast.showShortBottom('打开数据库成功');
-                                    db.transaction(function(tx) {
-                                        tx.executeSql('CREATE TABLE IF NOT EXISTS test_table (id integer primary key, data text,  data_num integer)');
-                                        tx.executeSql("INSERT INTO test_table (data, data_num) VALUES (?,?)", ["R U OK?", 100]);
-                                    });
-                                },
-                                function(db) {
-                                    // window.plugins.toast.showShortBottom('打开数据库失败');
-                                });
-                            // window.plugins.toast.showShortBottom('登录成功');
-                        } else if (user == "12345678910") {
-                            var db = window.sqlitePlugin.openDatabase({
-                                name: 'penpen.12345678905',
-                                iosDatabaseLocation: 'default'
-                            }, function(db) {
-                                window.plugins.toast.showShortBottom('打开数据库成功');
-                                db.transaction(function(tx) {
-                                    tx.executeSql("select message from penpen12345678901;", [], function(tx, res) {
-                                        window.plugins.toast.showLongBottom('查询成功');
-                                        // window.plugins.toast.showShortBottom(res.rows.length);
-                                        window.plugins.toast.showShortBottom(res.rows.item(0).message);
-                                        window.plugins.toast.showLongBottom(res.rows.item(1).message);
-                                        // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
-                                        // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
-                                        // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
-                                    }, function(err) {
-                                        window.plugins.toast.showLongBottom('查询失败' + err.message);
-                                    });
-                                    tx.executeSql("select lastMessage from lastMessage;", [], function(tx, res) {
-                                            // window.plugins.toast.showLongBottom('lastmessage成功');
-                                            // window.plugins.toast.showShortBottom(res.rows.length);
-                                            window.plugins.toast.showLongBottom(res.rows.item(0).lastMessage);
-                                            window.plugins.toast.showLongBottom(res.rows.item(1).lastMessage);
-                                            // window.plugins.toast.showLongBottom(res.rows.item(1).data_num);
-                                            // console.log("res.rows.length: " + res.rows.length + " -- should be 1");
-                                            // console.log("res.rows.item(0).cnt: " + res.rows.item(0).cnt + " -- should be 1");
-                                        },
-                                        function(err) {
-                                            window.plugins.toast.showLongBottom('lastmessage失败' + err.message);
-                                        });
-                                });
-                            }, function(db) {
-                                window.plugins.toast.showLongBottom('打开数据库失败');
-                            });
-                            $scope.$apply(function() {
-                                //TODO 为什么没有跳转？超级用户无效....
-                                $scope.logining = false;
-                                // $location.path('/tab/message');
-                            });
-                        } else {*/
             loginService.setUser(user);
             loginService.setPassword(password);
 
             wsService.ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
 
             wsService.ws.onopen = function() {
+                //打开立即发送登陆消息
                 wsService.sendMessage(loginService.getLoginMsg());
             };
             wsService.ws.onclose = function(evt) {
@@ -288,6 +227,7 @@ angular.module('penpen.controllers', [])
 
                     window.plugins.jPushPlugin.setAlias("penpen" + user);
                     loginService.logined();
+                    sqliteService.openDatabase();                    
                     // mp3Service.playLogin();
                     $scope.$apply(function() {
                         $scope.logining = false;
@@ -308,8 +248,6 @@ angular.module('penpen.controllers', [])
                     });
                 }
             };
-            // }
-
         };
     }
 ])
@@ -359,7 +297,7 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('broadcastCtrl',['$scope', '$state', function($scope, $state) {
+.controller('broadcastCtrl', ['$scope', '$state', function($scope, $state) {
     $scope.onSwipeLeft = function() {
         $state.go("tab.setting");
     };
@@ -393,13 +331,25 @@ angular.module('penpen.controllers', [])
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
     };
-    $scope.contact = loginService.getUserContact();
+    $scope.$on("$ionicView.beforeEnter", function() {
+        // console.log($scope.messages);
+        $scope.contact = loginService.getUserContact();
+    });
 }])
 
-.controller('settingCtrl', ['$scope', '$state', 'loginService', function($scope, $state, loginService) {
+.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', function($scope, $state, loginService, sqliteService) {
     $scope.onSwipeRight = function() {
         $state.go("tab.broadcast");
     };
-    $scope.contact = loginService.getUserContact();
+    // $scope.contact = loginService.getUserContact();
+    $scope.logoff = function() {
+        loginService.logoff();
+        sqliteService.closeDatabase();
+        $state.go("login");
+    };
+    $scope.$on("$ionicView.beforeEnter", function() {
+        // console.log($scope.messages);
+        $scope.contact = loginService.getUserContact();
+    });
     // $scope.contact = contactService.getContact("12345678900");
 }]);
