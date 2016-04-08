@@ -4,7 +4,7 @@
     <h1 class="title" ng-bind="contact.name">未知</h1>
     <button class="button button-icon icon ion-person"></button>
 </ion-header-bar>
-<ion-content class="rj-stable-content" overflow-scroll="true" delegate-handle="messageDetailsScroll" id="message-detail-content" on-swipe-right="onSwipeRight()">
+<ion-content class="rj-stable-content" overflow-scroll="false" has-bouncing="true" delegate-handle="messageDetailsScroll" id="message-detail-content" on-swipe-right="onSwipeRight()">
 	<!-- <ion-refresher pulling-text="..." on-refresh="doRefresh()" pulling-icon=""></ion-refresher> -->
     <!-- Message part -->
     <div ng-repeat="item in messageDetails">

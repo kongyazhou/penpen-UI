@@ -2,7 +2,7 @@
     <h1 class="title">消息</h1>
 </ion-header-bar>
 <ion-view on-swipe-left="onSwipeLeft()">
-    <ion-content overflow-scroll="true" class="has-header">
+    <ion-content overflow-scroll="false" has-bouncing="true" class="has-header">
         <ion-list rj-close-back-drop>
             <ion-item class="item-avatar" ng-class="{'rj-item-top': message.isTop}" on-hold="popupMessageOpthins(message)" rj-hold-active ng-repeat="message in messages | orderBy:['isTop', 'lastMessage.timeFrome1970']:true" ng-click="messageDetails(message.user)">
                 <img ng-src="{{message.icon}}">
