@@ -50,17 +50,17 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 
 - cordova-plugin-websocket（websocket）
 - cordova-plugin-splashscreen（启动画面）
-- ionic-plugin-keyboard（软键盘）
 - cordova-plugin-statusbar（手机顶部状态栏）
 - cordova-plugin-device(诸多插件依赖此插件)
 - cordova-plugin-x-toast（toast）
-- cordova-sqlite-storage(本地存储)
-- cordova-plugin-media（播放、录制媒体文件）
-- com.telerik.plugins.nativepagetransitions（源生体验）
+- cordova-plugin-media（播放、录制语音文件）
 - cordova-plugin-vibration（手机振动）
-- cordova-plugin-file（文件传输）
-
+- cordova-plugin-file（文件读写）
+- cordova-plugin-file-transfer（文件传输）
+- cordova-sqlite-storage(本地存储)
+- ionic-plugin-keyboard（软键盘）
 - cn.jpush.phonegap.JPushPlugin（极光推送）
+- com.telerik.plugins.nativepagetransitions（源生体验）
 
 #### 开发工具
 
