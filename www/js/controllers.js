@@ -174,7 +174,7 @@ angular.module('penpen.controllers', [])
         };
         $scope.sendMessage = function(msg) {
             if (window.WebSocket) {
-                var wsMsg = new WebSocket('ws://223.202.124.144:21888/');
+                var wsMsg = new WebSocket('ws://52.69.156.153:21888/');
 
                 wsMsg.onopen = function() {
                     jsonMsg = '{"from":"' + loginService.getUser() + '","to":"' + $scope.contact.user + '","type":"0","content":"' + Base64.encode(msg) + '"}';
@@ -208,7 +208,7 @@ angular.module('penpen.controllers', [])
             loginService.setUser(user);
             loginService.setPassword(password);
 
-            wsService.ws = new ReconnectingWebSocket('ws://223.202.124.144:20888/');
+            wsService.ws = new ReconnectingWebSocket('ws://52.69.156.153:20888/');
 
             wsService.ws.onopen = function() {
                 //打开立即发送登陆消息
