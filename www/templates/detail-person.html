@@ -7,26 +7,65 @@
     <ion-content overflow-scroll="false" has-bouncing="true" class="has-header">
         <ion-list>
 
-            <ion-item class="item-divider">基本资料</ion-item>
+            <ion-item class="item-divider">
+                <div class="row">
+                    <div class="col">基本资料</div>
+                </div>
+            </ion-item>
                        
             <ion-item class="item-thumbnail-left">
                 <img ng-src="{{contact.icon}}">
-                <h2 ng-bind="contact.name"></h2>
+                <div class="row">
+                <div class="col">
+                    <h2 ng-bind="contact.name"></h2>
+                </div>
+                </div>
+                <div class="row">
                 <!-- <p ng-bind="contact.name">部门</p> -->
-                <p ng-bind="contact.job"></p>
+                <div class="col">
+                    <p ng-bind="contact.job"></p>
+                </div>                
+                </div>
             </ion-item>
 
             <ion-item class="item-divider"></ion-item>
-
-            <ion-item ng-bind="contact.user">联系电话</ion-item>
-            <ion-item ng-disabled="true">个性签名</ion-item>  
-            <ion-item ng-disabled="true">备注</ion-item>       
+            <ion-item>
+                <div class="row">
+                    <div class="col col-25">部门</div>
+                    <div class="col">{{contact.department}}</div>
+                </div>
+            </ion-item>
+            <ion-item>
+                <div class="row">
+                    <div class="col col-25">联系电话</div>
+                    <div class="col">{{contact.user}}</div>
+                </div>
+            </ion-item>
+            <ion-item>
+                <div class="row">
+                    <div class="col col-25">个性签名</div>
+                    <div class="col">{{contact.signing}}</div>
+                </div>
+            </ion-item>  
+<!--             <ion-item ng-disabled="true">备注</ion-item>    -->    
             
-            <ion-item class="item-divider">个性设置</ion-item> 
+            <ion-item class="item-divider">
+                <div class="row">
+                    <div class="col">个性设置</div>
+                </div>
+            </ion-item> 
 
-            <ion-toggle toggle-class="toggle-calm" ng-disabled="true">定制提示音</ion-toggle>
+            <ion-toggle toggle-class="toggle-calm" ng-disabled="true">
+                <div class="row">
+                    <div class="col">定制提示音</div>
+                </div>
+            </ion-toggle>
             <label class="item item-select" ng-disabled="true">
-                <span class="input-label" ng-disabled="true">消息提示音</span>
+                <span class="input-label" ng-disabled="true">
+                    <div class="row">
+                        <div class="col">消息提示音</div>
+                    </div>
+                </span>
                 <select ng-disabled="true">
                     <option>叮咚</option>
                     <option>滴答</option>

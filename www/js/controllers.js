@@ -192,8 +192,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('loginCtrl', ['$scope', '$location', '$state', 'loginService', 'parser', 'wsService', 'sqliteService',
-    function($scope, $location, $state, loginService, parser, wsService, sqliteService) {
+.controller('loginCtrl', ['$scope', '$location', '$state', 'loginService', 'parser', 'wsService', 'sqliteService', 'contactService',
+    function($scope, $location, $state, loginService, parser, wsService, sqliteService, contactService) {
         /*
         输入用户名密码后，点击按钮发送登陆消息包
         等待返回结果，同时登录按钮disabled
@@ -223,11 +223,12 @@ angular.module('penpen.controllers', [])
                 // window.plugins.toast.showShortBottom('state：'+result.state);
                 if (result.state == 11) {
                     //登录成功
-                    window.plugins.toast.showShortBottom('登录成功');
+                    // window.plugins.toast.showShortBottom('登录成功');
 
                     window.plugins.jPushPlugin.setAlias("penpen" + user);
+                    contactService.init();
                     loginService.logined();
-                    sqliteService.openDatabase();                    
+                    sqliteService.openDatabase();
                     // mp3Service.playLogin();
                     $scope.$apply(function() {
                         $scope.logining = false;
@@ -265,10 +266,7 @@ angular.module('penpen.controllers', [])
 
     $scope.personDetail = function(contact) {
         $state.go("personDetail", {
-            "name": contact.name,
-            "user": contact.user,
-            "icon": contact.icon,
-            "job": contact.job
+            "user": contact.user
         });
     };
     $scope.groups = contactService.getGroups();
@@ -284,11 +282,11 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('personDetailCtrl', ['$scope', '$state', '$stateParams', function($scope, $state, $stateParams) {
+.controller('personDetailCtrl', ['$scope', '$state', '$stateParams', 'contactService', function($scope, $state, $stateParams, contactService) {
     $scope.onSwipeRight = function() {
         $state.go("tab.friends");
     };
-    $scope.contact = $stateParams;
+    $scope.contact = contactService.getContact($stateParams.user);
     $scope.messageDetails = function(user) {
         //TODO 更新lastMessage表的lastTime
         $state.go("messageDetail", {
