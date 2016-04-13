@@ -151,137 +151,137 @@ angular.module('penpen.services', [])
     var departments = {};
     var contacts = [];
     var groups = [];
-/*        var groups = [{
-            "show": true,
-            "department": "总经理",
-            "contacts": [{
-                "user": "12345678900",
-                "name": "郑总",
-                "icon": "img/0.jpg",
-                "job": "总经理",
-                "signing":"111"
-            }]
-        }, {
-            "show": true,
-            "department": "技术部",
-            "contacts": [{
-                "user": "12345678901",
-                "name": "李明",
-                "icon": "img/1.jpg",
-                "job": "部长",
-                "signing":"111"
-            }, {
-                "user": "12345678902",
-                "name": "刘翔",
-                "icon": "img/2.jpg",
-                "job": "软件工程师",
-                "signing":"111"
-            }, {
-                "user": "12345678903",
-                "name": "张涛",
-                "icon": "img/3.jpg",
-                "job": "硬件工程师",
-                "signing":"111"
-            }, {
-                "user": "12345678904",
-                "name": "顾城",
-                "icon": "img/4.jpg",
-                "job": "机械工程师",
-                "signing":"111"
-            }]
-        }, {
-            "show": true,
-            "department": "市场部",
-            "contacts": [{
-                "user": "12345678905",
-                "name": "朱薇",
-                "icon": "img/5.jpg",
-                "job": "部长",
-                "signing":"111"
-            }, {
-                "user": "12345678906",
-                "name": "郭思琪",
-                "icon": "img/6.jpg",
-                "job": "销售经理",
-                "signing":"111"
-            }, {
-                "user": "12345678907",
-                "name": "沈紫",
-                "icon": "img/7.jpg",
-                "job": "销售经理",
-                "signing":"111"
-            }]
-        }, {
-            "show": true,
-            "department": "财务部",
-            "contacts": [{
-                "user": "12345678908",
-                "name": "汪美琴",
-                "icon": "img/8.jpg",
-                "job": "部长",
-                "signing":"111"
-            }, {
-                "user": "12345678909",
-                "name": "刘斌",
-                "icon": "img/9.jpg",
-                "job": "副部长",
-                "signing":"111"
-            }]
-        }];
-        var contacts = [{
-            "user": "12345678900",
-            "name": "郑总",
-            "icon": "img/0.jpg",
-            "job": "总经理",
-                "signing":"111",
-                "department":"aasd"
+    /*        var groups = [{
+               "show": true,
+               "department": "总经理",
+               "contacts": [{
+                   "user": "12345678900",
+                   "name": "郑总",
+                   "icon": "img/0.jpg",
+                   "job": "总经理",
+                   "signing":"111"
+               }]
+           }, {
+               "show": true,
+               "department": "技术部",
+               "contacts": [{
+                   "user": "12345678901",
+                   "name": "李明",
+                   "icon": "img/1.jpg",
+                   "job": "部长",
+                   "signing":"111"
+               }, {
+                   "user": "12345678902",
+                   "name": "刘翔",
+                   "icon": "img/2.jpg",
+                   "job": "软件工程师",
+                   "signing":"111"
+               }, {
+                   "user": "12345678903",
+                   "name": "张涛",
+                   "icon": "img/3.jpg",
+                   "job": "硬件工程师",
+                   "signing":"111"
+               }, {
+                   "user": "12345678904",
+                   "name": "顾城",
+                   "icon": "img/4.jpg",
+                   "job": "机械工程师",
+                   "signing":"111"
+               }]
+           }, {
+               "show": true,
+               "department": "市场部",
+               "contacts": [{
+                   "user": "12345678905",
+                   "name": "朱薇",
+                   "icon": "img/5.jpg",
+                   "job": "部长",
+                   "signing":"111"
+               }, {
+                   "user": "12345678906",
+                   "name": "郭思琪",
+                   "icon": "img/6.jpg",
+                   "job": "销售经理",
+                   "signing":"111"
+               }, {
+                   "user": "12345678907",
+                   "name": "沈紫",
+                   "icon": "img/7.jpg",
+                   "job": "销售经理",
+                   "signing":"111"
+               }]
+           }, {
+               "show": true,
+               "department": "财务部",
+               "contacts": [{
+                   "user": "12345678908",
+                   "name": "汪美琴",
+                   "icon": "img/8.jpg",
+                   "job": "部长",
+                   "signing":"111"
+               }, {
+                   "user": "12345678909",
+                   "name": "刘斌",
+                   "icon": "img/9.jpg",
+                   "job": "副部长",
+                   "signing":"111"
+               }]
+           }];
+           var contacts = [{
+               "user": "12345678900",
+               "name": "郑总",
+               "icon": "img/0.jpg",
+               "job": "总经理",
+                   "signing":"111",
+                   "department":"aasd"
 
-        }, {
-            "user": "12345678901",
-            "name": "李明",
-            "icon": "img/1.jpg",
-            "job": "部长"
-        }, {
-            "user": "12345678902",
-            "name": "刘翔",
-            "icon": "img/2.jpg",
-            "job": "软件工程师"
-        }, {
-            "user": "12345678903",
-            "name": "张涛",
-            "icon": "img/3.jpg",
-            "job": "硬件工程师"
-        }, {
-            "user": "12345678904",
-            "name": "顾城",
-            "icon": "img/4.jpg",
-            "job": "机械工程师"
-        }, {
-            "user": "12345678905",
-            "name": "朱薇",
-            "icon": "img/5.jpg",
-            "job": "部长"
-        }, {
-            "user": "12345678906",
-            "name": "郭思琪",
-            "icon": "img/6.jpg",
-            "job": "销售经理"
-        }, {
-            "user": "12345678907",
-            "name": "沈紫",
-            "icon": "img/7.jpg",
-            "job": "销售经理"
-        }, {
-            "user": "12345678908",
-            "name": "汪美琴",
-            "icon": "img/8.jpg",
-            "job": "部长"
-        }, {
-            "user": "12345678909",
-            "name": "刘斌",
-            "icon": "img/9.jpg",
-            "job": "副部长"
-        }];*/
+           }, {
+               "user": "12345678901",
+               "name": "李明",
+               "icon": "img/1.jpg",
+               "job": "部长"
+           }, {
+               "user": "12345678902",
+               "name": "刘翔",
+               "icon": "img/2.jpg",
+               "job": "软件工程师"
+           }, {
+               "user": "12345678903",
+               "name": "张涛",
+               "icon": "img/3.jpg",
+               "job": "硬件工程师"
+           }, {
+               "user": "12345678904",
+               "name": "顾城",
+               "icon": "img/4.jpg",
+               "job": "机械工程师"
+           }, {
+               "user": "12345678905",
+               "name": "朱薇",
+               "icon": "img/5.jpg",
+               "job": "部长"
+           }, {
+               "user": "12345678906",
+               "name": "郭思琪",
+               "icon": "img/6.jpg",
+               "job": "销售经理"
+           }, {
+               "user": "12345678907",
+               "name": "沈紫",
+               "icon": "img/7.jpg",
+               "job": "销售经理"
+           }, {
+               "user": "12345678908",
+               "name": "汪美琴",
+               "icon": "img/8.jpg",
+               "job": "部长"
+           }, {
+               "user": "12345678909",
+               "name": "刘斌",
+               "icon": "img/9.jpg",
+               "job": "副部长"
+           }];*/
     this.init = function() {
         var wsContact = new WebSocket('ws://52.69.156.153:51888/');
 
@@ -300,7 +300,7 @@ angular.module('penpen.services', [])
                 contacts.push({
                     "name": Base64.decode(contact.name),
                     "user": contact.user,
-                    "icon": "img/8.jpg", //TODO
+                    "icon": cordova.file.dataDirectory + contact.user + ".jpg", //TODO
                     "signing": Base64.decode(contact.signing),
                     "job": Base64.decode(jobs[contact.job]),
                     "department": Base64.decode(departments[contact.department])
@@ -327,11 +327,35 @@ angular.module('penpen.services', [])
                 groups.push(group);
             }
             // window.plugins.toast.showLongBottom(groups[0].contacts.name);
+                
+        //TODO 判断头像是否存在
+            //下载头像
+            var transferSucc = function(entry) {
+                window.plugins.toast.showShortBottom('下载成功');
+            };
+            var transferFail = function(error) {
+                window.plugins.toast.showShortBottom(error.code);
+            };
+            for (var l in contacts) {
+                var fileTransfer = new FileTransfer();
+                var uri = encodeURI("http://52.69.156.153/upload/" + contacts[l].user + ".jpg");
+                // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                var fileURL = cordova.file.dataDirectory + contacts[l].user + ".jpg";
+                fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+                    headers: {
+                        "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                    }
+                });
+
+            }    
         };
 
     };
     this.getGroups = function() {
         return groups;
+    };
+    this.getContacts = function() {
+        return contacts;
     };
     this.getContact = function(user) {
         var i = 0;
@@ -549,4 +573,8 @@ angular.module('penpen.services', [])
         });
         return messages;
     };
+}])
+
+.service('iconService', ['contactService', function(contactService) {
+
 }]);
