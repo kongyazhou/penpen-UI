@@ -13,15 +13,18 @@
                 </div>
             </ion-item>
 
-            <ion-item class="item-thumbnail-left">
+            <ion-item class="item-thumbnail-left" ng-click="updateIcon()">
+                
                 <img ng-src="{{contact.icon}}">
                 <div class="row">
+
                     <div class="col">
                         <h2 ng-bind="contact.name"></h2>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row item-icon-right">
                 <!-- <p ng-bind="contact.name">部门</p> -->
+                <i class="icon ion-ios-arrow-right"></i>
                     <div class="col">
                         <p ng-bind="contact.job"></p>
                     </div>                

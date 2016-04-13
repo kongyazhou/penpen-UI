@@ -257,6 +257,7 @@ angular.module('penpen.controllers', [])
                 }
             };
         };
+
     }
 ])
 
@@ -372,6 +373,62 @@ angular.module('penpen.controllers', [])
         wsSigning.onmessage = function(evt) {
             // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
         };
+    };
+    $scope.updateIcon = function() {
+
+        window.imagePicker.getPictures(
+            function(results) {
+                var win = function(r) {
+                    // window.plugins.toast.showLongBottom(r.responseCode);
+                };
+                //config fail
+                var fail = function(error) {
+                    window.plugins.toast.showLongBottom(error.code);
+                };
+                //config options
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = $scope.contact.user + ".jpg";
+                options.mimeType = "image/jpeg";
+                //config options.para
+                var params = {};
+                params.value1 = "test";
+                params.value2 = "param";
+
+                options.params = params;
+                //do trandfer
+                for (var i = 0; i < results.length; i++) {
+                    // window.plugins.toast.showLongBottom('Image URI: ' + results[i]);
+                    var ft = new FileTransfer();
+                    ft.upload(results[i], encodeURI("http://52.69.156.153/upload.php"), win, fail, options);
+                }
+                //TODO
+                // contactService.setIcon($scope.contact.user, results[i]);
+                // $scope.contact.icon = results[i];
+                // $scope.$apply(function() {});
+            },
+            function(error) {
+                window.plugins.toast.showLongBottom('Error: ' + error);
+            }, {
+                maximumImagesCount: 1,
+                width: 128,
+                height: 128
+            }
+        );
+        /*navigator.camera.getPicture(onSuccess, onFail, {
+            destinationType: Camera.DestinationType.FILE_URI,
+            sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+        });
+
+        function onSuccess(imageURI) {
+            // var image = document.getElementById('myImage');
+            // image.src = imageURI;
+            window.plugins.toast.showLongBottom('上传成功');
+        }
+
+        function onFail(message) {
+            window.plugins.toast.showLongBottom('取消更换头像：' + message);
+        }*/
     };
 }])
 
