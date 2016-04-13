@@ -2,12 +2,26 @@ angular.module('penpen.controllers', [])
 
 .controller('messageCtrl', ['$scope', '$state', '$timeout', '$ionicPopup', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'activeState',
     function($scope, $state, $timeout, $ionicPopup, parser, wsService, loginService, mp3Service, contactService, sqliteService, activeState) {
+        $scope.$on("$ionicView.beforeEnter", function() {
+            //TODO 从服务器同步离线未读消息存入sqlite
+            //TODO 从lastMessage表读取消息
+            // console.log($scope.messages);
+            $scope.messages = sqliteService.getLastMessages();
+            // $scope.messages = messageService.getAllMessages();
+            $scope.popup = {
+                isPopup: false,
+                index: 0
+            };
+
+            $scope.$apply(function() {});
+        });
 
         // $scope.messages = messageService.getAllMessages();
         // console.log($scope.messages);
         $scope.onSwipeLeft = function() {
             $state.go("tab.friends");
         };
+
         $scope.popupMessageOpthins = function(message) {
             $scope.popup.index = $scope.messages.indexOf(message);
             $scope.popup.optionsPopup = $ionicPopup.show({
@@ -16,6 +30,7 @@ angular.module('penpen.controllers', [])
             });
             $scope.popup.isPopup = true;
         };
+
         $scope.markMessage = function() {
             var index = $scope.popup.index;
             var message = $scope.messages[index];
@@ -30,6 +45,7 @@ angular.module('penpen.controllers', [])
             $scope.popup.isPopup = false;
             messageService.updateMessage(message);
         };
+
         $scope.deleteMessage = function() {
             var index = $scope.popup.index;
             var message = $scope.messages[index];
@@ -39,6 +55,7 @@ angular.module('penpen.controllers', [])
             messageService.deleteMessageId(message.id);
             messageService.clearMessage(message);
         };
+
         $scope.topMessage = function() {
             var index = $scope.popup.index;
             var message = $scope.messages[index];
@@ -51,6 +68,7 @@ angular.module('penpen.controllers', [])
             $scope.popup.isPopup = false;
             messageService.updateMessage(message);
         };
+
         $scope.messageDetails = function(message) {
             $state.go("messageDetail", {
                 "user": message
@@ -84,28 +102,11 @@ angular.module('penpen.controllers', [])
             }, 200);
         };
 
-        $scope.$on("$ionicView.beforeEnter", function() {
-            //TODO 从服务器同步离线未读消息存入sqlite
-            //TODO 从lastMessage表读取消息
-            // console.log($scope.messages);
-            $scope.messages = sqliteService.getLastMessages();
-            // $scope.messages = messageService.getAllMessages();
-            $scope.popup = {
-                isPopup: false,
-                index: 0
-            };
-        });
     }
 ])
 
 .controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService',
     function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService) {
-        var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
-
-        $scope.onSwipeRight = function() {
-            $state.go("tab.message");
-        };
-
         $scope.$on("$ionicView.beforeEnter", function() {
             $scope.contact = contactService.getContact($stateParams.user);
             $scope.messageDetails = sqliteService.getContactMessages($scope.contact.user);
@@ -113,8 +114,14 @@ angular.module('penpen.controllers', [])
             sqliteService.setReaded($scope.contact.user);
             $timeout(function() {
                 viewScroll.scrollBottom(true);
-            }, 0);
+            }, 200);
         });
+
+        var viewScroll = $ionicScrollDelegate.$getByHandle('messageDetailsScroll');
+
+        $scope.onSwipeRight = function() {
+            $state.go("tab.message");
+        };
 
         //连接断开时重发登陆消息
         wsService.ws.onopen = function() {
@@ -254,12 +261,18 @@ angular.module('penpen.controllers', [])
 ])
 
 .controller('friendsCtrl', ['$scope', '$state', 'contactService', function($scope, $state, contactService) {
+    $scope.$on("$ionicView.beforeEnter", function() {
+        $scope.$apply(function() {});
+    });
+
     $scope.onSwipeLeft = function() {
         $state.go("tab.broadcast");
     };
+
     $scope.onSwipeRight = function() {
         $state.go("tab.message");
     };
+
     /*$scope.contacts_right_bar_swipe = function(e){
         console.log(e);
     };*/
@@ -269,7 +282,9 @@ angular.module('penpen.controllers', [])
             "user": contact.user
         });
     };
+
     $scope.groups = contactService.getGroups();
+
     /*
      * if given group is the selected group, deselect it
      * else, select the given group
@@ -277,6 +292,7 @@ angular.module('penpen.controllers', [])
     $scope.toggleGroup = function(group) {
         group.show = !group.show;
     };
+
     $scope.isGroupShown = function(group) {
         return group.show;
     };
@@ -286,7 +302,9 @@ angular.module('penpen.controllers', [])
     $scope.onSwipeRight = function() {
         $state.go("tab.friends");
     };
+
     $scope.contact = contactService.getContact($stateParams.user);
+
     $scope.messageDetails = function(user) {
         //TODO 更新lastMessage表的lastTime
         $state.go("messageDetail", {
@@ -296,19 +314,20 @@ angular.module('penpen.controllers', [])
 }])
 
 .controller('broadcastCtrl', ['$scope', '$state', function($scope, $state) {
+    $scope.$on("$ionicView.beforeEnter", function() {
+        // console.log($scope.messages);
+        $scope.messages = messageService.getBroadcast();
+    });
+
     $scope.onSwipeLeft = function() {
         $state.go("tab.setting");
     };
+
     $scope.onSwipeRight = function() {
         $state.go("tab.friends");
     };
 
     //
-
-    $scope.$on("$ionicView.beforeEnter", function() {
-        // console.log($scope.messages);
-        $scope.messages = messageService.getBroadcast();
-    });
 }])
 
 .controller('aboutCtrl', ['$scope', '$state', 'sqliteService', function($scope, $state, sqliteService) {
@@ -325,29 +344,52 @@ angular.module('penpen.controllers', [])
         };*/
 }])
 
-.controller('userDetailCtrl', ['$scope', '$state', 'loginService', function($scope, $state, loginService) {
+.controller('userDetailCtrl', ['$scope', '$state', 'loginService', 'contactService', function($scope, $state, loginService, contactService) {
+
+    $scope.$on("$ionicView.beforeEnter", function() {
+        // console.log($scope.messages);
+        $scope.contact = loginService.getUserContact();
+        $scope.signing = $scope.contact.signing;
+        $scope.$apply(function() {});
+    });
+
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
     };
+
+    $scope.updateSigning = function(signing) {
+        var wsSigning = new WebSocket('ws://52.69.156.153:31888/');
+
+        wsSigning.onopen = function() {
+            jsonMsg = '{"user":"' + $scope.contact.user + '","signing":"' + Base64.encode(signing) + '"}';
+            this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
+        };
+        wsSigning.onclose = function(evt) {
+            contactService.setSigning($scope.contact.user, signing);
+            $scope.contact.signing = signing;
+            $scope.$apply(function() {});
+        };
+        wsSigning.onmessage = function(evt) {
+            // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
+        };
+    };
+}])
+
+.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', function($scope, $state, loginService, sqliteService) {
     $scope.$on("$ionicView.beforeEnter", function() {
         // console.log($scope.messages);
         $scope.contact = loginService.getUserContact();
     });
-}])
 
-.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', function($scope, $state, loginService, sqliteService) {
     $scope.onSwipeRight = function() {
         $state.go("tab.broadcast");
     };
+
     // $scope.contact = loginService.getUserContact();
     $scope.logoff = function() {
         loginService.logoff();
         sqliteService.closeDatabase();
         $state.go("login");
     };
-    $scope.$on("$ionicView.beforeEnter", function() {
-        // console.log($scope.messages);
-        $scope.contact = loginService.getUserContact();
-    });
     // $scope.contact = contactService.getContact("12345678900");
 }]);

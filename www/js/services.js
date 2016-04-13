@@ -151,137 +151,137 @@ angular.module('penpen.services', [])
     var departments = {};
     var contacts = [];
     var groups = [];
-    /*        var groups = [{
-               "show": true,
-               "department": "总经理",
-               "contacts": [{
-                   "user": "12345678900",
-                   "name": "郑总",
-                   "icon": "img/0.jpg",
-                   "job": "总经理",
-                   "signing":"111"
-               }]
-           }, {
-               "show": true,
-               "department": "技术部",
-               "contacts": [{
-                   "user": "12345678901",
-                   "name": "李明",
-                   "icon": "img/1.jpg",
-                   "job": "部长",
-                   "signing":"111"
-               }, {
-                   "user": "12345678902",
-                   "name": "刘翔",
-                   "icon": "img/2.jpg",
-                   "job": "软件工程师",
-                   "signing":"111"
-               }, {
-                   "user": "12345678903",
-                   "name": "张涛",
-                   "icon": "img/3.jpg",
-                   "job": "硬件工程师",
-                   "signing":"111"
-               }, {
-                   "user": "12345678904",
-                   "name": "顾城",
-                   "icon": "img/4.jpg",
-                   "job": "机械工程师",
-                   "signing":"111"
-               }]
-           }, {
-               "show": true,
-               "department": "市场部",
-               "contacts": [{
-                   "user": "12345678905",
-                   "name": "朱薇",
-                   "icon": "img/5.jpg",
-                   "job": "部长",
-                   "signing":"111"
-               }, {
-                   "user": "12345678906",
-                   "name": "郭思琪",
-                   "icon": "img/6.jpg",
-                   "job": "销售经理",
-                   "signing":"111"
-               }, {
-                   "user": "12345678907",
-                   "name": "沈紫",
-                   "icon": "img/7.jpg",
-                   "job": "销售经理",
-                   "signing":"111"
-               }]
-           }, {
-               "show": true,
-               "department": "财务部",
-               "contacts": [{
-                   "user": "12345678908",
-                   "name": "汪美琴",
-                   "icon": "img/8.jpg",
-                   "job": "部长",
-                   "signing":"111"
-               }, {
-                   "user": "12345678909",
-                   "name": "刘斌",
-                   "icon": "img/9.jpg",
-                   "job": "副部长",
-                   "signing":"111"
-               }]
-           }];
-           var contacts = [{
-               "user": "12345678900",
-               "name": "郑总",
-               "icon": "img/0.jpg",
-               "job": "总经理",
-                   "signing":"111",
-                   "department":"aasd"
+    /*var groups = [{
+    "show": true,
+    "department": "总经理",
+    "contacts": [{
+    "user": "12345678900",
+    "name": "郑总",
+    "icon": "img/0.jpg",
+    "job": "总经理",
+    "signing":"111"
+    }]
+    }, {
+    "show": true,
+    "department": "技术部",
+    "contacts": [{
+    "user": "12345678901",
+    "name": "李明",
+    "icon": "img/1.jpg",
+    "job": "部长",
+    "signing":"111"
+    }, {
+    "user": "12345678902",
+    "name": "刘翔",
+    "icon": "img/2.jpg",
+    "job": "软件工程师",
+    "signing":"111"
+    }, {
+    "user": "12345678903",
+    "name": "张涛",
+    "icon": "img/3.jpg",
+    "job": "硬件工程师",
+    "signing":"111"
+    }, {
+    "user": "12345678904",
+    "name": "顾城",
+    "icon": "img/4.jpg",
+    "job": "机械工程师",
+    "signing":"111"
+    }]
+    }, {
+    "show": true,
+    "department": "市场部",
+    "contacts": [{
+    "user": "12345678905",
+    "name": "朱薇",
+    "icon": "img/5.jpg",
+    "job": "部长",
+    "signing":"111"
+    }, {
+    "user": "12345678906",
+    "name": "郭思琪",
+    "icon": "img/6.jpg",
+    "job": "销售经理",
+    "signing":"111"
+    }, {
+    "user": "12345678907",
+    "name": "沈紫",
+    "icon": "img/7.jpg",
+    "job": "销售经理",
+    "signing":"111"
+    }]
+    }, {
+    "show": true,
+    "department": "财务部",
+    "contacts": [{
+    "user": "12345678908",
+    "name": "汪美琴",
+    "icon": "img/8.jpg",
+    "job": "部长",
+    "signing":"111"
+    }, {
+    "user": "12345678909",
+    "name": "刘斌",
+    "icon": "img/9.jpg",
+    "job": "副部长",
+    "signing":"111"
+    }]
+    }];
+    var contacts = [{
+    "user": "12345678900",
+    "name": "郑总",
+    "icon": "img/0.jpg",
+    "job": "总经理",
+    "signing":"111",
+    "department":"aasd"
 
-           }, {
-               "user": "12345678901",
-               "name": "李明",
-               "icon": "img/1.jpg",
-               "job": "部长"
-           }, {
-               "user": "12345678902",
-               "name": "刘翔",
-               "icon": "img/2.jpg",
-               "job": "软件工程师"
-           }, {
-               "user": "12345678903",
-               "name": "张涛",
-               "icon": "img/3.jpg",
-               "job": "硬件工程师"
-           }, {
-               "user": "12345678904",
-               "name": "顾城",
-               "icon": "img/4.jpg",
-               "job": "机械工程师"
-           }, {
-               "user": "12345678905",
-               "name": "朱薇",
-               "icon": "img/5.jpg",
-               "job": "部长"
-           }, {
-               "user": "12345678906",
-               "name": "郭思琪",
-               "icon": "img/6.jpg",
-               "job": "销售经理"
-           }, {
-               "user": "12345678907",
-               "name": "沈紫",
-               "icon": "img/7.jpg",
-               "job": "销售经理"
-           }, {
-               "user": "12345678908",
-               "name": "汪美琴",
-               "icon": "img/8.jpg",
-               "job": "部长"
-           }, {
-               "user": "12345678909",
-               "name": "刘斌",
-               "icon": "img/9.jpg",
-               "job": "副部长"
-           }];*/
+    }, {
+    "user": "12345678901",
+    "name": "李明",
+    "icon": "img/1.jpg",
+    "job": "部长"
+    }, {
+    "user": "12345678902",
+    "name": "刘翔",
+    "icon": "img/2.jpg",
+    "job": "软件工程师"
+    }, {
+    "user": "12345678903",
+    "name": "张涛",
+    "icon": "img/3.jpg",
+    "job": "硬件工程师"
+    }, {
+    "user": "12345678904",
+    "name": "顾城",
+    "icon": "img/4.jpg",
+    "job": "机械工程师"
+    }, {
+    "user": "12345678905",
+    "name": "朱薇",
+    "icon": "img/5.jpg",
+    "job": "部长"
+    }, {
+    "user": "12345678906",
+    "name": "郭思琪",
+    "icon": "img/6.jpg",
+    "job": "销售经理"
+    }, {
+    "user": "12345678907",
+    "name": "沈紫",
+    "icon": "img/7.jpg",
+    "job": "销售经理"
+    }, {
+    "user": "12345678908",
+    "name": "汪美琴",
+    "icon": "img/8.jpg",
+    "job": "部长"
+    }, {
+    "user": "12345678909",
+    "name": "刘斌",
+    "icon": "img/9.jpg",
+    "job": "副部长"
+    }];*/
     this.init = function() {
         var wsContact = new WebSocket('ws://52.69.156.153:51888/');
 
@@ -327,11 +327,11 @@ angular.module('penpen.services', [])
                 groups.push(group);
             }
             // window.plugins.toast.showLongBottom(groups[0].contacts.name);
-                
-        //TODO 判断头像是否存在
+
+            //TODO 判断头像是否存在
             //下载头像
             var transferSucc = function(entry) {
-                window.plugins.toast.showShortBottom('下载成功');
+                // window.plugins.toast.showShortBottom('下载成功');
             };
             var transferFail = function(error) {
                 window.plugins.toast.showShortBottom(error.code);
@@ -347,7 +347,7 @@ angular.module('penpen.services', [])
                     }
                 });
 
-            }    
+            }
         };
 
     };
@@ -362,6 +362,15 @@ angular.module('penpen.services', [])
         for (i in contacts) {
             if (contacts[i].user == user) {
                 return contacts[i];
+            }
+        }
+    };
+    this.setSigning = function(user, signing) {
+        var i = 0;
+        for (i in contacts) {
+            if (contacts[i].user == user) {
+                contacts[i].signing = signing;
+                return;
             }
         }
     };
