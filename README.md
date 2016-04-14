@@ -1,6 +1,7 @@
 # PENPEN—Client
 
 * [概述](#概述)
+* [待解决问题](#待解决问题)
 * [开发环境](#开发环境)
 * [系统功能](#系统功能)
 * [其他工具](#其他工具)
@@ -13,6 +14,21 @@ PENPEN是一个面向企业用户开发的移动端IM应用项目，致力于为
 PENPEN-Client是项目的客户端部分。
 
 PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
+
+## 待解决问题
+
+```
+此处汇总目前已上线功能所存在的所有问题，一遍参照存在的问题进行下一步工作。
+```
+
+1. 查看联系人详情时，同步该联系人签名和头像
+2. 推送带上发送者信息
+3. 正在聊天的联系人信息停止推送
+4. 打开app清除所有推送消息
+5. 聊天根据最后消息排序
+6. 聊天置顶和删除等
+7. Resume后界面立即刷新一次
+8. 更新头像立即生效
 
 ## 开发环境
 
@@ -58,6 +74,8 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 - cordova-plugin-file（文件读写）
 - cordova-plugin-file-transfer（文件传输）
 - cordova-sqlite-storage(本地存储)
+- cordova-plugin-image-picker（选取照片并处理）
+- cordova-plugin-camera（拍照）
 - ionic-plugin-keyboard（软键盘）
 - cn.jpush.phonegap.JPushPlugin（极光推送）
 - com.telerik.plugins.nativepagetransitions（源生体验）
@@ -68,17 +86,17 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 
 使用的Sublime插件：
 
-**SublimeLinter**：《[安装与使用](http://gaohaoyang.github.io/2015/03/26/sublimeLinter/)》
+SublimeLinter：《[安装与使用](http://gaohaoyang.github.io/2015/03/26/sublimeLinter/)》
 - SublimeLinter-jshint(JS语法检查),《[JSLint语法错误一览](http://www.zystudios.cn/blog/post/70.Shtml)》《[设置JSHint](https://segmentfault.com/a/1190000000512948)》
 - SublimeLinter-csslint(CSS语法检查)
 
-**jsFormats**(JS格式对齐)
+jsFormats(JS格式对齐)
 
-[**AngularJS**](https://github.com/angular-ui/AngularJS-sublime-package)(Angular提示)
+[AngularJS](https://github.com/angular-ui/AngularJS-sublime-package)(Angular提示)
 
-**Babel**(ES6语法)
+Babel(ES6语法)
 
-**在线调试**：
+**在线代码预览**：
 
 ```
 本项目中没有使用到，推荐一试。
@@ -96,9 +114,9 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 
 #### 调试工具
 
-**ionic**：UI部分可以通过ionic提供的 **"ionic serve"** 命令在Chrome浏览器下进行调试。
+ionic：UI部分可以通过ionic提供的 " *ionic serve* " 命令在Chrome浏览器下进行调试。
 
-**GapDebug**：连接设备实时调试。
+GapDebug：连接设备实时调试。
 
 PhoneGapDeveloper
 
@@ -106,29 +124,35 @@ Chrome的Batarang插件。
 
 #### 测试工具
 
-**Protactor**：为测试AngularJS而生。
+Protactor：为测试AngularJS而生。
 
-**karma**单元测试
+karma：单元测试
 
-**Jasmine**写测试用例
+Jasmine：编写测试用例
 
 #### 构建工具
 
-**cordova/ionic**：本地编译构建，《[Ionic toturial for building a release.apk](https://forum.ionicframework.com/t/ionic-toturial-for-building-a-release-apk/15758)》
+```
+由于某些原因(PhoneGap在线编译不能使用Codova插件等)，两种方式不能并存，所以应在开发伊始选好构建平台。
+本项目使用cordova本地编译构建方式。
+```
 
-[**phonegap build**](https://build.phonegap.com)：在线编译构建
+cordova/ionic：本地编译构建，《[Ionic toturial for building a release.apk](https://forum.ionicframework.com/t/ionic-toturial-for-building-a-release-apk/15758)》
+
+[phonegap build](https://build.phonegap.com)：在线编译构建
 
 ```
 目前未找到可用的混淆压缩方案，试了下minify，结果白屏。
 考虑下从"其他工具"中找到解决办法吧。
 不过看了混淆后的代码，似乎意义不大，只不过是变成一行了..
-要找更完整更强大的解决方法，实在不行就自己做个工具。
+需要寻找更完整更强大的解决方法，实在不行就自己做个工具。
 ```
 
 ## 系统功能
 
 ```
 不带*号的将在1.0版本实现，带*号的将在2.0版本实现。
+在1.0版本正式发布之前将不做版本管理。
 ```
 
 - **用户系统**
@@ -143,7 +167,7 @@ Chrome的Batarang插件。
 
 实时视频聊天*
 
-- **会议系统** 
+- **讨论组系统** 
 
 多人文本聊天
 
@@ -157,17 +181,17 @@ Chrome的Batarang插件。
 当前版本未使用，后续可以考虑加入的工具
 ```
 
-[**Yeoman（Yo、Gulp、Bower）——前端工程化**](http://yeoman.io/)：代码生成器工厂，全是宝贵的财富哇
+[Yeoman（Yo、Gulp、Bower）——前端工程化](http://yeoman.io/)：代码生成器工厂，全是宝贵的财富哇
 
-[**Gulp**](http://www.gulpjs.com.cn/)：代码合并和混淆工具，部署发布必备，《[jshint在gulp中的使用](http://www.xiabingbao.com/gulp/2015/10/15/gulp-jshint/)》
+[Gulp](http://www.gulpjs.com.cn/)：代码合并和混淆工具，部署发布必备，《[jshint在gulp中的使用](http://www.xiabingbao.com/gulp/2015/10/15/gulp-jshint/)》
 
-[**bower**](http://bower.io/)：一个前端软件包管理工具，前端模块化必备，可以自己做个模块传上去之类，参见《[bower简明入门教程](http://www.wtoutiao.com/p/i1e8nJ.html)》《[如何使用bower包管理器](https://www.douban.com/note/495604729/)》
+[bower](http://bower.io/)：一个前端软件包管理工具，前端模块化必备，可以自己做个模块传上去之类，参见《[bower简明入门教程](http://www.wtoutiao.com/p/i1e8nJ.html)》《[如何使用bower包管理器](https://www.douban.com/note/495604729/)》
 
-**Babel**：**ES6** 代码 源到源的编译器
+Babel：ES6 代码 源到源的编译器
 
-**Browserify**：专业打包工具
+Browserify：专业打包工具
 
-[**Webpack**](http://webpack.github.io/):比上面的好用
+[Webpack](http://webpack.github.io/)：比上面更强大，更好用的打包工具
 
 [用webpack来取代browserify](https://segmentfault.com/a/1190000002490637)
 
