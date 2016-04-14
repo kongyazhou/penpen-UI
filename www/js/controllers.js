@@ -345,6 +345,17 @@ angular.module('penpen.controllers', [])
         };*/
 }])
 
+.controller('createGroupCtrl', ['$scope', '$state', 'contactService', function($scope, $state, contactService) {
+    $scope.$on("$ionicView.beforeEnter", function() {
+        $scope.groups = contactService.getGroups();
+        $scope.$apply(function() {});
+    });
+
+    $scope.onSwipeRight = function() {
+        $state.go("tab.friends");
+    };
+}])
+
 .controller('userDetailCtrl', ['$scope', '$state', 'loginService', 'contactService', function($scope, $state, loginService, contactService) {
 
     $scope.$on("$ionicView.beforeEnter", function() {

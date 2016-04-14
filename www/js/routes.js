@@ -4,6 +4,11 @@ angular.module('penpen.routes', [])
 
     $stateProvider
 
+        .state('createGroup', {
+            url: '/createGroup',
+            templateUrl: 'templates/create-group.html',
+            controller: "createGroupCtrl"
+        })
         .state('login', {
             url: '/login',
             templateUrl: 'templates/login.html',

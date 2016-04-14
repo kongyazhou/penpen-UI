@@ -3,28 +3,36 @@
 </ion-header-bar>
 <ion-view on-swipe-left="onSwipeLeft()" on-swipe-right="onSwipeRight()">
     <ion-content overflow-scroll="false" has-bouncing="true">
-      <ion-list>
-        <div ng-repeat="group in groups">
-          <ion-item class="item-stable"
-                    ng-click="toggleGroup(group)"
-                    ng-class="{active: isGroupShown(group)}">
-              <i class="icon" ng-class="isGroupShown(group) ? 'ion-ios-arrow-down' : 'ion-ios-arrow-right'"></i>
-            &nbsp;
-            {{group.department}}
-          </ion-item>
-          <ion-item class="item-avatar"
-                    ng-repeat="contact in group.contacts"
-                    ng-show="isGroupShown(group)"
-                    ng-click="personDetail(contact)">
-                    <img ng-src="{{contact.icon}}">
-                    <h2 ng-bind="contact.name"></h2>
-                    <p ng-bind="contact.signing"></p>
-                    <span class="badge badge-balanced" ng-bind="contact.job"></span>
-                                
-          </ion-item>
-          
-        </div>
-      </ion-list>
+        <ion-list>
+            <ion-item class="item-avatar"
+                ui-sref="createGroup">
+                <img ng-src="img/groupIcon.jpg">
+                <div class="row row-center item-icon-right">
+                    <i class="icon ion-ios-arrow-right"></i>
+                    <h2 class="col">创建讨论组</h2>
+                </div>
+            </ion-item>
+            <div ng-repeat="group in groups">
+            <ion-item class="item-stable"
+                ng-click="toggleGroup(group)"
+                ng-class="{active: isGroupShown(group)}">
+                <i class="icon" ng-class="isGroupShown(group) ? 'ion-ios-arrow-down' : 'ion-ios-arrow-right'"></i>
+                &nbsp;
+                {{group.department}}
+            </ion-item>
+            <ion-item class="item-avatar"
+                ng-repeat="contact in group.contacts"
+                ng-show="isGroupShown(group)"
+                ng-click="personDetail(contact)">
+                <img ng-src="{{contact.icon}}">
+                <h2 ng-bind="contact.name"></h2>
+                <p ng-bind="contact.signing"></p>
+                <span class="badge badge-balanced" ng-bind="contact.job"></span>
+
+            </ion-item>
+              
+            </div>
+        </ion-list>
 
 
     </ion-content>
