@@ -9,7 +9,7 @@
 
 ## 概述
 
-PENPEN是一个面向企业用户开发的移动端IM应用项目，致力于为企业用户打造灵活而可靠的通信方式。
+PENPEN是一个面向企业用户开发的移动端IM应用项目，致力于为企业用户打造灵活而可靠的沟通平台。
 
 PENPEN-Client是项目的客户端部分。
 
@@ -25,11 +25,13 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 2. 推送带上发送者信息
 3. 正在聊天的联系人信息停止推送
 4. 打开app清除所有推送消息
-5. 聊天根据最后消息排序
+5. 聊天根据最后消息时间远近排序
 6. 聊天置顶和删除等
 7. Resume后界面立即刷新一次
 8. 更新头像立即生效
 9. 头像裁剪后不是128*128
+10. 每次进入创建讨论组页面不会清除之前的设置
+11. 给自己发消息怎么处理
 
 ## 开发环境
 
@@ -88,7 +90,7 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 使用的Sublime插件：
 
 SublimeLinter：《[安装与使用](http://gaohaoyang.github.io/2015/03/26/sublimeLinter/)》
-- SublimeLinter-jshint(JS语法检查),《[JSLint语法错误一览](http://www.zystudios.cn/blog/post/70.Shtml)》《[设置JSHint](https://segmentfault.com/a/1190000000512948)》
+- SublimeLinter-jshint(JS语法检查)，《[JSLint语法错误一览](http://www.zystudios.cn/blog/post/70.Shtml)》《[设置JSHint](https://segmentfault.com/a/1190000000512948)》
 - SublimeLinter-csslint(CSS语法检查)
 
 jsFormats(JS格式对齐)
@@ -134,7 +136,7 @@ Jasmine：编写测试用例
 #### 构建工具
 
 ```
-由于某些原因(PhoneGap在线编译不能使用Codova插件等)，两种方式不能并存，所以应在开发伊始选好构建平台。
+由于某些原因(PhoneGap在线编译不能使用Cordova插件等)，两种方式不能并存，所以应在开发伊始选好构建平台。
 本项目使用cordova本地编译构建方式。
 ```
 
@@ -145,7 +147,7 @@ cordova/ionic：本地编译构建，《[Ionic toturial for building a release.a
 ```
 目前未找到可用的混淆压缩方案，试了下minify，结果白屏。
 考虑下从"其他工具"中找到解决办法吧。
-不过看了混淆后的代码，似乎意义不大，只不过是变成一行了..
+不过看了混淆后的代码，似乎意义不大，只不过是把代码变成一行了..
 需要寻找更完整更强大的解决方法，实在不行就自己做个工具。
 ```
 

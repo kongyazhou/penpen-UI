@@ -345,14 +345,70 @@ angular.module('penpen.controllers', [])
         };*/
 }])
 
-.controller('createGroupCtrl', ['$scope', '$state', 'contactService', function($scope, $state, contactService) {
+.controller('createGroupCtrl', ['$scope', '$state', 'contactService', 'loginService', function($scope, $state, contactService, loginService) {
     $scope.$on("$ionicView.beforeEnter", function() {
         $scope.groups = contactService.getGroups();
+        $scope.groupName = "";
+        // $scope.groupMembers = [];//清空会导致不相符
         $scope.$apply(function() {});
     });
 
+    $scope.groupMembers = [];
+
     $scope.onSwipeRight = function() {
         $state.go("tab.friends");
+    };
+
+    $scope.createGroup = function(groupName) {
+        //判断是否选择了讨论组成员，选择了则发送创建讨论组消息包
+        if ($scope.groupMembers.length !== 0) {
+            //TODO
+            // window.plugins.toast.showShortBottom("$scope.groupMembers:" + $scope.groupMembers);
+            // window.plugins.toast.showLongBottom("$scope.groupName:" + $scope.groupName);
+
+            var holder = loginService.getUser();
+            //为了防止多次添加holder的情况发生
+            //先删除已存在的holder账号
+            for (var i in $scope.groupMembers) {
+                if ($scope.groupMembers[i] == holder) {
+                    $scope.groupMembers.splice(i, 1);
+                }
+            }
+            $scope.groupMembers.push(holder); //加上本人user
+            var strGroupMembers = $scope.groupMembers.join(",");
+            window.plugins.toast.showShortBottom("strGroupMembers:" + strGroupMembers);
+            //将消息包发送给服务器创建套路暗组
+            var wsGroup = new WebSocket('ws://52.69.156.153:60888/');
+
+            wsGroup.onopen = function() {
+                jsonMsg = '{"holder":"' + holder + '","name":"' + Base64.encode($scope.groupName) + '","member":"' + strGroupMembers + '"}';
+                this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
+            };
+            wsGroup.onclose = function(evt) {};
+            wsGroup.onmessage = function(evt) {
+                // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
+            };
+            //等待服务器反馈，跳转至相应页面
+        } else {
+            window.plugins.toast.showLongBottom("未选择讨论组成员");
+        }
+    };
+
+    $scope.addGroupMember = function(state, user) {
+        if (state) {
+            //选定则在组成员中添加该用户
+            window.plugins.toast.showShortBottom("Checked:" + user);
+            $scope.groupMembers.push(user);
+        } else {
+            window.plugins.toast.showShortBottom("unChecked:" + user);
+            //取消选定则在组成员中删除该用户
+            for (var i in $scope.groupMembers) {
+                if ($scope.groupMembers[i] == user) {
+                    $scope.groupMembers.splice(i, 1);
+                }
+            }
+
+        }
     };
 }])
 

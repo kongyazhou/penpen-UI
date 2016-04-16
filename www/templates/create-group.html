@@ -6,21 +6,22 @@
 <ion-view title="详细资料" on-swipe-right="onSwipeRight()">
     <ion-content overflow-scroll="false" has-bouncing="true" class="has-header">
         <ion-list>
+        <!-- <form class="list"> -->
 
             <ion-item class="item-divider">
                 <div class="row">
-                    <div class="col">基本资料</div>
+                    <div class="col">设置名称</div>
                 </div>
             </ion-item>
-            <ion-item class="item item-input-inset">
+            <div class="item item-input-inset">
                 <div class="row">
-                    <span class="col col-25">组名称</span>
+                <!-- <span class="col col-25">组名称</span> -->
+                    <span class="input-label">讨论组名称</span>
                     <label class="item-input-wrapper">
-                        <input type="text" ng-model="groupName">
+                        <input type="text" ng-model="$parent.groupName">
                     </label>
-
                 </div>
-            </ion-item>
+            </div>
 
             <ion-item class="item-divider">
                 <div class="row">
@@ -34,7 +35,8 @@
                     &nbsp;
                     {{group.department}}
                 </ion-item>
-                <ion-checkbox  ng-repeat="contact in group.contacts">
+                <ion-checkbox ng-repeat="contact in group.contacts" ng-click="addGroupMember(isChecked,contact.user)" ng-model="isChecked">
+                <!-- <ion-checkbox  ng-repeat="contact in group.contacts"> -->
                     <ion-item class="item-avatar">
                         <img ng-src="{{contact.icon}}">  
                         <h2 ng-bind="contact.name"></h2>                            
@@ -43,9 +45,14 @@
                 </ion-checkbox>
             </div>
 
-
-            <button class="button button-balanced  button-block" ng-disabled="true">创建
+            <div class="item-divider">
+                <div class="row">
+                    <div class="col"></div>
+                </div>
+            </div>
+            <button class="button button-balanced  button-block" ng-click="createGroup($parent.groupName)" ng-disabled="!$parent.groupName">创建
             </button>
         </ion-list>
+        <!-- </form> -->
     </ion-content>
 </ion-view>
