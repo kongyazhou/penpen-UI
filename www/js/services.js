@@ -650,7 +650,7 @@ angular.module('penpen.services', [])
         var group = groupService.getGroup(msg.to);
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid integer, name text, icon text, lastMessage text, lastTime text, unreadNo integer);');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid integer, name text, lastMessage text, lastTime text, unreadNo integer);');
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastGroupMessage where gid=?;', [msg.to], function(tx, res) {
                 // 如果没有则创建,有则更新
@@ -737,6 +737,20 @@ angular.module('penpen.services', [])
         var count = 0;
         dbPenpen.transaction(function(tx) {
             stmt = 'UPDATE lastMessage SET unreadNo=0  WHERE user=' + user + ';';
+            tx.executeSql(stmt, [], function(tx, res) {
+                // window.plugins.toast.showShortBottom('Count:' + count);
+            }, function(err) {
+                // window.plugins.toast.showShortBottom('setReaded失败');
+            });
+        });
+    };
+
+    this.setGroupReaded = function(gid) {
+        // var contact = contactService.getContact(user);
+        var messages = [];
+        var count = 0;
+        dbPenpen.transaction(function(tx) {
+            stmt = 'UPDATE lastGroupMessage SET unreadNo=0  WHERE gid=' + gid + ';';
             tx.executeSql(stmt, [], function(tx, res) {
                 // window.plugins.toast.showShortBottom('Count:' + count);
             }, function(err) {

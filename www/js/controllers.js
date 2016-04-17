@@ -31,6 +31,7 @@ angular.module('penpen.controllers', [])
                     };
                     // window.plugins.toast.showShortBottom('Else msg:' + msg);
                     // 将message存入消息数据库，并更新lastMessage表
+                    mp3Service.playMessage();
                     sqliteService.addNewMessageRecv(msgObj);
                     //重新获取lastMessage表，并更新界面
                     $scope.messages = sqliteService.getLastMessages();
@@ -49,6 +50,7 @@ angular.module('penpen.controllers', [])
                     };
                     //将消息存入群消息数据库，并更新lastMessage表
                     sqliteService.addNewGroupMessageRecv(msgObj);
+                    mp3Service.playMessage();
                     //重新获取lastMessage表，并更新界面
                     $scope.gmessages = sqliteService.getLastGroupMessages();
                     $timeout(function() {
@@ -75,6 +77,7 @@ angular.module('penpen.controllers', [])
                     // window.plugins.toast.showShortBottom(content + "!!!" + msg.to);
                     //将消息存入群消息数据库，并更新lastMessage表
                     sqliteService.addNewGroupMessageRecv(msgObj);
+                    mp3Service.playMessage();
                     //重新获取lastMessage表，并更新界面
                     $scope.gmessages = sqliteService.getLastGroupMessages();
                     $timeout(function() {
@@ -86,8 +89,8 @@ angular.module('penpen.controllers', [])
             };
 
             for (var i = 0; i < 25; i++) {
-                $timeout(refresh, 200*i);
-            }            
+                $timeout(refresh, 200 * i);
+            }
         });
 
         var refresh = function() {
@@ -206,8 +209,7 @@ angular.module('penpen.controllers', [])
                         // 将message存入sqlite
                         sqliteService.addNewMessageRecv(msgObj);
                     }
-                }
-                else if (msg.type === 10) {
+                } else if (msg.type === 10) {
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
@@ -216,15 +218,8 @@ angular.module('penpen.controllers', [])
                         "time": msg.time //TODO
                     };
                     //将消息存入群消息数据库，并更新lastMessage表
+                    mp3Service.playMessage();
                     sqliteService.addNewGroupMessageRecv(msgObj);
-                    //重新获取lastMessage表，并更新界面
-                    $scope.gmessages = sqliteService.getLastGroupMessages();
-                    $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
-                    }, 200);
-
                 } else if (msg.type === 19) {
                     //收到创建group通知组成消息，按正常消息存入
                     // window.plugins.toast.showLongBottom('收到创建通知');
@@ -242,14 +237,8 @@ angular.module('penpen.controllers', [])
                     };
                     // window.plugins.toast.showShortBottom(content + "!!!" + msg.to);
                     //将消息存入群消息数据库，并更新lastMessage表
+                    mp3Service.playMessage();
                     sqliteService.addNewGroupMessageRecv(msgObj);
-                    //重新获取lastMessage表，并更新界面
-                    $scope.gmessages = sqliteService.getLastGroupMessages();
-                    $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
-                    }, 200);
                 }
             };
             $timeout(function() {
@@ -316,6 +305,7 @@ angular.module('penpen.controllers', [])
             $scope.group = groupService.getGroup($stateParams.gid);
             $scope.gmessageDetails = sqliteService.getGroupMessages($scope.group.gid);
             $scope.self = loginService.getUserContact();
+            sqliteService.setGroupReaded($scope.group.gid);
             //TODO
             // sqliteService.setReaded($scope.contact.user);//需改为group
 
@@ -333,31 +323,28 @@ angular.module('penpen.controllers', [])
                     };
                     // window.plugins.toast.showShortBottom('Else msg:' + msg);
                     // 将message存入消息数据库，并更新lastMessage表
+                    mp3Service.playMessage();
                     sqliteService.addNewMessageRecv(msgObj);
-                    //重新获取lastMessage表，并更新界面
-                    $scope.messages = sqliteService.getLastMessages();
-                    $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
-                    }, 200);
                 } else if (msg.type === 10) {
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
                         "isFromMe": 0,
                         "content": parser.parseCotent(msg.content),
+                        "icon": cordova.file.dataDirectory + msg.from + ".jpg",
                         "time": msg.time //TODO
                     };
-                    //将消息存入群消息数据库，并更新lastMessage表
-                    sqliteService.addNewGroupMessageRecv(msgObj);
-                    //重新获取lastMessage表，并更新界面
-                    $scope.gmessages = sqliteService.getLastGroupMessages();
-                    $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
-                    }, 200);
+                    if (msg.to == $scope.group.gid) {
+                        $scope.gmessageDetails.push(msgObj);
+                        mp3Service.playMessage();
+                        $timeout(function() {
+                            viewScroll.scrollBottom(true);
+                        }, 200);
+                        //将消息存入群消息数据库，并更新lastMessage表
+                        sqliteService.addNewGroupMessageRecvReaded(msgObj);
+                    } else {
+                        sqliteService.addNewGroupMessageRecv(msgObj);
+                    }
 
                 } else if (msg.type === 19) {
                     //收到创建group通知组成消息，按正常消息存入
@@ -376,14 +363,8 @@ angular.module('penpen.controllers', [])
                     };
                     // window.plugins.toast.showShortBottom(content + "!!!" + msg.to);
                     //将消息存入群消息数据库，并更新lastMessage表
+                    mp3Service.playMessage();
                     sqliteService.addNewGroupMessageRecv(msgObj);
-                    //重新获取lastMessage表，并更新界面
-                    $scope.gmessages = sqliteService.getLastGroupMessages();
-                    $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
-                    }, 200);
                 }
             };
 
@@ -634,7 +615,10 @@ angular.module('penpen.controllers', [])
                 jsonMsg = '{"holder":"' + holder + '","name":"' + Base64.encode($scope.groupName) + '","member":"' + strGroupMembers + '"}';
                 this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
             };
-            wsGroup.onclose = function(evt) {};
+            wsGroup.onclose = function(evt) {
+                $state.go("tab.message");
+                $scope.$apply(function() {});
+            };
             wsGroup.onmessage = function(evt) {
                 // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
             };
@@ -749,7 +733,7 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', function($scope, $state, loginService, sqliteService) {
+.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', 'wsService', function($scope, $state, loginService, sqliteService, wsService) {
     $scope.$on("$ionicView.beforeEnter", function() {
         // console.log($scope.messages);
         $scope.contact = loginService.getUserContact();
@@ -761,8 +745,10 @@ angular.module('penpen.controllers', [])
 
     // $scope.contact = loginService.getUserContact();
     $scope.logoff = function() {
-        //TODO ws连接断开 ws置空
+
         loginService.logoff();
+        wsService.ws.close();
+        wsService.ws={};
         sqliteService.closeDatabase();
         $state.go("login");
     };
