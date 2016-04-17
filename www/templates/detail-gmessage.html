@@ -1,23 +1,27 @@
 <ion-header-bar class="bar-calm">
     <button class="button button-icon ion-ios-arrow-back" native-ui-sref="tab.message" native-options="{type: 'slide', direction:'right'}">
     </button>
-    <h1 class="title" ng-bind="contact.name">未知</h1>
+    <h1 class="title" ng-bind="group.name">未知</h1>
     <button class="button button-icon icon ion-person"></button>
 </ion-header-bar>
 <ion-content class="rj-stable-content" overflow-scroll="false" has-bouncing="true" delegate-handle="messageDetailsScroll" id="message-detail-content" on-swipe-right="onSwipeRight()">
 	<!-- <ion-refresher pulling-text="..." on-refresh="doRefresh()" pulling-icon=""></ion-refresher> -->
     <!-- Message part -->
-    <div ng-repeat="item in messageDetails">
+    <div ng-repeat="item in gmessageDetails">
     	<p class="rj-message-time" ng-bind="item.time" ng-if="false"></p>
-        <div class="rj-message-wrap" ng-if="!item.isFromMe">
-            <img ng-src="{{contact.icon}}" class="rj-head-pic">
+        <div class="rj-message-wrap" ng-if="(!item.isFromMe)&&item.from">
+            <img ng-src="{{item.icon}}" class="rj-head-pic">
             <!-- <span class="rj-triangle-left"></span> -->
-            <p class="rj-message" ng-bind="item.content"></p>
+            <p class="rj-message" ng-bind="item.content+'not from me.'"></p>
         </div>
-        <div class="rj-message-wrap" ng-if="item.isFromMe">
+        <div class="rj-message-wrap" ng-if="item.isFromMe&&item.from">
             <img ng-src="{{self.icon}}" class="rj-head-pic-right">
             <!-- <span class="rj-triangle-right"></span> -->
             <p class="rj-message-right" ng-bind="item.content"></p>
+        </div>
+        <div class="rj-message-wrap" ng-if="!item.from">
+            <!-- <img ng-src="{{self.icon}}" class="rj-head-pic-right"> -->
+            <p class="rj-message" ng-bind="item.content"></p>
         </div>
     </div>
     <!--  -->
@@ -42,7 +46,7 @@
             <button class="button button-icon icon ion-ios-plus-outline rj-footer-btn-left">
             </button>
         </div>
-        <div class="rj-send-button" ng-hide="!send_content || send_content === ''" ng-click="addLocalMsg(send_content);sendMessage(send_content);send_content =''">
+        <div class="rj-send-button" ng-hide="!send_content || send_content === ''" ng-click="addLocalMsg(send_content);sendMessage(send_content);send_content ='';">
             <p>发送</p>
         </div>
     </div>

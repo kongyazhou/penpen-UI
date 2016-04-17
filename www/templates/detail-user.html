@@ -52,9 +52,9 @@
                     <label class="item-input-wrapper">
                         <input type="text" ng-model="signing">
                     </label>
-                    <button class="button button-small button-clear button-balanced" ng-click="updateSigning(signing)" ng-show="signing!=contact.signing">
-                    提交
-                    </button>
+                    <div class="rj-send-button" ng-click="updateSigning(signing)" ng-show="signing!=contact.signing">
+                        <p>更新</p>
+                    </div>
                 </div>
             </ion-item>
 

@@ -24,6 +24,11 @@ angular.module('penpen.routes', [])
             templateUrl: "templates/detail-message.html",
             controller: "messageDetailCtrl"
         })
+        .state('gmessageDetail', {
+            url: '/gmessageDetail/:gid',
+            templateUrl: "templates/detail-gmessage.html",
+            controller: "gmessageDetailCtrl"
+        })
         .state('personDetail', {
             url: '/personDetail/:user',
             templateUrl: "templates/detail-person.html",

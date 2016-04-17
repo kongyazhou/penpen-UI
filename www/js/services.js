@@ -405,7 +405,37 @@ angular.module('penpen.services', [])
     };
 }])
 
-.service('sqliteService', ['loginService', 'contactService', function(loginService, contactService) {
+.service('groupService', ['parser', function(parser) {
+    var groups = [];
+    this.init = function() {
+        var wsContact = new WebSocket('ws://52.69.156.153:53888/');
+
+        wsContact.onopen = function() {};
+        wsContact.onclose = function(evt) {};
+        wsContact.onmessage = function(evt) {
+            // window.plugins.toast.showShortBottom(evt.data);
+            var msgObj = parser.parseMsg(evt.data);
+            groups = msgObj.groups;
+            for (var i in groups) {
+                groups[i].name = parser.parseCotent(groups[i].name);
+            }
+            // window.plugins.toast.showLongBottom(groups[0].holder);
+        };
+    };
+
+    this.getGroup = function(gid) {
+        var i = 0;
+        // window.plugins.toast.showShortBottom(groups);
+        for (i in groups) {
+            if (groups[i].gid == gid) {
+                return groups[i];
+            }
+        }
+        // window.plugins.toast.showLongBottom("Get Group Failed.");
+    };
+}])
+
+.service('sqliteService', ['loginService', 'contactService', 'groupService', function(loginService, contactService, groupService) {
     var dbName = "";
     // var dbName = 'penpen.12345678905';
     var stmt = "";
@@ -474,6 +504,52 @@ angular.module('penpen.services', [])
         });
     };
 
+
+    this.addNewGroupMessageSend = function(msg) {
+        // window.plugins.toast.showShortBottom(msg.content);
+
+        var group = groupService.getGroup(msg.to);
+        dbPenpen.transaction(function(tx) {
+            //更新lastMessage
+            //判断表是否存在，不存在则创建
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid text, name text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
+                // window.plugins.toast.showShortBottom('创建表成功');
+            }, function(err) {
+                // window.plugins.toast.showShortBottom('创建表失败' + err.message);
+            });
+            //判断条目是否存在
+            tx.executeSql('select count(*) as cnt from lastGroupMessage where gid=?;', [msg.to], function(tx, res) {
+                // 如果没有则创建,有则更新
+                if (res.rows.item(0).cnt !== 0) {
+                    //存在则更新
+                    // window.plugins.toast.showShortBottom('条目存在');
+                    tx.executeSql("UPDATE lastGroupMessage SET lastMessage=?,lastTime=?  WHERE gid=?;", [msg.content, msg.time, msg.to]);
+                } else {
+                    //不存在则创建条目
+                    // window.plugins.toast.showShortBottom('条目不存在');
+                    tx.executeSql("INSERT INTO lastGroupMessage( gid, name, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?);", [msg.to, group.name, msg.content, msg.time, 0]);
+                }
+            });
+
+            //添加到账号记录中
+            //若不存在则创建表
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time text, unread integer);';
+            tx.executeSql(stmt, [], function(argument) {
+                // window.plugins.toast.showLongBottom('创建表成功');
+            }, function(err) {
+                // window.plugins.toast.showLongBottom('创建表失败' + err.message);
+            });
+            //添加新消息条目
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
+            tx.executeSql(stmt, [1, loginService.getUser(), msg.content, msg.time, 0], function(tx, res) {
+                // window.plugins.toast.showLongBottom('添加新消息成功');
+            }, function(err) {
+                // window.plugins.toast.showLongBottom('添加新消息失败' + err.message);
+            });
+
+        });
+    };
+
     this.addNewMessageRecv = function(msg) {
         var contact = contactService.getContact(msg.from);
         dbPenpen.transaction(function(tx) {
@@ -528,6 +604,73 @@ angular.module('penpen.services', [])
         });
     };
 
+    //收到未读的群消息
+    //TODO
+    this.addNewGroupMessageRecv = function(msg) {
+        //根据gid获取group详情
+        //TODO 呵呵呵...
+        // var group = groupService.getGroup(msg.to);
+        // window.plugins.toast.showShortBottom(msg.time);
+        dbPenpen.transaction(function(tx) {
+            //更新lastGroupMessage表
+            //判断表是否存在，不存在则创建
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid text, name text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
+                // window.plugins.toast.showLongBottom('创建Group表成功');
+            }, function(err) {
+                // window.plugins.toast.showLongBottom('创建Group表失败' + err.message);
+            });
+            //判断条目是否存在
+            tx.executeSql('select count(*) as cnt from lastGroupMessage where gid=?;', [msg.to], function(tx, res) {
+                // 如果没有则创建,有则更新
+                if (res.rows.item(0).cnt !== 0) {
+                    //存在则更新最后消息，并使未读消息数目+1
+                    tx.executeSql('select unreadNo from lastGroupMessage where gid=?;', [msg.to], function(tx, res) {
+                        tx.executeSql("UPDATE lastGroupMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE gid=?;", [msg.content, msg.time, res.rows.item(0).unreadNo + 1, msg.to]);
+                    });
+                } else {
+                    //不存在则创建条目
+                    tx.executeSql("INSERT INTO lastGroupMessage( gid, `name`, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?);", [msg.to, msg.name, msg.content, msg.time, 1]);
+                }
+            });
+            //将消息插入讨论组消息表
+            //判断表是否存在，不存在则创建
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time text, unread integer);';
+            tx.executeSql(stmt, []);
+            //添加新消息条目
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.from, msg.content, msg.time, 1]);
+
+        });
+    };
+
+    //收到读过的群消息
+    //TODO
+    this.addNewGroupMessageRecvReaded = function(msg) {
+        //根据gid获取group详情
+        var group = groupService.getGroup(msg.to);
+        dbPenpen.transaction(function(tx) {
+            //判断表是否存在，不存在则创建
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid integer, name text, icon text, lastMessage text, lastTime text, unreadNo integer);');
+            //判断条目是否存在
+            tx.executeSql('select count(*) as cnt from lastGroupMessage where gid=?;', [msg.to], function(tx, res) {
+                // 如果没有则创建,有则更新
+                if (res.rows.item(0).cnt !== 0) {
+                    //存在则更新
+                    tx.executeSql("UPDATE lastGroupMessage SET lastMessage=?,lastTime=?,unreadNo=?  WHERE gid=?;", [msg.content, msg.time, 0, msg.to]);
+                } else {
+                    //不存在则创建条目
+                    tx.executeSql("INSERT INTO lastGroupMessage( gid, name, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?);", [msg.to, group.name, msg.content, msg.time, 0]);
+                }
+            });
+            //判断表是否存在，不存在则创建
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time text, unread integer);';
+            tx.executeSql(stmt, []);
+            //添加新消息条目
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.from, msg.content, msg.time, 0]);
+        });
+    };
+
     this.getContactMessages = function(user) {
         // var contact = contactService.getContact(user);
         var messages = [];
@@ -549,6 +692,37 @@ angular.module('penpen.services', [])
                         "isFromMe": res.rows.item(i).isFromMe,
                         "content": res.rows.item(i).content,
                         "time": res.rows.item(i).time
+                    };
+                    messages.push(obj);
+                }
+            });
+        });
+        return messages;
+    };
+
+    this.getGroupMessages = function(gid) {
+        // var contact = contactService.getContact(user);
+        var messages = [];
+        var count = 0;
+        dbPenpen.transaction(function(tx) {
+            stmt = 'select count(content) as cnt from penpen' + gid + ';';
+            tx.executeSql(stmt, [], function(tx, res) {
+                count = res.rows.item(0).cnt;
+                // window.plugins.toast.showShortBottom('Count:' + count);
+            }, function(err) {
+                // window.plugins.toast.showShortBottom('Count失败');
+            });
+            stmt = 'select * from penpen' + gid + ';';
+            tx.executeSql(stmt, [], function(tx, res) {
+                var i = 0;
+                for (i = 0; i < count; i++) {
+                    // window.plugins.toast.showShortBottom(res.rows.item(i).user);
+                    var obj = {
+                        "isFromMe": res.rows.item(i).isFromMe,
+                        "content": res.rows.item(i).content,
+                        "time": res.rows.item(i).time,
+                        "icon": cordova.file.dataDirectory + res.rows.item(i).user + ".jpg",
+                        "from": res.rows.item(i).user
                     };
                     messages.push(obj);
                 }
@@ -600,7 +774,6 @@ angular.module('penpen.services', [])
                         "lastMessage": res.rows.item(i).lastMessage,
                         "lastTime": res.rows.item(i).lastTime,
                         "unreadNo": res.rows.item(i).unreadNo
-
                     };
                     messages.push(obj);
                 }
@@ -611,8 +784,44 @@ angular.module('penpen.services', [])
         });
         return messages;
     };
-}])
 
-.service('iconService', ['contactService', function(contactService) {
+    this.getLastGroupMessages = function() {
+        var messages = [];
+        var count = 0;
+        // var length = 0;
 
+        dbPenpen.transaction(function(tx) {
+            //获取条目数
+            tx.executeSql("select count(gid) as cnt from lastGroupMessage;", [], function(tx, res) {
+                count = res.rows.item(0).cnt;
+                // length = res.rows.item.length;
+                // window.plugins.toast.showShortBottom('Count:' + count);
+                // window.plugins.toast.showLongBottom('Length:' + length);
+            }, function(err) {
+                // window.plugins.toast.showShortBottom('Count失败');
+            });
+            //获取每一条条目详情
+            tx.executeSql('select * from lastGroupMessage;', [], function(tx, res) {
+                // window.plugins.toast.showShortBottom('读取lastGroupMessage成功');
+                // window.plugins.toast.showLongBottom(res.rows.item(0).user);
+
+                var i = 0;
+                for (i = 0; i < count; i++) {
+                    // window.plugins.toast.showShortBottom(res.rows.item(i).user);
+                    var obj = {
+                        "gid": res.rows.item(i).gid,
+                        "name": res.rows.item(i).name,
+                        "lastMessage": res.rows.item(i).lastMessage,
+                        "lastTime": res.rows.item(i).lastTime,
+                        "unreadNo": res.rows.item(i).unreadNo
+                    };
+                    messages.push(obj);
+                }
+
+            }, function(err) {
+                // window.plugins.toast.showShortBottom('读取lastGroupMessage失败' + err.message);
+            });
+        });
+        return messages;
+    };
 }]);
