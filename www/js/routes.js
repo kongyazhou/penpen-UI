@@ -34,11 +34,6 @@ angular.module('penpen.routes', [])
             templateUrl: "templates/detail-person.html",
             controller: "personDetailCtrl"
         })
-        .state('userDetail', {
-            url: '/userDetail',
-            templateUrl: "templates/detail-user.html",
-            controller: "userDetailCtrl"
-        })
         .state("tab", {
             url: "/tab",
             abstract: true,

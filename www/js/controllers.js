@@ -65,7 +65,7 @@ angular.module('penpen.controllers', [])
                     groupService.init();
                     var contentObj = eval('(' + parser.parseCotent(msg.content) + ')');
                     // window.plugins.toast.showShortBottom(JSON.stringify(contentObj));
-                    var content = contentObj.holder + '创建了讨论组"' + parser.parseCotent(contentObj.name) + '"';
+                    var content = contentObj.holder + '创建了讨论组"' + parser.parseCotent(contentObj.name) + '",邀请了：' + contentObj.member;
                     msgObj = {
                         // "from": "0",
                         "to": msg.to, //gid
@@ -646,8 +646,7 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('userDetailCtrl', ['$scope', '$state', 'loginService', 'contactService', function($scope, $state, loginService, contactService) {
-
+.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', 'wsService', 'contactService', function($scope, $state, loginService, sqliteService, wsService, contactService) {
     $scope.$on("$ionicView.beforeEnter", function() {
         // console.log($scope.messages);
         $scope.contact = loginService.getUserContact();
@@ -656,7 +655,16 @@ angular.module('penpen.controllers', [])
     });
 
     $scope.onSwipeRight = function() {
-        $state.go("tab.setting");
+        $state.go("tab.broadcast");
+    };
+
+    // $scope.contact = loginService.getUserContact();
+    $scope.logoff = function() {
+        loginService.logoff();
+        wsService.ws.close();
+        wsService.ws = {};
+        sqliteService.closeDatabase();
+        $state.go("login");
     };
 
     $scope.updateSigning = function(signing) {
@@ -675,12 +683,34 @@ angular.module('penpen.controllers', [])
             // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
         };
     };
+
+    var picnumber = 0;
+
     $scope.updateIcon = function() {
 
         window.imagePicker.getPictures(
             function(results) {
                 var win = function(r) {
-                    // window.plugins.toast.showLongBottom(r.responseCode);
+                    window.plugins.toast.showLongBottom("重新登录可看到新的头像");
+                    var transferSucc = function(entry) {
+                        $scope.contact.icon = fileURL;
+                        contactService.setIcon($scope.contact.user, $scope.contact.icon);
+                        window.plugins.toast.showLongBottom(fileURL);
+                        $scope.$apply(function() {});
+                    };
+                    var transferFail = function(error) {
+                        window.plugins.toast.showShortBottom(error.code);
+                    };
+                    var fileTransfer = new FileTransfer();
+                    var uri = encodeURI("http://52.69.156.153/upload/" + user + ".jpg");
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var fileURL = cordova.file.dataDirectory + "new.jpg";
+                    fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+                    picnumber = picnumber + 1;
                 };
                 //config fail
                 var fail = function(error) {
@@ -716,6 +746,9 @@ angular.module('penpen.controllers', [])
                 height: 128
             }
         );
+
+
+
         /*navigator.camera.getPicture(onSuccess, onFail, {
             destinationType: Camera.DestinationType.FILE_URI,
             sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
@@ -730,27 +763,6 @@ angular.module('penpen.controllers', [])
         function onFail(message) {
             window.plugins.toast.showLongBottom('取消更换头像：' + message);
         }*/
-    };
-}])
-
-.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', 'wsService', function($scope, $state, loginService, sqliteService, wsService) {
-    $scope.$on("$ionicView.beforeEnter", function() {
-        // console.log($scope.messages);
-        $scope.contact = loginService.getUserContact();
-    });
-
-    $scope.onSwipeRight = function() {
-        $state.go("tab.broadcast");
-    };
-
-    // $scope.contact = loginService.getUserContact();
-    $scope.logoff = function() {
-
-        loginService.logoff();
-        wsService.ws.close();
-        wsService.ws={};
-        sqliteService.closeDatabase();
-        $state.go("login");
     };
     // $scope.contact = contactService.getContact("12345678900");
 }]);

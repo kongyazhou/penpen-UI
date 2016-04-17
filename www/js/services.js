@@ -395,6 +395,29 @@ angular.module('penpen.services', [])
             }
         });
     };
+    
+    var picnumber = 0;
+
+    this.getNewIcon = function(user) {
+        var transferSucc = function(entry) {
+            // window.plugins.toast.showShortBottom('下载成功');
+        };
+        var transferFail = function(error) {
+            window.plugins.toast.showShortBottom(error.code);
+        };
+        var fileTransfer = new FileTransfer();
+        var uri = encodeURI("http://52.69.156.153/upload/" + user + ".jpg");
+        // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+        var fileURL = cordova.file.dataDirectory + "new" + picnumber + ".jpg";
+        fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+            headers: {
+                "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+            }
+        });
+        picnumber = picnumber + 1;
+        return fileURL;
+    };
+
     this.setIcon = function(user, iconURL) {
         for (var i in contacts) {
             if (contacts[i].user == user) {
