@@ -29,7 +29,7 @@ angular.module('penpen.controllers', [])
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time
                     };
-                    // window.plugins.toast.showShortBottom('Else msg:' + msg);
+                    // window.plugins.toast.showShortBottom('time:' + msg.time);
                     // 将message存入消息数据库，并更新lastMessage表
                     mp3Service.playMessage();
                     sqliteService.addNewMessageRecv(msgObj);
@@ -265,9 +265,10 @@ angular.module('penpen.controllers', [])
                 "to": $scope.contact.user,
                 "isFromMe": true,
                 "content": msg,
-                "time": timeService.getSecondsSince1970()
+                "time": timeService.getFormatDate()
+                // "time": timeService.getSecondsSince1970()
             };
-
+            // window.plugins.toast.showShortBottom('time:' + msgObj.time);
             $scope.messageDetails.push(msgObj);
 
             // 发送消息的提示音
@@ -391,7 +392,8 @@ angular.module('penpen.controllers', [])
                 "isFromMe": true,
                 "from": $scope.self.user,
                 "content": msg,
-                "time": timeService.getSecondsSince1970()
+                "time": timeService.getFormatDate()
+                // "time": timeService.getSecondsSince1970()
             };
 
             $scope.gmessageDetails.push(msgObj);

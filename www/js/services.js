@@ -87,12 +87,40 @@ angular.module('penpen.services', [])
 }])
 
 .service('timeService', [function() {
+    var formatDate = function(date, format) {
+        var paddNum = function(num) {
+            num += "";
+            return num.replace(/^(\d)$/, "0$1");
+        };
+        //指定格式字符
+        var cfg = {
+            yyyy: date.getFullYear(), //年 : 4位
+            yy: date.getFullYear().toString().substring(2), //年 : 2位
+            M: date.getMonth() + 1, //月 : 如果1位的时候不补0
+            MM: paddNum(date.getMonth() + 1), //月 : 如果1位的时候补0
+            d: date.getDate(), //日 : 如果1位的时候不补0
+            dd: paddNum(date.getDate()), //日 : 如果1位的时候补0
+            hh: paddNum(date.getHours()), //时
+            mm: paddNum(date.getMinutes()), //分
+            ss: paddNum(date.getSeconds()) //秒
+        };
+        format || (format = "yyyy-MM-dd hh:mm:ss");
+        return format.replace(/([a-z])(\1)*/ig, function(m) {
+            return cfg[m];
+        });
+    };
+
+    this.getFormatDate = function(argument) {
+        var date = new Date();
+        return formatDate(date);
+    };
 
     this.getSecondsSince1970 = function() {
         var date = new Date();
         var seconds = parseInt(date.getTime() / 1000);
         return seconds;
     };
+
     this.getDistanceOfTime = function(time) {
         var now = this.getSecondsSince1970();
         //TODO
@@ -508,7 +536,7 @@ angular.module('penpen.services', [])
         dbPenpen.transaction(function(tx) {
             //更新lastMessage
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime datetime, unreadNo integer);', [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
                 // window.plugins.toast.showLongBottom('创建表失败' + err.message);
@@ -529,7 +557,7 @@ angular.module('penpen.services', [])
 
             //添加到账号记录中
             //若不存在则创建表
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key,isFromMe integer, content text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key,isFromMe integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
@@ -554,7 +582,7 @@ angular.module('penpen.services', [])
         dbPenpen.transaction(function(tx) {
             //更新lastMessage
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid text, name text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid text, name text, lastMessage text, lastTime datetime, unreadNo integer);', [], function(argument) {
                 // window.plugins.toast.showShortBottom('创建表成功');
             }, function(err) {
                 // window.plugins.toast.showShortBottom('创建表失败' + err.message);
@@ -575,7 +603,7 @@ angular.module('penpen.services', [])
 
             //添加到账号记录中
             //若不存在则创建表
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time datetime, unread integer);';
             tx.executeSql(stmt, [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
@@ -596,7 +624,7 @@ angular.module('penpen.services', [])
         var contact = contactService.getContact(msg.from);
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime text, unreadNo integer);');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime datetime, unreadNo integer);');
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
                 // 如果没有则创建,有则更新
@@ -611,7 +639,7 @@ angular.module('penpen.services', [])
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
             stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
@@ -625,7 +653,7 @@ angular.module('penpen.services', [])
         var contact = contactService.getContact(msg.from);
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime text, unreadNo integer);');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastMessage (id integer primary key, user text, name text, icon text, lastMessage text, lastTime datetime, unreadNo integer);');
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastMessage where user=?;', [msg.from], function(tx, res) {
                 // 如果没有则创建,有则更新
@@ -638,7 +666,7 @@ angular.module('penpen.services', [])
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
             stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
@@ -656,7 +684,7 @@ angular.module('penpen.services', [])
         dbPenpen.transaction(function(tx) {
             //更新lastGroupMessage表
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid text, name text, lastMessage text, lastTime text, unreadNo integer);', [], function(argument) {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid text, name text, lastMessage text, lastTime datetime, unreadNo integer);', [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建Group表成功');
             }, function(err) {
                 // window.plugins.toast.showLongBottom('创建Group表失败' + err.message);
@@ -676,7 +704,7 @@ angular.module('penpen.services', [])
             });
             //将消息插入讨论组消息表
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
             stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
@@ -692,7 +720,7 @@ angular.module('penpen.services', [])
         var group = groupService.getGroup(msg.to);
         dbPenpen.transaction(function(tx) {
             //判断表是否存在，不存在则创建
-            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid integer, name text, lastMessage text, lastTime text, unreadNo integer);');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS lastGroupMessage (id integer primary key, gid integer, name text, lastMessage text, lastTime datetime, unreadNo integer);');
             //判断条目是否存在
             tx.executeSql('select count(*) as cnt from lastGroupMessage where gid=?;', [msg.to], function(tx, res) {
                 // 如果没有则创建,有则更新
@@ -705,7 +733,7 @@ angular.module('penpen.services', [])
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time text, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
             stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
