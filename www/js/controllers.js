@@ -608,7 +608,7 @@ angular.module('penpen.controllers', [])
             //生成字符串
             var strGroupMembers = $scope.groupMembers.join(",");
             // window.plugins.toast.showShortBottom("strGroupMembers:" + strGroupMembers);
-            //将消息包发送给服务器创建套路暗组
+            //将消息包发送给服务器创建讨论组
             var wsGroup = new WebSocket('ws://52.69.156.153:60888/');
 
             wsGroup.onopen = function() {

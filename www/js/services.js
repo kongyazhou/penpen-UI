@@ -283,6 +283,11 @@ angular.module('penpen.services', [])
     "job": "副部长"
     }];*/
     this.init = function() {
+        //清空数据
+        jobs = {};
+        departments = {};
+        contacts = [];
+        groups = [];
         var wsContact = new WebSocket('ws://52.69.156.153:51888/');
 
         wsContact.onopen = function() {};
