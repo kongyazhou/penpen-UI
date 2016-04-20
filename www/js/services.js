@@ -86,6 +86,20 @@ angular.module('penpen.services', [])
     };
 }])
 
+.service('timeService', [function() {
+
+    this.getSecondsSince1970 = function() {
+        var date = new Date();
+        var seconds = parseInt(date.getTime() / 1000);
+        return seconds;
+    };
+    this.getDistanceOfTime = function(time) {
+        var now = this.getSecondsSince1970();
+        //TODO
+
+    };
+}])
+
 .service('activeState', ['loginService', function(loginService) {
     /*
     本服务将消息包body部分解码
@@ -400,7 +414,7 @@ angular.module('penpen.services', [])
             }
         });
     };
-    
+
     var picnumber = 0;
 
     this.getNewIcon = function(user) {

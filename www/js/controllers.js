@@ -169,8 +169,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService',
-    function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService) {
+.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'timeService',
+    function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, timeService) {
         $scope.$on("$ionicView.beforeEnter", function() {
             $scope.contact = contactService.getContact($stateParams.user);
             $scope.messageDetails = sqliteService.getContactMessages($scope.contact.user);
@@ -261,12 +261,11 @@ angular.module('penpen.controllers', [])
 
         //这是发送消息的函数
         $scope.addLocalMsg = function(msg) {
-            var date = new Date();
             var msgObj = {
                 "to": $scope.contact.user,
                 "isFromMe": true,
                 "content": msg,
-                "time": date
+                "time": timeService.getSecondsSince1970()
             };
 
             $scope.messageDetails.push(msgObj);
@@ -298,8 +297,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('gmessageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'groupService',
-    function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, groupService) {
+.controller('gmessageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'groupService', 'timeService',
+    function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, groupService, timeService) {
         // TODO
         $scope.$on("$ionicView.beforeEnter", function() {
             $scope.group = groupService.getGroup($stateParams.gid);
@@ -386,13 +385,13 @@ angular.module('penpen.controllers', [])
 
         //这是发送消息的函数
         $scope.addLocalMsg = function(msg) {
-            var date = new Date();
+            // var date = new Date();
             var msgObj = {
                 "to": $scope.group.gid,
                 "isFromMe": true,
                 "from": $scope.self.user,
                 "content": msg,
-                "time": date
+                "time": timeService.getSecondsSince1970()
             };
 
             $scope.gmessageDetails.push(msgObj);
