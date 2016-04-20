@@ -201,6 +201,7 @@ angular.module('penpen.controllers', [])
                         mp3Service.playMessage();
                         $timeout(function() {
                             viewScroll.scrollBottom(true);
+                            $scope.$apply(function() {});
                         }, 200);
                         // 将message存入sqlite
                         sqliteService.addNewMessageRecvReaded(msgObj);
@@ -257,7 +258,11 @@ angular.module('penpen.controllers', [])
             wsService.sendMessage(loginService.getLoginMsg());
         };
 
-
+        $scope.personDetail = function(user) {
+            $state.go("personDetail", {
+                "user": user
+            });
+        };
 
         //这是发送消息的函数
         $scope.addLocalMsg = function(msg) {
@@ -266,7 +271,7 @@ angular.module('penpen.controllers', [])
                 "isFromMe": true,
                 "content": msg,
                 "time": timeService.getFormatDate()
-                // "time": timeService.getSecondsSince1970()
+                    // "time": timeService.getSecondsSince1970()
             };
             // window.plugins.toast.showShortBottom('time:' + msgObj.time);
             $scope.messageDetails.push(msgObj);
@@ -339,6 +344,7 @@ angular.module('penpen.controllers', [])
                         mp3Service.playMessage();
                         $timeout(function() {
                             viewScroll.scrollBottom(true);
+                            $scope.$apply(function() {});
                         }, 200);
                         //将消息存入群消息数据库，并更新lastMessage表
                         sqliteService.addNewGroupMessageRecvReaded(msgObj);
@@ -393,7 +399,7 @@ angular.module('penpen.controllers', [])
                 "from": $scope.self.user,
                 "content": msg,
                 "time": timeService.getFormatDate()
-                // "time": timeService.getSecondsSince1970()
+                    // "time": timeService.getSecondsSince1970()
             };
 
             $scope.gmessageDetails.push(msgObj);
@@ -543,6 +549,10 @@ angular.module('penpen.controllers', [])
             "user": user
         });
     };
+
+    // $scope.myGoBack = function() {
+    //     $ionicHistory.goBack();
+    // };
 }])
 
 .controller('broadcastCtrl', ['$scope', '$state', function($scope, $state) {
