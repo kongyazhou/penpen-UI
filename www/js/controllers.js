@@ -498,8 +498,13 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('friendsCtrl', ['$scope', '$state', 'contactService', function($scope, $state, contactService) {
-    $scope.$on("$ionicView.beforeEnter", function() {
+.controller('friendsCtrl', ['$scope', '$state', 'contactService', 'groupService', function($scope, $state, contactService, groupService) {
+    $scope.$on("$ionicView.beforeEnter", function() {        
+        if ($scope.userGroups.length === 0) {
+            $scope.showUserGroups = false;
+        } else {
+            $scope.showUserGroups = true;
+        }
         $scope.$apply(function() {});
     });
 
@@ -522,6 +527,7 @@ angular.module('penpen.controllers', [])
     };
 
     $scope.groups = contactService.getGroups();
+    $scope.userGroups = groupService.getUserGroups();
 
     /*
      * if given group is the selected group, deselect it
@@ -533,6 +539,21 @@ angular.module('penpen.controllers', [])
 
     $scope.isGroupShown = function(group) {
         return group.show;
+    };
+
+    var showUserGroup = true;
+
+
+    $scope.toggleUserGroup = function() {
+        showUserGroup = !showUserGroup;
+    };
+
+    $scope.isUserGroupShown = function() {
+        return showUserGroup;
+    };
+
+    $scope.groupDetail = function(gid) {
+        window.plugins.toast.showLongBottom(gid);
     };
 }])
 

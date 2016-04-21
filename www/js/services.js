@@ -475,9 +475,13 @@ angular.module('penpen.services', [])
     };
 }])
 
-.service('groupService', ['parser', function(parser) {
+.service('groupService', ['parser', 'loginService', function(parser, loginService) {
     var groups = [];
+    var userGroups = [];
+
     this.init = function() {
+        groups = [];
+        userGroups = [];
         var wsContact = new WebSocket('ws://52.69.156.153:53888/');
 
         wsContact.onopen = function() {};
@@ -490,7 +494,22 @@ angular.module('penpen.services', [])
                 groups[i].name = parser.parseCotent(groups[i].name);
             }
             // window.plugins.toast.showLongBottom(groups[0].holder);
+            var user = loginService.getUser();
+            for (i in groups) {
+                if (checkMember(groups[i].member, user)) {
+                    userGroups.push(groups[i]);
+                }
+            }
         };
+
+    };
+
+    var checkMember = function(strMembers, member) {
+        memembers = strMembers.split(",");
+        for (var i in memembers) {
+            if (memembers[i] == member) return true;
+        }
+        return false;
     };
 
     this.getGroup = function(gid) {
@@ -503,6 +522,10 @@ angular.module('penpen.services', [])
         }
         // window.plugins.toast.showLongBottom("Get Group Failed.");
     };
+    this.getUserGroups = function () {
+        return userGroups;
+    };
+
 }])
 
 .service('sqliteService', ['loginService', 'contactService', 'groupService', function(loginService, contactService, groupService) {
