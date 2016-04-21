@@ -37,7 +37,6 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 16. 多种编码
 17. 通知功能
 18. 用户发送通知的权限
-19. **单聊与群聊混合排列**
 20. **提示最后消息距离现在时间**
 22. 历史后退并使用Native切换效果
 24. 修改讨论组名称
@@ -183,18 +182,23 @@ gulp：压缩混淆打包
 
 用到的gulp插件：
 
+```
+npm i gulp-XXX --save-dev
+```
 [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)
 
 [gulp-concat](https://www.npmjs.com/package/gulp-concat)
 
 [gulp-ng-annotate](https://www.npmjs.com/package/gulp-ng-annotate)
 
+[gulp-htmlmin](https://github.com/jonschlinkert/gulp-htmlmin)
+
 ## 快速迭代
 
 1. 从Github上clone该项目
 2. 安装配置开发环境
 3. 双击运行init.bat(安装cordova插件并添加平台)
-4. 执行命令"npm install"(安装gulp插件)
+4. 执行命令"npm install"(安装gulp及插件)
 5. gulp && cordova build android
 
 ## 系统功能

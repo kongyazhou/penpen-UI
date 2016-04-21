@@ -3,7 +3,7 @@ angular.module('penpen.controllers', [])
 .controller('messageCtrl', ['$scope', '$state', '$timeout', '$ionicPopup', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'activeState', 'groupService',
     function($scope, $state, $timeout, $ionicPopup, parser, wsService, loginService, mp3Service, contactService, sqliteService, activeState, groupService) {
         $scope.$on("$ionicView.beforeEnter", function() {
-            $scope.gmessages = sqliteService.getLastGroupMessages();
+            // $scope.gmessages = sqliteService.getLastGroupMessages();
             /*            $scope.gmessages = [{
                             "gid": 123,
                             "name": "测试组",
@@ -52,7 +52,7 @@ angular.module('penpen.controllers', [])
                     sqliteService.addNewGroupMessageRecv(msgObj);
                     mp3Service.playMessage();
                     //重新获取lastMessage表，并更新界面
-                    $scope.gmessages = sqliteService.getLastGroupMessages();
+                    $scope.messages = sqliteService.getLastMessages();
                     $timeout(function() {
                         $scope.$apply(function() {
                             // $scope.messages=$scope.messages;
@@ -79,7 +79,7 @@ angular.module('penpen.controllers', [])
                     sqliteService.addNewGroupMessageRecv(msgObj);
                     mp3Service.playMessage();
                     //重新获取lastMessage表，并更新界面
-                    $scope.gmessages = sqliteService.getLastGroupMessages();
+                    $scope.messages = sqliteService.getLastMessages();
                     $timeout(function() {
                         $scope.$apply(function() {
                             // $scope.messages=$scope.messages;
@@ -150,15 +150,19 @@ angular.module('penpen.controllers', [])
             messageService.updateMessage(message);
         };
 
-        $scope.messageDetails = function(message) {
-            $state.go("messageDetail", {
-                "user": message
-            });
-        };
-        $scope.gmessageDetails = function(message) {
-            $state.go("gmessageDetail", {
-                "gid": message
-            });
+        $scope.messageDetails = function(type, message) {
+            if (type === 0) {
+                $state.go("messageDetail", {
+                    "user": message
+                });
+            } else if (type === 1) {
+                $state.go("gmessageDetail", {
+                    "gid": message
+                });
+            } else {
+                window.plugins.toast.showLongBottom(type);
+            }
+
         };
 
         wsService.ws.onopen = function() {
@@ -310,7 +314,7 @@ angular.module('penpen.controllers', [])
             $scope.group = groupService.getGroup($stateParams.gid);
             $scope.gmessageDetails = sqliteService.getGroupMessages($scope.group.gid);
             $scope.self = loginService.getUserContact();
-            sqliteService.setGroupReaded($scope.group.gid);
+            sqliteService.setReaded($scope.group.gid);
             //TODO
             // sqliteService.setReaded($scope.contact.user);//需改为group
 
@@ -505,7 +509,7 @@ angular.module('penpen.controllers', [])
 ])
 
 .controller('friendsCtrl', ['$scope', '$state', 'contactService', 'groupService', function($scope, $state, contactService, groupService) {
-    $scope.$on("$ionicView.beforeEnter", function() {        
+    $scope.$on("$ionicView.beforeEnter", function() {
         if ($scope.userGroups.length === 0) {
             $scope.showUserGroups = false;
         } else {
