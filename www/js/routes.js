@@ -34,6 +34,11 @@ angular.module('penpen.routes', [])
             templateUrl: "templates/detail-person.html",
             controller: "personDetailCtrl"
         })
+        .state('groupDetail', {
+            url: '/groupDetail/:gid',
+            templateUrl: "templates/detail-group.html",
+            controller: "groupDetailCtrl"
+        })
         .state("tab", {
             url: "/tab",
             abstract: true,

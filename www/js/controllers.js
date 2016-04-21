@@ -385,6 +385,12 @@ angular.module('penpen.controllers', [])
             $state.go("tab.message");
         };
 
+        $scope.groupDetail = function(gid) {
+            $state.go("groupDetail", {
+                "gid": gid
+            });
+        };
+
         //连接断开时重发登陆消息
         wsService.ws.onopen = function() {
             wsService.sendMessage(loginService.getLoginMsg());
@@ -526,6 +532,13 @@ angular.module('penpen.controllers', [])
         });
     };
 
+    $scope.groupDetail = function(gid) {
+        // window.plugins.toast.showLongBottom(gid);
+        $state.go("groupDetail", {
+            "gid": gid
+        });
+    };
+
     $scope.groups = contactService.getGroups();
     $scope.userGroups = groupService.getUserGroups();
 
@@ -551,10 +564,6 @@ angular.module('penpen.controllers', [])
     $scope.isUserGroupShown = function() {
         return showUserGroup;
     };
-
-    $scope.groupDetail = function(gid) {
-        window.plugins.toast.showLongBottom(gid);
-    };
 }])
 
 .controller('personDetailCtrl', ['$scope', '$state', '$stateParams', 'contactService', function($scope, $state, $stateParams, contactService) {
@@ -568,6 +577,25 @@ angular.module('penpen.controllers', [])
         //TODO 更新lastMessage表的lastTime
         $state.go("messageDetail", {
             "user": user
+        });
+    };
+
+    // $scope.myGoBack = function() {
+    //     $ionicHistory.goBack();
+    // };
+}])
+
+.controller('groupDetailCtrl', ['$scope', '$state', '$stateParams', 'groupService', function($scope, $state, $stateParams, groupService) {
+    $scope.onSwipeRight = function() {
+        $state.go("tab.friends");
+    };
+
+    $scope.group = groupService.getGroup($stateParams.gid);
+
+    $scope.gmessageDetails = function(gid) {
+        //TODO 更新lastMessage表的lastTime
+        $state.go("gmessageDetail", {
+            "gid": gid
         });
     };
 
