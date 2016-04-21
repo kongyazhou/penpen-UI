@@ -3,8 +3,8 @@
 * [概述](#概述)
 * [待解决问题](#待解决问题)
 * [开发环境](#开发环境)
+* [快速迭代](#快速迭代)
 * [系统功能](#系统功能)
-* [其他工具](#其他工具)
 * [参考资料](#参考资料)
 
 ## 概述
@@ -31,7 +31,6 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 9. 头像裁剪后不是128*128
 10. 每次进入创建讨论组页面不会清除之前的设置
 11. 给自己发消息怎么处理
-12. **寻找压缩混淆可用方案**
 13. 表情系统
 14. 图片和语音
 15. 服务器安全认证授权系统
@@ -80,6 +79,12 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 
 查询命令:ionic -v
 
+**gulp**：构建工具，压缩混淆打包
+
+使用版本:3.9.1
+
+查询命令:gulp -v
+
 **cordova**：源生API插件，APP编译环境
 
 使用版本:6.1.0
@@ -118,7 +123,7 @@ jsFormats(JS格式对齐)
 
 [AngularJS](https://github.com/angular-ui/AngularJS-sublime-package)(Angular提示)
 
-Babel(ES6语法)
+[HTMLPrettify](https://github.com/victorporof/Sublime-HTMLPrettify)：有了这个，jsFormats、cssFormats好像都不需要了...
 
 **在线代码预览**：
 
@@ -131,8 +136,6 @@ Babel(ES6语法)
 [RunJS](http://runjs.cn/)：国产
 
 [jsfiddle](jsfiddle.net)：老牌
-
-[CSS3 generator]()
 
 参考文章《[Web前端开发实用在线工具](http://www.php100.com/html/webkaifa/DIV_CSS/2013/0107/11896.html)》
 
@@ -148,6 +151,12 @@ Chrome的Batarang插件。
 
 #### 测试工具
 
+```
+小项目测试有点奢侈了
+测试代码的时间都够开发个项目了
+不过工具还是要熟悉下
+```
+
 Protactor：为测试AngularJS而生。
 
 karma：单元测试
@@ -155,6 +164,10 @@ karma：单元测试
 Jasmine：编写测试用例
 
 #### 构建工具
+
+```bash
+gulp && cordova build android
+```
 
 ```
 由于某些原因(PhoneGap在线编译不能使用Cordova插件等)，两种方式不能并存，所以应在开发伊始选好构建平台。
@@ -165,18 +178,24 @@ cordova/ionic：本地编译构建，《[Ionic toturial for building a release.a
 
 [phonegap build](https://build.phonegap.com)：在线编译构建
 
-```
-目前未找到可用的混淆压缩方案，试了下minify，结果白屏。
-考虑下从"其他工具"中找到解决办法吧。
-不过看了混淆后的代码，似乎意义不大，只不过是把代码变成一行了..
-需要寻找更完整更强大的解决方法，实在不行就自己做个工具。
-```
+gulp：压缩混淆打包
+
+
+用到的gulp插件：
 
 [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)
 
 [gulp-concat](https://www.npmjs.com/package/gulp-concat)
 
 [gulp-ng-annotate](https://www.npmjs.com/package/gulp-ng-annotate)
+
+## 快速迭代
+
+1. 从Github上clone该项目
+2. 安装配置开发环境
+3. 双击运行init.bat(安装cordova插件并添加平台)
+4. 执行命令"npm install"(安装gulp插件)
+5. gulp && cordova build android
 
 ## 系统功能
 
@@ -205,30 +224,6 @@ cordova/ionic：本地编译构建，《[Ionic toturial for building a release.a
 
 多人视频实时聊天*
 
-## 其他工具
-
-```
-当前版本未使用，后续可以考虑加入的工具
-```
-
-[Yeoman（Yo、Gulp、Bower）——前端工程化](http://yeoman.io/)：代码生成器工厂，全是宝贵的财富哇
-
-[Gulp](http://www.gulpjs.com.cn/)：代码合并和混淆工具，部署发布必备，《[jshint在gulp中的使用](http://www.xiabingbao.com/gulp/2015/10/15/gulp-jshint/)》
-
-[bower](http://bower.io/)：一个前端软件包管理工具，前端模块化必备，可以自己做个模块传上去之类，参见《[bower简明入门教程](http://www.wtoutiao.com/p/i1e8nJ.html)》《[如何使用bower包管理器](https://www.douban.com/note/495604729/)》
-
-Babel：ES6 代码 源到源的编译器
-
-Browserify：专业打包工具
-
-[Webpack](http://webpack.github.io/)：比上面更强大，更好用的打包工具
-
-[用webpack来取代browserify](https://segmentfault.com/a/1190000002490637)
-
-[webpack 入门指南](http://www.w2bc.com/Article/50764)
-
-[gulp + webpack 构建多页面前端项目](http://www.open-open.com/news/view/1c51682)
-
 ## 参考资料
 
 [ionic-wechat](https://github.com/Frogmarch/ionic-wechat)：ionic模仿微信界面的作品，值得学习
@@ -238,3 +233,11 @@ Browserify：专业打包工具
 [Cordova官网](http://cordova.apache.org/)：各类源生API插件
 
 [推荐10个免费在线测试网页性能工具](http://www.daqianduan.com/3962.html)
+
+[Yeoman（Yo、Gulp、Bower）——前端工程化](http://yeoman.io/)
+
+[bower](http://bower.io/)：一个前端软件包管理工具，前端模块化必备，可以自己做个模块传上去之类，参见《[bower简明入门教程](http://www.wtoutiao.com/p/i1e8nJ.html)》《[如何使用bower包管理器](https://www.douban.com/note/495604729/)》
+
+Babel：ES6 代码 源到源的编译器
+
+[Webpack](http://webpack.github.io/)：比上面更强大，更好用的打包工具
