@@ -25,7 +25,7 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 2. 推送带上发送者信息
 3. 正在聊天的联系人信息停止推送
 4. 打开app清除所有推送消息
-6. **添加聊天置顶和删除等功能**
+6. 添加聊天置顶和删除等功能
 7. **Resume后界面应立即刷新一次**
 8. **更新头像立即生效**
 9. 头像裁剪后不是128*128
@@ -40,10 +40,11 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 18. 用户发送通知的权限
 19. **单聊与群聊混合排列**
 20. **提示最后消息距离现在时间**
-22. 聊天界面查看资料后应返回聊天界面
+22. 历史后退并使用Native切换效果
 24. 修改讨论组名称
-25. 退出讨论组
+26. **讨论组成员一览**
 26. 添加讨论组成员
+27. 退出讨论组
 
 ```
 下边是服务器所存在的所有问题
@@ -170,6 +171,12 @@ cordova/ionic：本地编译构建，《[Ionic toturial for building a release.a
 不过看了混淆后的代码，似乎意义不大，只不过是把代码变成一行了..
 需要寻找更完整更强大的解决方法，实在不行就自己做个工具。
 ```
+
+[gulp-uglify](https://www.npmjs.com/package/gulp-uglify)
+
+[gulp-concat](https://www.npmjs.com/package/gulp-concat)
+
+[gulp-ng-annotate](https://www.npmjs.com/package/gulp-ng-annotate)
 
 ## 系统功能
 
