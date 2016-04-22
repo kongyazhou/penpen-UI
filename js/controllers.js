@@ -510,6 +510,7 @@ angular.module('penpen.controllers', [])
 
 .controller('friendsCtrl', ['$scope', '$state', 'contactService', 'groupService', function($scope, $state, contactService, groupService) {
     $scope.$on("$ionicView.beforeEnter", function() {
+        $scope.userGroups = groupService.getUserGroups();
         if ($scope.userGroups.length === 0) {
             $scope.showUserGroups = false;
         } else {
@@ -544,8 +545,7 @@ angular.module('penpen.controllers', [])
     };
 
     $scope.groups = contactService.getGroups();
-    $scope.userGroups = groupService.getUserGroups();
-
+    
     /*
      * if given group is the selected group, deselect it
      * else, select the given group
@@ -589,12 +589,37 @@ angular.module('penpen.controllers', [])
     // };
 }])
 
-.controller('groupDetailCtrl', ['$scope', '$state', '$stateParams', 'groupService', function($scope, $state, $stateParams, groupService) {
+.controller('groupDetailCtrl', ['$scope', '$state', '$stateParams', 'groupService', 'contactService', function($scope, $state, $stateParams, groupService, contactService) {
+    $scope.$on("$ionicView.beforeEnter", function() {
+        $scope.group = groupService.getGroup($stateParams.gid);
+
+        var strMembers = $scope.group.member;
+        // window.plugins.toast.showShortBottom("strMembers:" + strMembers);
+        var members = strMembers.split(",");
+        // window.plugins.toast.showLongBottom("Members:" + members);
+        //获取成员详情
+
+        // $scope.memberRows = [[{icon:"img/groupIcon.jpg",name:"张三"},{icon:"img/groupIcon.jpg",name:"李四"}]];
+        $scope.memberRows = [];
+        var row = [];
+        for (var i in members) {
+            row.push(contactService.getContact(members[i]));
+            if (i % 5 == 4) {
+                $scope.memberRows.push(row);
+                row = [];
+            }
+        }
+        //最后一轮不满5个要加上
+        if (i % 5 != 4) {
+            $scope.memberRows.push(row);
+            row = [];
+        }
+        $scope.$apply(function() {});
+    });
+
     $scope.onSwipeRight = function() {
         $state.go("tab.friends");
     };
-
-    $scope.group = groupService.getGroup($stateParams.gid);
 
     $scope.gmessageDetails = function(gid) {
         //TODO 更新lastMessage表的lastTime
@@ -602,6 +627,8 @@ angular.module('penpen.controllers', [])
             "gid": gid
         });
     };
+
+
 
     // $scope.myGoBack = function() {
     //     $ionicHistory.goBack();
@@ -625,10 +652,21 @@ angular.module('penpen.controllers', [])
     //
 }])
 
-.controller('aboutCtrl', ['$scope', '$state', 'sqliteService', function($scope, $state, sqliteService) {
+.controller('aboutCtrl', ['$scope', '$state', function($scope, $state) {
+    $scope.$on("$ionicView.beforeEnter", function() {
+        /*这插件到底能不能用了
+        cordova.getAppVersion.getVersionNumber(function (version) {
+            // $('.version').text(version);
+            $scope.app.version = version;
+            window.plugins.toast.showLongBottom("version:" + version);
+            $scope.$apply(function() {});
+        });*/
+    });
+
     $scope.onSwipeRight = function() {
         $state.go("tab.setting");
     };
+
     /*    $scope.test = function() {
             $scope.obj = sqliteService.getLastMessages();
             $scope.lastMessage = $scope.obj[1].lastMessage;

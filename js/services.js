@@ -478,6 +478,7 @@ angular.module('penpen.services', [])
 .service('groupService', ['parser', 'loginService', function(parser, loginService) {
     var groups = [];
     var userGroups = [];
+    // var userGroups = [{holder:123,name:"qqq",gid:111,member:12345678901}];
 
     this.init = function() {
         groups = [];
@@ -522,10 +523,9 @@ angular.module('penpen.services', [])
         }
         // window.plugins.toast.showLongBottom("Get Group Failed.");
     };
-    this.getUserGroups = function () {
+    this.getUserGroups = function() {
         return userGroups;
     };
-
 }])
 
 .service('sqliteService', ['loginService', 'contactService', 'groupService', function(loginService, contactService, groupService) {
@@ -838,19 +838,19 @@ angular.module('penpen.services', [])
         });
     };
 
-/*    this.setGroupReaded = function(gid) {
-        // var contact = contactService.getContact(user);
-        var messages = [];
-        var count = 0;
-        dbPenpen.transaction(function(tx) {
-            stmt = 'UPDATE lastGroupMessage SET unreadNo=0  WHERE gid=' + gid + ';';
-            tx.executeSql(stmt, [], function(tx, res) {
-                // window.plugins.toast.showShortBottom('Count:' + count);
-            }, function(err) {
-                // window.plugins.toast.showShortBottom('setReaded失败');
+    /*    this.setGroupReaded = function(gid) {
+            // var contact = contactService.getContact(user);
+            var messages = [];
+            var count = 0;
+            dbPenpen.transaction(function(tx) {
+                stmt = 'UPDATE lastGroupMessage SET unreadNo=0  WHERE gid=' + gid + ';';
+                tx.executeSql(stmt, [], function(tx, res) {
+                    // window.plugins.toast.showShortBottom('Count:' + count);
+                }, function(err) {
+                    // window.plugins.toast.showShortBottom('setReaded失败');
+                });
             });
-        });
-    };*/
+        };*/
 
 
     this.getLastMessages = function() {
@@ -893,43 +893,43 @@ angular.module('penpen.services', [])
         return messages;
     };
 
-/*    this.getLastGroupMessages = function() {
-        var messages = [];
-        var count = 0;
-        // var length = 0;
+    /*    this.getLastGroupMessages = function() {
+            var messages = [];
+            var count = 0;
+            // var length = 0;
 
-        dbPenpen.transaction(function(tx) {
-            //获取条目数
-            tx.executeSql("select count(gid) as cnt from lastGroupMessage;", [], function(tx, res) {
-                count = res.rows.item(0).cnt;
-                // length = res.rows.item.length;
-                // window.plugins.toast.showShortBottom('Count:' + count);
-                // window.plugins.toast.showLongBottom('Length:' + length);
-            }, function(err) {
-                // window.plugins.toast.showShortBottom('Count失败');
+            dbPenpen.transaction(function(tx) {
+                //获取条目数
+                tx.executeSql("select count(gid) as cnt from lastGroupMessage;", [], function(tx, res) {
+                    count = res.rows.item(0).cnt;
+                    // length = res.rows.item.length;
+                    // window.plugins.toast.showShortBottom('Count:' + count);
+                    // window.plugins.toast.showLongBottom('Length:' + length);
+                }, function(err) {
+                    // window.plugins.toast.showShortBottom('Count失败');
+                });
+                //获取每一条条目详情
+                tx.executeSql('select * from lastGroupMessage;', [], function(tx, res) {
+                    // window.plugins.toast.showShortBottom('读取lastGroupMessage成功');
+                    // window.plugins.toast.showLongBottom(res.rows.item(0).user);
+
+                    var i = 0;
+                    for (i = 0; i < count; i++) {
+                        // window.plugins.toast.showShortBottom(res.rows.item(i).user);
+                        var obj = {
+                            "gid": res.rows.item(i).gid,
+                            "name": res.rows.item(i).name,
+                            "lastMessage": res.rows.item(i).lastMessage,
+                            "lastTime": res.rows.item(i).lastTime,
+                            "unreadNo": res.rows.item(i).unreadNo
+                        };
+                        messages.push(obj);
+                    }
+
+                }, function(err) {
+                    // window.plugins.toast.showShortBottom('读取lastGroupMessage失败' + err.message);
+                });
             });
-            //获取每一条条目详情
-            tx.executeSql('select * from lastGroupMessage;', [], function(tx, res) {
-                // window.plugins.toast.showShortBottom('读取lastGroupMessage成功');
-                // window.plugins.toast.showLongBottom(res.rows.item(0).user);
-
-                var i = 0;
-                for (i = 0; i < count; i++) {
-                    // window.plugins.toast.showShortBottom(res.rows.item(i).user);
-                    var obj = {
-                        "gid": res.rows.item(i).gid,
-                        "name": res.rows.item(i).name,
-                        "lastMessage": res.rows.item(i).lastMessage,
-                        "lastTime": res.rows.item(i).lastTime,
-                        "unreadNo": res.rows.item(i).unreadNo
-                    };
-                    messages.push(obj);
-                }
-
-            }, function(err) {
-                // window.plugins.toast.showShortBottom('读取lastGroupMessage失败' + err.message);
-            });
-        });
-        return messages;
-    };*/
+            return messages;
+        };*/
 }]);
