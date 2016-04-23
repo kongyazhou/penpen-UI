@@ -110,6 +110,30 @@ angular.module('penpen.services', [])
         });
     };
 
+    this.getTimeDistance = function(time1) {
+        //获取time1到现在的时间差
+        var oTime1 = new Date(time1);
+        var oTime2 = new Date();
+        var dist = (oTime2 - oTime1) / 1000;
+        if (dist > 15000000) {
+            return time1.split(" ")[0];
+        } else if (dist > 2592000) {
+            return parseInt(dist / 2592000) + "个月前";
+        } else if (dist > 86400) {
+            return parseInt(dist / 86400) + "天前";
+        } else if (dist > 3600) {
+            return parseInt(dist / 3600) + "小时前";
+        } else if (dist > 60) {
+            return parseInt(dist / 60) + "分钟前";
+        } else {
+            return "刚刚";
+        }
+
+        return "未知";
+
+    };
+
+
     this.getFormatDate = function(argument) {
         var date = new Date();
         return formatDate(date);
@@ -528,7 +552,7 @@ angular.module('penpen.services', [])
     };
 }])
 
-.service('sqliteService', ['loginService', 'contactService', 'groupService', function(loginService, contactService, groupService) {
+.service('sqliteService', ['loginService', 'contactService', 'groupService', 'timeService', function(loginService, contactService, groupService, timeService) {
     var dbName = "";
     // var dbName = 'penpen.12345678905';
     var stmt = "";
@@ -881,7 +905,8 @@ angular.module('penpen.services', [])
                         "type": res.rows.item(i).type,
                         "lastMessage": res.rows.item(i).lastMessage,
                         "lastTime": res.rows.item(i).lastTime,
-                        "unreadNo": res.rows.item(i).unreadNo
+                        "unreadNo": res.rows.item(i).unreadNo,
+                        "lastTimeDist": timeService.getTimeDistance(res.rows.item(i).lastTime)
                     };
                     messages.push(obj);
                 }

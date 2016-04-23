@@ -4,7 +4,7 @@
 <ion-view on-swipe-left="onSwipeLeft()">
     <ion-content overflow-scroll="false" has-bouncing="true" class="has-header">
         <ion-list rj-close-back-drop>
-<!--             <ion-item class="item-avatar" ng-class="{'rj-item-top': gmessage.isTop}" on-hold="popupMessageOpthins(gmessage)" rj-hold-active ng-repeat="gmessage in gmessages | orderBy:['isTop', 'lastTime']:true" ng-click="gmessageDetails(gmessage.gid)">
+            <!--             <ion-item class="item-avatar" ng-class="{'rj-item-top': gmessage.isTop}" on-hold="popupMessageOpthins(gmessage)" rj-hold-active ng-repeat="gmessage in gmessages | orderBy:['isTop', 'lastTime']:true" ng-click="gmessageDetails(gmessage.gid)">
                 <img ng-src="img/groupIcon.jpg">
                 <span class="rj-sm-red-icon" ng-show="gmessage.unreadNo"><p ng-bind="gmessage.unreadNo"></p></span>
                 <h2 ng-bind="gmessage.name"></h2>
@@ -16,8 +16,16 @@
                 <span class="rj-sm-red-icon" ng-show="message.unreadNo"><p ng-bind="message.unreadNo"></p></span>
                 <h2 ng-bind="message.name"></h2>
                 <p class="rj-list-p" ng-bind="message.lastMessage"></p>
-                <!-- <span class="rj-push-right" ng-bind="message.lastTime" ng-show="false"></span> -->
+                <span class="rj-push-right" ng-bind="message.lastTimeDist" ng-show="true"></span>
             </ion-item>
+            <!-- 测试样式 -->
+            <!--             <ion-item class="item-avatar">
+                <img ng-src="img/groupIcon.jpg">
+                <span class="rj-sm-red-icon" ng-show="true"><p>2</p></span>
+                <h2>name</h2>
+                <p class="rj-list-p">message</p>
+                <span class="rj-push-right" ng-show="true">1990</span>
+            </ion-item> -->
         </ion-list>
     </ion-content>
 </ion-view>

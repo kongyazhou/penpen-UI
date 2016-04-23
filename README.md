@@ -26,18 +26,19 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 3. 正在聊天的联系人信息停止推送
 4. 打开app清除所有推送消息
 6. 添加聊天置顶和删除等功能
+7. **同步所有消息**[新功能]4
+8. **消息缓存读取**[新功能]4
 7. **Resume后界面应立即刷新一次**[AngularJS]
-8. **更新头像立即生效**[AngularJS]3
+8. **更新头像立即生效**[AngularJS]2
 9. 头像裁剪后不是128*128
 10. 每次进入创建讨论组页面不会清除之前的设置
 11. 给自己发消息怎么处理
 13. 表情系统
 14. 图片和语音
-15. **服务器安全认证授权系统**[通信协议]2
-16. **多种编码,协议升级**[通信协议]2
-17. 通知功能
+15. **服务器安全认证授权系统**[通信协议]3
+16. **多种编码,协议升级**[通信协议]3
+17. **通知功能**[新功能]1
 18. 用户发送通知的权限
-20. **提示最后消息距离现在时间**[计算时间差，样式]1
 22. 历史后退并使用Native切换效果
 24. 修改讨论组名称
 26. 添加讨论组成员
@@ -45,7 +46,10 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 28. **搜索算法**
 29. **长页面(列表)加载**
 30. 设备号
-31. 创建新讨论组实时更新到通讯录(可能存在问题)
+32. 改搜索为散列
+33. groupInit函数重做
+34. getContact函数机制重做
+35. contactInit放到服务器上去做
 
 ```
 下边是服务器所存在的所有问题
@@ -195,6 +199,8 @@ npm i gulp-XXX --save-dev
 [gulp-ng-annotate](https://www.npmjs.com/package/gulp-ng-annotate)
 
 [gulp-htmlmin](https://github.com/jonschlinkert/gulp-htmlmin)
+
+[gulp-clean-css](https://github.com/scniro/gulp-clean-css)
 
 ## 快速迭代
 
