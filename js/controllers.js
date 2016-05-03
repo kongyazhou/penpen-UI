@@ -545,7 +545,7 @@ angular.module('penpen.controllers', [])
     };
 
     $scope.groups = contactService.getGroups();
-    
+
     /*
      * if given group is the selected group, deselect it
      * else, select the given group
@@ -752,7 +752,7 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('settingCtrl', ['$scope', '$state', 'loginService', 'sqliteService', 'wsService', 'contactService', function($scope, $state, loginService, sqliteService, wsService, contactService) {
+.controller('settingCtrl', ['$scope', '$state', '$ionicPopup', 'loginService', 'sqliteService', 'wsService', 'contactService', function($scope, $state, $ionicPopup, loginService, sqliteService, wsService, contactService) {
     $scope.$on("$ionicView.beforeEnter", function() {
         // console.log($scope.messages);
         $scope.contact = loginService.getUserContact();
@@ -790,38 +790,63 @@ angular.module('penpen.controllers', [])
         };
     };
 
-    var picnumber = 0;
+    // var picnumber = 0;
+    var myPopup = {};
 
     $scope.updateIcon = function() {
 
+        $scope.data = {};
+
+        // An elaborate, custom popup
+        myPopup = $ionicPopup.show({
+            template: '<a class="button button-calm button-full" ng-click="takePhoto()">拍照上传</a><a class="button button-calm button-full" ng-click="pickPhoto()">从相册选择</a>',
+            title: '更新头像',
+            scope: $scope,
+            buttons: [{
+                text: '取消',
+                type: 'button-assertive'
+            }]
+        });
+
+    };
+
+    $scope.test = function() {
+        window.plugins.toast.showLongBottom("Test.");
+    };
+
+    var win = function(r) {
+        // 关闭弹窗
+        myPopup.close();
+        window.plugins.toast.showLongBottom("重新登录可看到新的头像");
+        var transferSucc = function(entry) {
+            $scope.contact.icon = fileURL;
+            contactService.setIcon($scope.contact.user, $scope.contact.icon);
+            window.plugins.toast.showLongBottom(fileURL);
+            $scope.$apply(function() {});
+        };
+        var transferFail = function(error) {
+            window.plugins.toast.showShortBottom(error.code);
+        };
+        var fileTransfer = new FileTransfer();
+        var uri = encodeURI("http://52.69.156.153/upload/" + user + ".jpg");
+        // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+        var fileURL = cordova.file.dataDirectory + "new.jpg";
+        fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+            headers: {
+                "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+            }
+        });
+        picnumber = picnumber + 1;
+    };
+    //config fail
+    var fail = function(error) {
+        window.plugins.toast.showLongBottom(error.code);
+    };
+
+
+    $scope.pickPhoto = function() {
         window.imagePicker.getPictures(
             function(results) {
-                var win = function(r) {
-                    window.plugins.toast.showLongBottom("重新登录可看到新的头像");
-                    var transferSucc = function(entry) {
-                        $scope.contact.icon = fileURL;
-                        contactService.setIcon($scope.contact.user, $scope.contact.icon);
-                        window.plugins.toast.showLongBottom(fileURL);
-                        $scope.$apply(function() {});
-                    };
-                    var transferFail = function(error) {
-                        window.plugins.toast.showShortBottom(error.code);
-                    };
-                    var fileTransfer = new FileTransfer();
-                    var uri = encodeURI("http://52.69.156.153/upload/" + user + ".jpg");
-                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
-                    var fileURL = cordova.file.dataDirectory + "new.jpg";
-                    fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
-                        headers: {
-                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
-                        }
-                    });
-                    picnumber = picnumber + 1;
-                };
-                //config fail
-                var fail = function(error) {
-                    window.plugins.toast.showLongBottom(error.code);
-                };
                 //config options
                 var options = new FileUploadOptions();
                 options.fileKey = "file";
@@ -852,23 +877,42 @@ angular.module('penpen.controllers', [])
                 height: 128
             }
         );
+    };
 
 
+    $scope.takePhoto = function() {
 
-        /*navigator.camera.getPicture(onSuccess, onFail, {
+        navigator.camera.getPicture(onSuccess, onFail, {
             destinationType: Camera.DestinationType.FILE_URI,
-            sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+            // sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+            sourceType: Camera.PictureSourceType.CAMERA,
+            targetHeight: 128,
+            targetWidth: 128
         });
 
         function onSuccess(imageURI) {
-            // var image = document.getElementById('myImage');
-            // image.src = imageURI;
-            window.plugins.toast.showLongBottom('上传成功');
+            // TODO
+            // config options
+            var options = new FileUploadOptions();
+            options.fileKey = "file";
+            options.fileName = $scope.contact.user + ".jpg";
+            options.mimeType = "image/jpeg";
+            // config options.para
+            var params = {};
+            params.value1 = "test";
+            params.value2 = "param";
+            options.params = params;
+            // Transfer
+            var ft = new FileTransfer();
+            ft.upload(imageURI, encodeURI("http://52.69.156.153/upload.php"), win, fail, options);
+            // window.plugins.toast.showLongBottom('上传成功' + imageURI);
+            
         }
 
         function onFail(message) {
             window.plugins.toast.showLongBottom('取消更换头像：' + message);
-        }*/
+        }
     };
+
     // $scope.contact = contactService.getContact("12345678900");
 }]);

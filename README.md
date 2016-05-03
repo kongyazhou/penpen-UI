@@ -22,10 +22,9 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 ```
 #### 主要问题
 
-1. **表情系统**
-2. **图片和语音**1
-3. **拍照**
-4. **更新头像立即生效**[AngularJS]2
+1. 表情系统
+2. 发送图片
+3. 更新头像立即生效[AngularJS]
 
 #### 次要问题
 
@@ -55,6 +54,7 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 33. groupInit函数重做
 34. getContact函数机制重做
 35. contactInit放到服务器上去做
+36. 发送语音
 
 ```
 下边是服务器所存在的所有问题
