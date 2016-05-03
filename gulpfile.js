@@ -5,7 +5,8 @@ var ngAnnotate = require('gulp-ng-annotate');
 var htmlmin = require('gulp-htmlmin');
 var shell = require('shelljs');
 
-gulp.task('default', ['build']);
+// gulp.task('default', ['build']);
+gulp.task('default', ['js', 'html']);
 
 gulp.task('js', function() {
     gulp.src('js/*.js')

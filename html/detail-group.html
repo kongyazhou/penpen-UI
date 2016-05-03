@@ -44,7 +44,7 @@
             </ion-item>
             <ion-item>
                 <div class="row" ng-repeat="memberRow in memberRows">
-                    <div class="col-20" ng-repeat="member in memberRow">
+                    <div class="col-20" ng-repeat="member in memberRow" ng-click="personDetail(member.user)">
                         <img ng-src="{{member.icon}}" style="width: 90%">
                         <p style="text-align: center;">
                             {{member.name}}

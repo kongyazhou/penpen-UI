@@ -628,7 +628,11 @@ angular.module('penpen.controllers', [])
         });
     };
 
-
+    $scope.personDetail = function(user) {
+        $state.go("personDetail", {
+            "user": user
+        });
+    };
 
     // $scope.myGoBack = function() {
     //     $ionicHistory.goBack();
