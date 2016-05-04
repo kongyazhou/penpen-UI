@@ -604,15 +604,15 @@ angular.module('penpen.services', [])
 
             //添加到账号记录中
             //若不存在则创建表
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key,isFromMe integer, content text, time datetime, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, type integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
                 // window.plugins.toast.showLongBottom('创建表失败' + err.message);
             });
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
-            tx.executeSql(stmt, [1, msg.content, msg.time, 0], function(tx, res) {
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, type, content, time, unread) VALUES (?,?,?,?,?);';
+            tx.executeSql(stmt, [1, msg.type, msg.content, msg.time, 0], function(tx, res) {
                 // window.plugins.toast.showLongBottom('添加新消息成功');
             }, function(err) {
                 // window.plugins.toast.showLongBottom('添加新消息失败' + err.message);
@@ -650,15 +650,15 @@ angular.module('penpen.services', [])
 
             //添加到账号记录中
             //若不存在则创建表
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time datetime, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, type integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, [], function(argument) {
                 // window.plugins.toast.showLongBottom('创建表成功');
             }, function(err) {
                 // window.plugins.toast.showLongBottom('创建表失败' + err.message);
             });
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
-            tx.executeSql(stmt, [1, loginService.getUser(), msg.content, msg.time, 0], function(tx, res) {
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, type, content, time, unread) VALUES (?,?,?,?,?,?);';
+            tx.executeSql(stmt, [1, loginService.getUser(), msg.type, msg.content, msg.time, 0], function(tx, res) {
                 // window.plugins.toast.showLongBottom('添加新消息成功');
             }, function(err) {
                 // window.plugins.toast.showLongBottom('添加新消息失败' + err.message);
@@ -686,11 +686,11 @@ angular.module('penpen.services', [])
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time datetime, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key, isFromMe integer, type integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
-            tx.executeSql(stmt, [0, msg.content, msg.time, 1]);
+            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, type, content, time, unread) VALUES (?,?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.type, msg.content, msg.time, 1]);
 
         });
     };
@@ -713,11 +713,11 @@ angular.module('penpen.services', [])
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key,isFromMe integer, content text, time datetime, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.from + ' (id integer primary key, isFromMe integer, type integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, content, time, unread) VALUES (?,?,?,?);';
-            tx.executeSql(stmt, [0, msg.content, msg.time, 0]);
+            stmt = 'INSERT INTO penpen' + msg.from + ' (isFromMe, type, content, time, unread) VALUES (?,?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.type, msg.content, msg.time, 0]);
         });
     };
 
@@ -751,11 +751,11 @@ angular.module('penpen.services', [])
             });
             //将消息插入讨论组消息表
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time datetime, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, type integer,, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
-            tx.executeSql(stmt, [0, msg.from, msg.content, msg.time, 1]);
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, type, content, time, unread) VALUES (?,?,?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.from, msg.type, msg.content, msg.time, 1]);
 
         });
     };
@@ -780,11 +780,11 @@ angular.module('penpen.services', [])
                 }
             });
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, content text, time datetime, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, type integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
-            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, content, time, unread) VALUES (?,?,?,?,?);';
-            tx.executeSql(stmt, [0, msg.from, msg.content, msg.time, 0]);
+            stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, type, content, time, unread) VALUES (?,?,?,?,?,?);';
+            tx.executeSql(stmt, [0, msg.from, msg.type, msg.content, msg.time, 0]);
         });
     };
 
@@ -807,6 +807,7 @@ angular.module('penpen.services', [])
                     // window.plugins.toast.showShortBottom(res.rows.item(i).user);
                     var obj = {
                         "isFromMe": res.rows.item(i).isFromMe,
+                        "type": res.rows.item(i).type,
                         "content": res.rows.item(i).content,
                         "time": res.rows.item(i).time
                     };
@@ -836,6 +837,7 @@ angular.module('penpen.services', [])
                     // window.plugins.toast.showShortBottom(res.rows.item(i).user);
                     var obj = {
                         "isFromMe": res.rows.item(i).isFromMe,
+                        "type": res.rows.item(i).type,
                         "content": res.rows.item(i).content,
                         "time": res.rows.item(i).time,
                         "icon": cordova.file.dataDirectory + res.rows.item(i).user + ".jpg",

@@ -26,6 +26,7 @@ angular.module('penpen.controllers', [])
                     msgObj = {
                         "from": msg.from,
                         "isFromMe": 0,
+                        "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time
                     };
@@ -40,11 +41,41 @@ angular.module('penpen.controllers', [])
                             // $scope.messages=$scope.messages;
                         });
                     }, 200);
+                } else if (msg.type === 1) {
+                    var fileName = parser.parseCotent(msg.content);
+                    // 下载图片成功
+                    var transferSucc = function(entry) {
+                        var msgObj = {
+                            "from": msg.from,
+                            "isFromMe": 0,
+                            "type": 1,
+                            "content": cordova.file.dataDirectory + fileName,
+                            "time": msg.time
+                                // "time": timeService.getSecondsSince1970()
+                        };
+                        sqliteService.addNewMessageRecv(msgObj);
+                    };
+                    var transferFail = function(error) {
+                        window.plugins.toast.showShortBottom(error.code);
+                    };
+                    //下载图片
+                    var fileTransfer = new FileTransfer();
+                    var uri = encodeURI("http://52.69.156.153/upload/" + fileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var fileURL = cordova.file.dataDirectory + fileName;
+                    fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+
+                    // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 10) {
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
                         "isFromMe": 0,
+                        "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time //TODO
                     };
@@ -71,6 +102,7 @@ angular.module('penpen.controllers', [])
                         "to": msg.to, //gid
                         "isFromMe": 0,
                         "name": parser.parseCotent(contentObj.name),
+                        "type": msg.type,
                         "content": content,
                         "time": msg.time //TODO
                     };
@@ -173,8 +205,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'timeService',
-    function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, timeService) {
+.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$ionicPopup', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'timeService',
+    function($scope, $state, $stateParams, $ionicScrollDelegate, $ionicPopup, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, timeService) {
         $scope.$on("$ionicView.beforeEnter", function() {
             $scope.contact = contactService.getContact($stateParams.user);
             $scope.messageDetails = sqliteService.getContactMessages($scope.contact.user);
@@ -188,14 +220,15 @@ angular.module('penpen.controllers', [])
                 msgObj = {};
                 // window.plugins.toast.showShortBottom('msg:' + msg);
 
-                // 判断消息是否属于本聊天
                 if (msg.type === 0) {
                     msgObj = {
                         "from": msg.from,
                         "isFromMe": 0,
+                        "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time
                     };
+                    // 判断消息是否属于本聊天
                     if (msg.from == $scope.contact.user) {
                         // window.plugins.toast.showShortBottom('msg：'+msg);
                         // window.plugins.toast.showShortBottom('content:' + msg.content);
@@ -214,11 +247,56 @@ angular.module('penpen.controllers', [])
                         // 将message存入sqlite
                         sqliteService.addNewMessageRecv(msgObj);
                     }
+                } else if (msg.type === 1) {
+                    var fileName = parser.parseCotent(msg.content);
+                    // 下载图片成功
+                    var transferSucc = function(entry) {
+                        var msgObj = {
+                            "from": msg.from,
+                            "isFromMe": 0,
+                            "type": 1,
+                            "content": cordova.file.dataDirectory + fileName,
+                            "time": msg.time
+                                // "time": timeService.getSecondsSince1970()
+                        };
+                        if (msg.from == $scope.contact.user) {
+                            // window.plugins.toast.showShortBottom('time:' + msgObj.time);
+                            $scope.messageDetails.push(msgObj);
+
+                            // 发送消息的提示音
+                            mp3Service.playMessage();
+                            $timeout(function() {
+                                viewScroll.scrollBottom(true);
+                                $scope.$apply(function() {});
+                            }, 200);
+                            // 更新lastMessage表的lastMessage和lastTime
+                            // 将message插入联系人的allMessage表
+                            sqliteService.addNewMessageRecvReaded(msgObj);
+                        } else {
+                            sqliteService.addNewMessageRecv(msgObj);
+                        }
+                    };
+                    var transferFail = function(error) {
+                        window.plugins.toast.showShortBottom(error.code);
+                    };
+                    //下载图片
+                    var fileTransfer = new FileTransfer();
+                    var uri = encodeURI("http://52.69.156.153/upload/" + fileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var fileURL = cordova.file.dataDirectory + fileName;
+                    fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+
+                    // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 10) {
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
                         "isFromMe": 0,
+                        "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time //TODO
                     };
@@ -237,6 +315,7 @@ angular.module('penpen.controllers', [])
                         "to": msg.to, //gid
                         "isFromMe": 0,
                         "name": parser.parseCotent(contentObj.name),
+                        "type": msg.type,
                         "content": content,
                         "time": msg.time //TODO
                     };
@@ -273,6 +352,7 @@ angular.module('penpen.controllers', [])
             var msgObj = {
                 "to": $scope.contact.user,
                 "isFromMe": true,
+                "type": 0,
                 "content": msg,
                 "time": timeService.getFormatDate()
                     // "time": timeService.getSecondsSince1970()
@@ -287,6 +367,7 @@ angular.module('penpen.controllers', [])
             sqliteService.addNewMessageSend(msgObj);
 
         };
+
         $scope.sendMessage = function(msg) {
             if (window.WebSocket) {
                 var wsMsg = new WebSocket('ws://52.69.156.153:21888/');
@@ -301,6 +382,164 @@ angular.module('penpen.controllers', [])
                 };
             } else {
                 // window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
+            }
+        };
+
+        var myPopup = {};
+
+        $scope.sendPhoto = function() {
+
+            myPopup = $ionicPopup.show({
+                // template: '<a class="button button-calm button-full" ng-click="takePhoto()">拍照上传</a><a class="button button-calm button-full" ng-click="pickPhoto()">从相册选择</a>',
+                templateUrl: "templates/pop-photo.html",
+                // title: '更新头像',
+                scope: $scope
+                    /* buttons: [{
+                        text: '取消',
+                        type: 'button-assertive'
+                    }]*/
+            });
+
+        };
+
+        $scope.cancelPop = function() {
+            myPopup.close();
+        };
+
+        $scope.sendPhotoMessage = function(msg) {
+            if (window.WebSocket) {
+                var wsMsg = new WebSocket('ws://52.69.156.153:21888/');
+
+                wsMsg.onopen = function() {
+                    jsonMsg = '{"from":"' + loginService.getUser() + '","to":"' + $scope.contact.user + '","type":"1","content":"' + Base64.encode(msg) + '"}';
+                    this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
+                };
+                wsMsg.onclose = function(evt) {};
+                wsMsg.onmessage = function(evt) {
+                    // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
+                };
+            } else {
+                // window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
+            }
+        };
+
+        var picnumber = new Date();
+        // 文件上传成功函数
+        var win = function(r) {
+            // 关闭弹窗
+            $scope.cancelPop();
+            // window.plugins.toast.showLongBottom("重新登录可看到新的头像");
+            // 发送图片消息
+            $scope.sendPhotoMessage($scope.contact.user + picnumber + ".jpg");
+            // 下载图片
+            var transferSendSucc = function(entry) {
+                var msgObj = {
+                    "to": $scope.contact.user,
+                    "isFromMe": true,
+                    "type": 1,
+                    "content": cordova.file.dataDirectory + $scope.contact.user + picnumber + ".jpg",
+                    "time": timeService.getFormatDate()
+                        // "time": timeService.getSecondsSince1970()
+                };
+                // window.plugins.toast.showShortBottom('time:' + msgObj.time);
+                $scope.messageDetails.push(msgObj);
+
+                // 发送消息的提示音
+                mp3Service.playMessage();
+                $timeout(function() {
+                    viewScroll.scrollBottom(true);
+                    $scope.$apply(function() {});
+                }, 200);
+                // 更新lastMessage表的lastMessage和lastTime
+                // 将message插入联系人的allMessage表
+                sqliteService.addNewMessageSend(msgObj);
+                picnumber = picnumber + 1;
+            };
+            var transferSendFail = function(error) {
+                window.plugins.toast.showShortBottom(error.code);
+            };
+            var fileTransfer = new FileTransfer();
+            var uri = encodeURI("http://52.69.156.153/upload/" + $scope.contact.user + picnumber + ".jpg");
+            // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+            var fileURL = cordova.file.dataDirectory + $scope.contact.user + picnumber + ".jpg";
+            fileTransfer.download(uri, fileURL, transferSendSucc, transferSendFail, false, {
+                headers: {
+                    "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                }
+            });
+
+
+        };
+        // 文件传输失败函数
+        var fail = function(error) {
+            window.plugins.toast.showLongBottom(error.code);
+        };
+
+        // 选择照片上传函数
+        $scope.pickPhoto = function() {
+            window.imagePicker.getPictures(
+                // 成功选取照片函数
+                function(imageURI) {
+                    // 上传照片
+                    // config options
+                    var options = new FileUploadOptions();
+                    options.fileKey = "file";
+                    // TODO
+                    options.fileName = $scope.contact.user + picnumber + ".jpg";
+                    options.mimeType = "image/jpeg";
+                    // config options.para
+                    var params = {};
+                    params.value1 = "test";
+                    params.value2 = "param";
+
+                    options.params = params;
+                    // 上传
+
+                    var ft = new FileTransfer();
+                    ft.upload(imageURI[0], encodeURI("http://52.69.156.153/upload.php"), win, fail, options);
+                },
+                function(error) {
+                    window.plugins.toast.showLongBottom('Error: ' + error);
+                }, {
+                    maximumImagesCount: 1,
+                    width: 128,
+                    height: 128
+                }
+            );
+        };
+
+        // 拍照上传函数
+        $scope.takePhoto = function() {
+
+            navigator.camera.getPicture(onSuccess, onFail, {
+                destinationType: Camera.DestinationType.FILE_URI,
+                // sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+                sourceType: Camera.PictureSourceType.CAMERA,
+                targetHeight: 128,
+                targetWidth: 128
+            });
+
+            function onSuccess(imageURI) {
+                // config options
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                // TODO
+                options.fileName = $scope.contact.user + picnumber + ".jpg";
+                options.mimeType = "image/jpeg";
+                // config options.para
+                var params = {};
+                params.value1 = "test";
+                params.value2 = "param";
+                options.params = params;
+                // 上传照片
+                var ft = new FileTransfer();
+                ft.upload(imageURI, encodeURI("http://52.69.156.153/upload.php"), win, fail, options);
+                // window.plugins.toast.showLongBottom('上传成功' + imageURI);
+
+            }
+
+            function onFail(message) {
+                window.plugins.toast.showLongBottom('取消' + message);
             }
         };
 
@@ -327,6 +566,7 @@ angular.module('penpen.controllers', [])
                     msgObj = {
                         "from": msg.from,
                         "isFromMe": 0,
+                        "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time
                     };
@@ -334,11 +574,41 @@ angular.module('penpen.controllers', [])
                     // 将message存入消息数据库，并更新lastMessage表
                     mp3Service.playMessage();
                     sqliteService.addNewMessageRecv(msgObj);
+                } else if (msg.type === 1) {
+                    var fileName = parser.parseCotent(msg.content);
+                    // 下载图片成功
+                    var transferSucc = function(entry) {
+                        var msgObj = {
+                            "from": msg.from,
+                            "isFromMe": 0,
+                            "type": 1,
+                            "content": cordova.file.dataDirectory + fileName,
+                            "time": msg.time
+                                // "time": timeService.getSecondsSince1970()
+                        };
+                        sqliteService.addNewMessageRecv(msgObj);
+                    };
+                    var transferFail = function(error) {
+                        window.plugins.toast.showShortBottom(error.code);
+                    };
+                    //下载图片
+                    var fileTransfer = new FileTransfer();
+                    var uri = encodeURI("http://52.69.156.153/upload/" + fileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var fileURL = cordova.file.dataDirectory + fileName;
+                    fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+
+                    // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 10) {
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
                         "isFromMe": 0,
+                        "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "icon": cordova.file.dataDirectory + msg.from + ".jpg",
                         "time": msg.time //TODO
@@ -368,6 +638,7 @@ angular.module('penpen.controllers', [])
                         "to": msg.to, //gid
                         "isFromMe": 0,
                         "name": parser.parseCotent(contentObj.name),
+                        "type": msg.type,
                         "content": content,
                         "time": msg.time //TODO
                     };
@@ -407,6 +678,7 @@ angular.module('penpen.controllers', [])
                 "to": $scope.group.gid,
                 "isFromMe": true,
                 "from": $scope.self.user,
+                "type": 10,
                 "content": msg,
                 "time": timeService.getFormatDate()
                     // "time": timeService.getSecondsSince1970()
@@ -438,6 +710,10 @@ angular.module('penpen.controllers', [])
             } else {
                 // window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
             }
+        };
+
+        $scope.sendPhoto = function () {
+            window.plugins.toast.showLongBottom('请联系程序员添加此功能');
         };
 
     }
@@ -794,13 +1070,11 @@ angular.module('penpen.controllers', [])
     var myPopup = {};
 
     $scope.updateIcon = function() {
-
-        $scope.data = {};
-
         // An elaborate, custom popup
         myPopup = $ionicPopup.show({
             template: '<a class="button button-calm button-full" ng-click="takePhoto()">拍照上传</a><a class="button button-calm button-full" ng-click="pickPhoto()">从相册选择</a>',
             title: '更新头像',
+            // template: "templates/pop-photo.html",
             scope: $scope,
             buttons: [{
                 text: '取消',
@@ -810,13 +1084,13 @@ angular.module('penpen.controllers', [])
 
     };
 
-    $scope.test = function() {
-        window.plugins.toast.showLongBottom("Test.");
+    $scope.cancelPop = function() {
+        myPopup.close();
     };
 
     var win = function(r) {
         // 关闭弹窗
-        myPopup.close();
+        $scope.cancelPop();
         window.plugins.toast.showLongBottom("重新登录可看到新的头像");
         var transferSucc = function(entry) {
             $scope.contact.icon = fileURL;
@@ -906,7 +1180,7 @@ angular.module('penpen.controllers', [])
             var ft = new FileTransfer();
             ft.upload(imageURI, encodeURI("http://52.69.156.153/upload.php"), win, fail, options);
             // window.plugins.toast.showLongBottom('上传成功' + imageURI);
-            
+
         }
 
         function onFail(message) {
