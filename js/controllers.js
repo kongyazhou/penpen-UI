@@ -37,9 +37,7 @@ angular.module('penpen.controllers', [])
                     //重新获取lastMessage表，并更新界面
                     $scope.messages = sqliteService.getLastMessages();
                     $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
+                        $scope.$apply(function() {});
                     }, 200);
                 } else if (msg.type === 1) {
                     var fileName = parser.parseCotent(msg.content);
@@ -54,6 +52,10 @@ angular.module('penpen.controllers', [])
                                 // "time": timeService.getSecondsSince1970()
                         };
                         sqliteService.addNewMessageRecv(msgObj);
+                        $timeout(function() {
+                            $scope.$apply(function() {});
+                        }, 200);
+
                     };
                     var transferFail = function(error) {
                         window.plugins.toast.showShortBottom(error.code);
@@ -85,9 +87,7 @@ angular.module('penpen.controllers', [])
                     //重新获取lastMessage表，并更新界面
                     $scope.messages = sqliteService.getLastMessages();
                     $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
+                        $scope.$apply(function() {});
                     }, 200);
 
                 } else if (msg.type === 19) {
@@ -113,9 +113,7 @@ angular.module('penpen.controllers', [])
                     //重新获取lastMessage表，并更新界面
                     $scope.messages = sqliteService.getLastMessages();
                     $timeout(function() {
-                        $scope.$apply(function() {
-                            // $scope.messages=$scope.messages;
-                        });
+                        $scope.$apply(function() {});
                     }, 200);
                 }
             };
