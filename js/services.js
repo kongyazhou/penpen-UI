@@ -751,7 +751,7 @@ angular.module('penpen.services', [])
             });
             //将消息插入讨论组消息表
             //判断表是否存在，不存在则创建
-            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, type integer,, content text, time datetime, unread integer);';
+            stmt = 'CREATE TABLE IF NOT EXISTS penpen' + msg.to + ' (id integer primary key, isFromMe integer, user text, type integer, content text, time datetime, unread integer);';
             tx.executeSql(stmt, []);
             //添加新消息条目
             stmt = 'INSERT INTO penpen' + msg.to + ' (isFromMe, user, type, content, time, unread) VALUES (?,?,?,?,?,?);';
