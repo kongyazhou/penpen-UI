@@ -746,7 +746,7 @@ angular.module('penpen.services', [])
                     });
                 } else {
                     //不存在则创建条目
-                    tx.executeSql("INSERT INTO lastMessage( user, `name`, icon, type, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?,?,?);", [msg.to, msg.name, "img/groupIcon.jpg", 1, msg.content, msg.time, 1]);
+                    tx.executeSql("INSERT INTO lastMessage( user, name, icon, type, lastMessage, lastTime, unreadNo) VALUES (?,?,?,?,?,?,?);", [msg.to, msg.name, "img/groupIcon.jpg", 1, msg.content, msg.time, 1]);
                 }
             });
             //将消息插入讨论组消息表

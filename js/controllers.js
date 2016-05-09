@@ -51,6 +51,7 @@ angular.module('penpen.controllers', [])
                             "time": msg.time
                                 // "time": timeService.getSecondsSince1970()
                         };
+                        mp3Service.playMessage();
                         sqliteService.addNewMessageRecv(msgObj);
                         $timeout(function() {
                             $scope.$apply(function() {});
@@ -90,6 +91,43 @@ angular.module('penpen.controllers', [])
                         $scope.$apply(function() {});
                     }, 200);
 
+                } else if (msg.type === 11) {
+                    var gfileName = parser.parseCotent(msg.content);
+                    // 下载图片成功，存储本地消息
+                    var gtransferSucc = function(entry) {
+                        var msgObj = {
+                            "from": msg.from,
+                            "to": msg.to,
+                            "isFromMe": 0,
+                            "type": 11,
+                            "content": cordova.file.dataDirectory + gfileName,
+                            "icon": cordova.file.dataDirectory + msg.from + ".jpg",
+                            "time": msg.time
+                                // "time": timeService.getSecondsSince1970()
+                        };
+                        mp3Service.playMessage();
+                        sqliteService.addNewGroupMessageRecv(msgObj);
+                        //重新获取lastMessage表，并更新界面
+                        $scope.messages = sqliteService.getLastMessages();
+                        $timeout(function() {
+                            $scope.$apply(function() {});
+                        }, 200);
+                    };
+                    var gtransferFail = function(error) {
+                        window.plugins.toast.showShortBottom(error.code);
+                    };
+                    //下载图片
+                    var gfileTransfer = new FileTransfer();
+                    var guri = encodeURI("http://52.69.156.153/upload/" + gfileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var gfileURL = cordova.file.dataDirectory + gfileName;
+                    gfileTransfer.download(guri, gfileURL, gtransferSucc, gtransferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+
+                    // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 19) {
                     //收到创建group通知组成消息，按正常消息存入
                     // window.plugins.toast.showLongBottom('收到创建通知');
@@ -243,6 +281,7 @@ angular.module('penpen.controllers', [])
                     } else {
                         // window.plugins.toast.showShortBottom('Else msg:' + msg);
                         // 将message存入sqlite
+                        mp3Service.playMessage();
                         sqliteService.addNewMessageRecv(msgObj);
                     }
                 } else if (msg.type === 1) {
@@ -271,6 +310,7 @@ angular.module('penpen.controllers', [])
                             // 将message插入联系人的allMessage表
                             sqliteService.addNewMessageRecvReaded(msgObj);
                         } else {
+                            mp3Service.playMessage();
                             sqliteService.addNewMessageRecv(msgObj);
                         }
                     };
@@ -301,6 +341,38 @@ angular.module('penpen.controllers', [])
                     //将消息存入群消息数据库，并更新lastMessage表
                     mp3Service.playMessage();
                     sqliteService.addNewGroupMessageRecv(msgObj);
+                } else if (msg.type === 11) {
+                    var gfileName = parser.parseCotent(msg.content);
+                    // 下载图片成功，存储本地消息
+                    var gtransferSucc = function(entry) {
+                        var msgObj = {
+                            "from": msg.from,
+                            "to": msg.to,
+                            "isFromMe": 0,
+                            "type": 11,
+                            "content": cordova.file.dataDirectory + gfileName,
+                            "icon": cordova.file.dataDirectory + msg.from + ".jpg",
+                            "time": msg.time
+                                // "time": timeService.getSecondsSince1970()
+                        };
+                        mp3Service.playMessage();
+                        sqliteService.addNewGroupMessageRecv(msgObj);
+                    };
+                    var gtransferFail = function(error) {
+                        window.plugins.toast.showShortBottom(error.code);
+                    };
+                    //下载图片
+                    var gfileTransfer = new FileTransfer();
+                    var guri = encodeURI("http://52.69.156.153/upload/" + gfileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var gfileURL = cordova.file.dataDirectory + gfileName;
+                    gfileTransfer.download(guri, gfileURL, gtransferSucc, gtransferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+
+                    // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 19) {
                     //收到创建group通知组成消息，按正常消息存入
                     // window.plugins.toast.showLongBottom('收到创建通知');
@@ -544,8 +616,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('gmessageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'groupService', 'timeService',
-    function($scope, $state, $stateParams, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, groupService, timeService) {
+.controller('gmessageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicPopup', '$ionicScrollDelegate', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'groupService', 'timeService',
+    function($scope, $state, $stateParams, $ionicPopup, $ionicScrollDelegate, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, groupService, timeService) {
         // TODO
         $scope.$on("$ionicView.beforeEnter", function() {
             $scope.group = groupService.getGroup($stateParams.gid);
@@ -584,6 +656,7 @@ angular.module('penpen.controllers', [])
                             "time": msg.time
                                 // "time": timeService.getSecondsSince1970()
                         };
+                        mp3Service.playMessage();
                         sqliteService.addNewMessageRecv(msgObj);
                     };
                     var transferFail = function(error) {
@@ -621,9 +694,57 @@ angular.module('penpen.controllers', [])
                         //将消息存入群消息数据库，并更新lastMessage表
                         sqliteService.addNewGroupMessageRecvReaded(msgObj);
                     } else {
+                        mp3Service.playMessage();
                         sqliteService.addNewGroupMessageRecv(msgObj);
                     }
 
+                } else if (msg.type === 11) {
+                    var gfileName = parser.parseCotent(msg.content);
+                    // 下载图片成功，存储本地消息，若属于该聊天则聊天界面添加该消息
+                    var gtransferSucc = function(entry) {
+                        var msgObj = {
+                            "from": msg.from,
+                            "to": msg.to,
+                            "isFromMe": 0,
+                            "type": 11,
+                            "content": cordova.file.dataDirectory + gfileName,
+                            "icon": cordova.file.dataDirectory + msg.from + ".jpg",
+                            "time": msg.time
+                                // "time": timeService.getSecondsSince1970()
+                        };
+                        if (msg.to == $scope.group.gid) {
+                            // window.plugins.toast.showShortBottom('time:' + msgObj.time);
+                            $scope.gmessageDetails.push(msgObj);
+
+                            // 发送消息的提示音
+                            mp3Service.playMessage();
+                            $timeout(function() {
+                                viewScroll.scrollBottom(true);
+                                $scope.$apply(function() {});
+                            }, 200);
+                            // 更新lastMessage表的lastMessage和lastTime
+                            // 将message插入联系人的allMessage表
+                            sqliteService.addNewGroupMessageRecvReaded(msgObj);
+                        } else {
+                            mp3Service.playMessage();
+                            sqliteService.addNewGroupMessageRecv(msgObj);
+                        }
+                    };
+                    var gtransferFail = function(error) {
+                        window.plugins.toast.showShortBottom(error.code);
+                    };
+                    //下载图片
+                    var gfileTransfer = new FileTransfer();
+                    var guri = encodeURI("http://52.69.156.153/upload/" + gfileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var gfileURL = cordova.file.dataDirectory + gfileName;
+                    gfileTransfer.download(guri, gfileURL, gtransferSucc, gtransferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+
+                    // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 19) {
                     //收到创建group通知组成消息，按正常消息存入
                     // window.plugins.toast.showLongBottom('收到创建通知');
@@ -683,7 +804,10 @@ angular.module('penpen.controllers', [])
             };
 
             $scope.gmessageDetails.push(msgObj);
-
+            $timeout(function() {
+                viewScroll.scrollBottom(true);
+                $scope.$apply(function() {});
+            }, 200);
             // 发送消息的提示音
             mp3Service.playMessage();
             // 更新lastMessage表的lastMessage和lastTime
@@ -710,8 +834,169 @@ angular.module('penpen.controllers', [])
             }
         };
 
-        $scope.sendPhoto = function () {
-            window.plugins.toast.showLongBottom('请联系程序员添加此功能');
+        // $scope.sendPhoto = function () {
+        //     window.plugins.toast.showLongBottom('请联系程序员添加此功能');
+        // };
+
+        // 下面是图片消息部分
+        var myPopup = {};
+
+        $scope.sendPhoto = function() {
+
+            myPopup = $ionicPopup.show({
+                // template: '<a class="button button-calm button-full" ng-click="takePhoto()">拍照上传</a><a class="button button-calm button-full" ng-click="pickPhoto()">从相册选择</a>',
+                templateUrl: "templates/pop-photo.html",
+                // title: '更新头像',
+                scope: $scope
+                    /* buttons: [{
+                        text: '取消',
+                        type: 'button-assertive'
+                    }]*/
+            });
+
+        };
+
+        $scope.cancelPop = function() {
+            myPopup.close();
+        };
+
+        $scope.sendGroupPhotoMessage = function(msg) {
+            if (window.WebSocket) {
+                var wsMsg = new WebSocket('ws://52.69.156.153:26888/');
+
+                wsMsg.onopen = function() {
+                    jsonMsg = '{"from":"' + loginService.getUser() + '","to":"' + $scope.group.gid + '","type":"11","content":"' + Base64.encode(msg) + '"}';
+                    this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
+                };
+                wsMsg.onclose = function(evt) {};
+                wsMsg.onmessage = function(evt) {
+                    // window.plugins.toast.showLongBottom('收到信息：' + evt.data + '\n' + Base64.decode(evt.data));
+                };
+            } else {
+                // window.plugins.toast.showLongBottom('Your browser does not support WebSockets.');
+            }
+        };
+
+        var picnumber = new Date();
+        // 图片上传成功函数，发送图片消息，并重新下载图片，最后将消息存入数据库
+        var win = function(r) {
+            // 关闭弹窗
+            $scope.cancelPop();
+            // window.plugins.toast.showLongBottom("重新登录可看到新的头像");
+            // 发送图片消息
+            $scope.sendGroupPhotoMessage($scope.group.gid + picnumber + ".jpg");
+            // 添加本地图片消息
+            var transferSendSucc = function(entry) {
+                var msgObj = {
+                    "from": loginService.getUser(),
+                    "to": $scope.group.gid,
+                    "isFromMe": true,
+                    "type": 11,
+                    "content": cordova.file.dataDirectory + $scope.group.gid + picnumber + ".jpg",
+                    "time": timeService.getFormatDate()
+                        // "time": timeService.getSecondsSince1970()
+                };
+                // window.plugins.toast.showShortBottom('time:' + msgObj.time);
+                $scope.gmessageDetails.push(msgObj);
+
+                // 发送消息的提示音
+                mp3Service.playMessage();
+                $timeout(function() {
+                    viewScroll.scrollBottom(true);
+                    $scope.$apply(function() {});
+                }, 200);
+                // 更新lastMessage表的lastMessage和lastTime
+                // 将message插入联系人的allMessage表
+                sqliteService.addNewGroupMessageSend(msgObj);// TODO
+                picnumber = picnumber + 1;
+            };
+            var transferSendFail = function(error) {
+                window.plugins.toast.showShortBottom(error.code);
+            };
+            // 下载图片
+            var fileTransfer = new FileTransfer();
+            var uri = encodeURI("http://52.69.156.153/upload/" + $scope.group.gid + picnumber + ".jpg");
+            // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+            var fileURL = cordova.file.dataDirectory + $scope.group.gid + picnumber + ".jpg";
+            fileTransfer.download(uri, fileURL, transferSendSucc, transferSendFail, false, {
+                headers: {
+                    "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                }
+            });
+
+
+        };
+        // 文件传输失败函数
+        var fail = function(error) {
+            window.plugins.toast.showLongBottom(error.code);
+        };
+
+        // 选择照片上传函数
+        $scope.pickPhoto = function() {
+            window.imagePicker.getPictures(
+                // 成功选取照片函数
+                function(imageURI) {
+                    // 上传照片
+                    // config options
+                    var options = new FileUploadOptions();
+                    options.fileKey = "file";
+                    // TODO
+                    options.fileName = $scope.group.gid + picnumber + ".jpg";
+                    options.mimeType = "image/jpeg";
+                    // config options.para
+                    var params = {};
+                    params.value1 = "test";
+                    params.value2 = "param";
+
+                    options.params = params;
+                    // 上传
+
+                    var ft = new FileTransfer();
+                    ft.upload(imageURI[0], encodeURI("http://52.69.156.153/upload.php"), win, fail, options);
+                },
+                function(error) {
+                    window.plugins.toast.showLongBottom('Error: ' + error);
+                }, {
+                    maximumImagesCount: 1,
+                    width: 128,
+                    height: 128
+                }
+            );
+        };
+
+        // 拍照上传函数
+        $scope.takePhoto = function() {
+
+            navigator.camera.getPicture(onSuccess, onFail, {
+                destinationType: Camera.DestinationType.FILE_URI,
+                // sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+                sourceType: Camera.PictureSourceType.CAMERA,
+                targetHeight: 128,
+                targetWidth: 128
+            });
+
+            function onSuccess(imageURI) {
+                // config options
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                // TODO
+                options.fileName = $scope.group.gid + picnumber + ".jpg";
+                options.mimeType = "image/jpeg";
+                // config options.para
+                var params = {};
+                params.value1 = "test";
+                params.value2 = "param";
+                options.params = params;
+                // 上传照片
+                var ft = new FileTransfer();
+                ft.upload(imageURI, encodeURI("http://52.69.156.153/upload.php"), win, fail, options);
+                // window.plugins.toast.showLongBottom('上传成功' + imageURI);
+
+            }
+
+            function onFail(message) {
+                window.plugins.toast.showLongBottom('取消' + message);
+            }
         };
 
     }
