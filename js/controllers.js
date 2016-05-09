@@ -237,6 +237,36 @@ angular.module('penpen.controllers', [])
             wsService.sendMessage(loginService.getLoginMsg());
         };
 
+        // 测试Event
+        var alertContent = "";
+        document.addEventListener("jpush.openNotification", function() {
+
+            if (device.platform == "Android") {
+                alertContent = window.plugins.jPushPlugin.openNotification.extras.user;
+            } else {
+                alertContent = event.aps.alert;
+            }
+            if (alertContent > 10000) {
+                $state.go("messageDetail", {
+                    "user": alertContent
+                });
+            } else {
+                $state.go("gmessageDetail", {
+                    "gid": alertContent
+                });
+            }
+        }, false);
+
+        /*var onOpenNotification = function() {
+            var alertContent;
+            if(device.platform == "Android") {
+                alertContent = window.plugins.jPushPlugin.openNotification.alert;
+            } else {
+                alertContent = event.aps.alert;
+            }
+            window.plugins.toast.showLongBottom(alertContent);
+        };*/
+
 
     }
 ])
@@ -907,7 +937,7 @@ angular.module('penpen.controllers', [])
                 }, 200);
                 // 更新lastMessage表的lastMessage和lastTime
                 // 将message插入联系人的allMessage表
-                sqliteService.addNewGroupMessageSend(msgObj);// TODO
+                sqliteService.addNewGroupMessageSend(msgObj); // TODO
                 picnumber = picnumber + 1;
             };
             var transferSendFail = function(error) {
