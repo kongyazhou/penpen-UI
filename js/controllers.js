@@ -1188,8 +1188,9 @@ angular.module('penpen.controllers', [])
     };
 
     $scope.deleteMessage = function(user) {
-        // 删除联系人消息表
-        sqliteService.dropTable(user);
+        // 删除联系人消息表及最后消息
+        // TODO 确认对话框
+        sqliteService.deleteMessages(user);
     };
 
     $scope.syncMessage = function(user) {
@@ -1250,11 +1251,9 @@ angular.module('penpen.controllers', [])
     };
 
     $scope.deleteMessage = function(user) {
-        // 删除讨论组消息表
+        // 删除讨论组消息表及最后消息
         // TODO 确认对话框
-        sqliteService.dropTable(user);
-        sqliteService.deleteLastMessage(user);
-
+        sqliteService.deleteMessages(user);
     };
 
     $scope.syncMessage = function(user) {
