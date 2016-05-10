@@ -1314,7 +1314,7 @@ angular.module('penpen.controllers', [])
     // };
 }])
 
-.controller('groupDetailCtrl', ['$scope', '$state', '$stateParams', 'groupService', 'contactService', 'sqliteService', function($scope, $state, $stateParams, groupService, contactService, sqliteService) {
+.controller('groupDetailCtrl', ['$scope', '$state', '$stateParams', 'groupService', 'contactService', 'sqliteService', 'loginService', 'parser', function($scope, $state, $stateParams, groupService, contactService, sqliteService, loginService, parser) {
     $scope.$on("$ionicView.beforeEnter", function() {
         $scope.group = groupService.getGroup($stateParams.gid);
 
@@ -1365,11 +1365,117 @@ angular.module('penpen.controllers', [])
         sqliteService.deleteMessages(user);
     };
 
-    $scope.syncMessage = function(user) {
-        // TODO 先删表，再发送同步消息
-        sqliteService.dropTable(user);
+    var jsonMsg = "";
 
+    $scope.syncMessage = function(user) {
+        // 先删表，再发送同步消息，最后添加所有消息
+        // TODO 确认对话框，判断最后消息是否存在
+        sqliteService.deleteMessageTable(user);
+
+        var wsSyncMsg = new WebSocket('ws://52.69.156.153:50888/');
+
+        wsSyncMsg.onopen = function() {
+            jsonMsg = '{"user":"' + loginService.getUser() + '","target":"' + $scope.group.gid + '"}';
+            this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
+        };
+
+        wsSyncMsg.onclose = function(evt) {
+            window.plugins.toast.showLongBottom("同步聊天记录完成");
+        };
+        wsSyncMsg.onmessage = function(evt) {
+            // 解析返回的消息
+            // window.plugins.toast.showShortBottom("收到data:" + evt.data);
+            var responseObj = parser.parseMsg(evt.data);
+            // 新建表，将消息插入表中
+            var msg = {};
+            var msgObj = {};
+            var gfileName = "";
+            var group = {};
+            // 下载图片成功
+
+            for (var k in responseObj.messages) {
+                msg = eval('(' + responseObj.messages[k] + ')');
+                // window.plugins.toast.showLongBottom("msg:" + msg);
+                // window.plugins.toast.showLongBottom("msgFrom:" + msg.from);
+                // TODO type===19
+                if (msg.type === 10) {
+                    if (msg.from == loginService.getUser()) {
+                        msgObj = {
+                            "to": msg.to,
+                            "isFromMe": true,
+                            "from": loginService.getUser(),
+                            "type": msg.type,
+                            "content": parser.parseCotent(msg.content),
+                            "time": msg.time
+                        };
+                        // 更新lastMessage表的lastMessage和lastTime
+                        // 将message插入联系人的allMessage表
+                        sqliteService.addNewGroupMessageSend(msgObj);
+                    } else {
+                        group = groupService.getGroup(msg.to);
+                        msgObj = {
+                            "from": msg.from,
+                            "to": msg.to, //群id
+                            "isFromMe": 0,
+                            "name": group.name,
+                            "type": msg.type,
+                            "content": parser.parseCotent(msg.content),
+                            "time": msg.time //TODO
+                        };
+                        //将消息存入群消息数据库，并更新lastMessage表
+                        sqliteService.addNewGroupMessageRecvReaded(msgObj);
+                    }
+
+                } else if (msg.type === 11) {
+                    gfileName = parser.parseCotent(msg.content);
+                    if (msg.from == loginService.getUser()) {
+                        msgObj = {
+                            "from": msg.from,
+                            "to": msg.to,
+                            "isFromMe": true,
+                            "type": msg.type,
+                            "content": cordova.file.dataDirectory + gfileName,
+                            "time": msg.time
+                        };
+                        // 更新lastMessage表的lastMessage和lastTime
+                        // 将message插入联系人的allMessage表
+                        sqliteService.addNewGroupMessageSend(msgObj);
+                    } else {
+                        group = groupService.getGroup(msg.to);
+                        msgObj = {
+                            "from": msg.from,
+                            "to": msg.to,
+                            "isFromMe": 0,
+                            "name": group.name,
+                            "type": msg.type,
+                            "content": cordova.file.dataDirectory + gfileName,
+                            "icon": cordova.file.dataDirectory + msg.from + ".jpg",
+                            "time": msg.time
+                        };
+                        sqliteService.addNewGroupMessageRecvReaded(msgObj);
+                    }
+                    //下载图片
+                    var fileTransfer = new FileTransfer();
+                    var uri = encodeURI("http://52.69.156.153/upload/" + gfileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var fileURL = cordova.file.dataDirectory + gfileName;
+                    var transferSucc = function(entry) {
+
+                    };
+                    var transferFail = function(error) {
+                        // window.plugins.toast.showShortBottom(error.code);
+                    };
+                    fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+
+                }
+            }
+        };
     };
+
 
     // $scope.myGoBack = function() {
     //     $ionicHistory.goBack();
