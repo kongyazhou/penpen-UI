@@ -28,7 +28,6 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 4. 群成员图片高度不统一
 5. 表情系统
 
-
 #### 次要问题
 
 1. 查看联系人详情时，同步该联系人签名和头像
@@ -56,6 +55,7 @@ PENPEN-Client采用PhoneGap平台开发HTML5跨平台移动应用程序。
 34. getContact函数机制重做
 35. contactInit放到服务器上去做
 36. 发送语音
+37. 把controller拆成多个文件
 
 ```
 下边是服务器所存在的所有问题

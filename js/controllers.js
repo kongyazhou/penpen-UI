@@ -327,7 +327,7 @@ angular.module('penpen.controllers', [])
                         var msgObj = {
                             "from": msg.from,
                             "isFromMe": 0,
-                            "type": 1,
+                            "type": msg.type,
                             "content": cordova.file.dataDirectory + fileName,
                             "time": msg.time
                                 // "time": timeService.getSecondsSince1970()
@@ -1174,7 +1174,7 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('personDetailCtrl', ['$scope', '$state', '$stateParams', 'contactService', 'sqliteService', function($scope, $state, $stateParams, contactService, sqliteService) {
+.controller('personDetailCtrl', ['$scope', '$state', '$stateParams', 'contactService', 'sqliteService', 'loginService', 'parser', function($scope, $state, $stateParams, contactService, sqliteService, loginService, parser) {
     $scope.onSwipeRight = function() {
         $state.go("tab.friends");
     };
@@ -1193,11 +1193,87 @@ angular.module('penpen.controllers', [])
         sqliteService.deleteMessages(user);
     };
 
+    var jsonMsg = "";
+
     $scope.syncMessage = function(user) {
-        // TODO 先删库，再同步
-        $state.go("messageDetail", {
-            "user": user
-        });
+        // 先删表，再发送同步消息，最后添加所有消息
+        // TODO 确认对话框，判断最后消息是否存在
+        sqliteService.deleteMessageTable(user);
+
+        var wsSyncMsg = new WebSocket('ws://52.69.156.153:50888/');
+
+        wsSyncMsg.onopen = function() {
+            jsonMsg = '{"user":"' + loginService.getUser() + '","target":"' + $scope.contact.user + '"}';
+            this.send('{"head":1110,"body":"' + Base64.encode(jsonMsg) + '","tail":"PENPEN 1.0"}');
+        };
+
+        wsSyncMsg.onclose = function(evt) {};
+        wsSyncMsg.onmessage = function(evt) {
+            // 解析返回的消息
+            // window.plugins.toast.showLongBottom("收到data:" + evt.data);
+            var responseObj = parser.parseMsg(evt.data);
+            // 新建表，将消息插入表中
+            var msg = {};
+            var msgObj = {};
+            var fileName = "";
+            // 下载图片成功
+            var transferSucc = function(entry) {
+                msgObj = {
+                    "from": msg.from,
+                    "isFromMe": 0,
+                    "type": msg.type,
+                    "content": cordova.file.dataDirectory + fileName,
+                    "time": msg.time
+                        // "time": timeService.getSecondsSince1970()
+                };
+                sqliteService.addNewMessageRecv(msgObj);
+            };
+            var transferFail = function(error) {
+                window.plugins.toast.showShortBottom(error.code);
+            };
+            for (var k in responseObj.messages) {
+                msg = eval('(' + responseObj.messages[k] + ')');
+                // window.plugins.toast.showShortBottom("msg:" + msg);
+                window.plugins.toast.showLongBottom("msgFrom:" + msg.from);
+                if (msg.type === 0) {
+                    if (msg.from == loginService.getUser()) {
+                        msgObj = {
+                            "to": msg.to,
+                            "isFromMe": true,
+                            "type": msg.type,
+                            "content": parser.parseCotent(msg.content),
+                            "time": msg.time
+                                // "time": timeService.getSecondsSince1970()
+                        };
+                        // 更新lastMessage表的lastMessage和lastTime
+                        // 将message插入联系人的allMessage表
+                        sqliteService.addNewMessageSend(msgObj);
+                    }else{
+                        msgObj = {
+                            "from": msg.from,
+                            "isFromMe": 0,
+                            "type": msg.type,
+                            "content": parser.parseCotent(msg.content),
+                            "time": msg.time
+                        };
+                        sqliteService.addNewMessageRecvReaded(msgObj);
+                    }
+
+                } else if (msg.type === 1) {
+                    fileName = parser.parseCotent(msg.content);
+                    //下载图片
+                    var fileTransfer = new FileTransfer();
+                    var uri = encodeURI("http://52.69.156.153/upload/" + fileName);
+                    // var fileURL =  "///storage/emulated/0/DCIM/penpen/test.jpg";
+                    var fileURL = cordova.file.dataDirectory + fileName;
+                    fileTransfer.download(uri, fileURL, transferSucc, transferFail, false, {
+                        headers: {
+                            "Authorization": "Basic dGVzdHVzZXJuYW1lOnRlc3RwYXNzd29yZA=="
+                        }
+                    });
+                }
+            }
+        };
     };
 
     // $scope.myGoBack = function() {

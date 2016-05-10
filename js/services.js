@@ -578,6 +578,18 @@ angular.module('penpen.services', [])
         });
     };
 
+    this.deleteMessageTable = function(user) {
+        // 删除联系人或讨论组消息表
+        dbPenpen.transaction(function(tx) {
+            stmt = 'DROP TABLE IF EXISTS penpen' + user;
+            tx.executeSql(stmt, [], function(argument) {
+                // window.plugins.toast.showShortBottom('聊天记录已清除');
+            }, function(err) {
+                // window.plugins.toast.showLongBottom('创建表失败' + err.message);
+            });
+        });
+    };
+
     this.deleteMessages = function(user) {
         // 删除联系人或讨论组消息表和最后消息        
         dbPenpen.transaction(function(tx) {
