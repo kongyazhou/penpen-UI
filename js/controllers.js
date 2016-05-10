@@ -21,6 +21,7 @@ angular.module('penpen.controllers', [])
                 // window.plugins.toast.showShortBottom('controller!：'+evt.data);
                 var msg = parser.parseMsg(evt.data);
                 var msgObj = {};
+                var group = {};
                 // window.plugins.toast.showShortBottom('msg:' + msg);
                 if (msg.type === 0) {
                     msgObj = {
@@ -74,10 +75,12 @@ angular.module('penpen.controllers', [])
 
                     // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 10) {
+                    group = groupService.getGroup(msg.to);
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
                         "isFromMe": 0,
+                        "name": group.name,
                         "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time //TODO
@@ -92,6 +95,7 @@ angular.module('penpen.controllers', [])
                     }, 200);
 
                 } else if (msg.type === 11) {
+                    group = groupService.getGroup(msg.to);
                     var gfileName = parser.parseCotent(msg.content);
                     // 下载图片成功，存储本地消息
                     var gtransferSucc = function(entry) {
@@ -99,6 +103,7 @@ angular.module('penpen.controllers', [])
                             "from": msg.from,
                             "to": msg.to,
                             "isFromMe": 0,
+                            "name": group.name,
                             "type": 11,
                             "content": cordova.file.dataDirectory + gfileName,
                             "icon": cordova.file.dataDirectory + msg.from + ".jpg",
@@ -271,8 +276,8 @@ angular.module('penpen.controllers', [])
     }
 ])
 
-.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$ionicPopup', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'timeService',
-    function($scope, $state, $stateParams, $ionicScrollDelegate, $ionicPopup, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, timeService) {
+.controller('messageDetailCtrl', ['$scope', '$state', '$stateParams', '$ionicScrollDelegate', '$ionicPopup', '$timeout', 'parser', 'wsService', 'loginService', 'mp3Service', 'contactService', 'sqliteService', 'timeService', 'groupService',
+    function($scope, $state, $stateParams, $ionicScrollDelegate, $ionicPopup, $timeout, parser, wsService, loginService, mp3Service, contactService, sqliteService, timeService, groupService) {
         $scope.$on("$ionicView.beforeEnter", function() {
             $scope.contact = contactService.getContact($stateParams.user);
             $scope.messageDetails = sqliteService.getContactMessages($scope.contact.user);
@@ -284,6 +289,7 @@ angular.module('penpen.controllers', [])
                 // window.plugins.toast.showShortBottom('controller!：'+evt.data);
                 var msg = parser.parseMsg(evt.data);
                 msgObj = {};
+                var group = {};
                 // window.plugins.toast.showShortBottom('msg:' + msg);
 
                 if (msg.type === 0) {
@@ -360,10 +366,12 @@ angular.module('penpen.controllers', [])
 
                     // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 10) {
+                    group = groupService.getGroup(msg.to);
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
                         "isFromMe": 0,
+                        "name": group.name,
                         "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "time": msg.time //TODO
@@ -373,12 +381,14 @@ angular.module('penpen.controllers', [])
                     sqliteService.addNewGroupMessageRecv(msgObj);
                 } else if (msg.type === 11) {
                     var gfileName = parser.parseCotent(msg.content);
+                    group = groupService.getGroup(msg.to);
                     // 下载图片成功，存储本地消息
                     var gtransferSucc = function(entry) {
                         var msgObj = {
                             "from": msg.from,
                             "to": msg.to,
                             "isFromMe": 0,
+                            "name": group.name,
                             "type": 11,
                             "content": cordova.file.dataDirectory + gfileName,
                             "icon": cordova.file.dataDirectory + msg.from + ".jpg",
@@ -661,6 +671,7 @@ angular.module('penpen.controllers', [])
                 // window.plugins.toast.showShortBottom('controller!：'+evt.data);
                 var msg = parser.parseMsg(evt.data);
                 var msgObj = {};
+                var group = {};
                 // window.plugins.toast.showShortBottom('msg:' + msg);
                 if (msg.type === 0) {
                     msgObj = {
@@ -705,10 +716,12 @@ angular.module('penpen.controllers', [])
 
                     // window.plugins.toast.showLongBottom(msg);
                 } else if (msg.type === 10) {
+                    group = groupService.getGroup(msg.to);
                     msgObj = {
                         "from": msg.from,
                         "to": msg.to, //群id
                         "isFromMe": 0,
+                        "name": group.name,
                         "type": msg.type,
                         "content": parser.parseCotent(msg.content),
                         "icon": cordova.file.dataDirectory + msg.from + ".jpg",
@@ -730,12 +743,14 @@ angular.module('penpen.controllers', [])
 
                 } else if (msg.type === 11) {
                     var gfileName = parser.parseCotent(msg.content);
+                    group = groupService.getGroup(msg.to);
                     // 下载图片成功，存储本地消息，若属于该聊天则聊天界面添加该消息
                     var gtransferSucc = function(entry) {
                         var msgObj = {
                             "from": msg.from,
                             "to": msg.to,
                             "isFromMe": 0,
+                            "name": group.name,
                             "type": 11,
                             "content": cordova.file.dataDirectory + gfileName,
                             "icon": cordova.file.dataDirectory + msg.from + ".jpg",
@@ -1159,7 +1174,7 @@ angular.module('penpen.controllers', [])
     };
 }])
 
-.controller('personDetailCtrl', ['$scope', '$state', '$stateParams', 'contactService', function($scope, $state, $stateParams, contactService) {
+.controller('personDetailCtrl', ['$scope', '$state', '$stateParams', 'contactService', 'sqliteService', function($scope, $state, $stateParams, contactService, sqliteService) {
     $scope.onSwipeRight = function() {
         $state.go("tab.friends");
     };
@@ -1167,7 +1182,18 @@ angular.module('penpen.controllers', [])
     $scope.contact = contactService.getContact($stateParams.user);
 
     $scope.messageDetails = function(user) {
-        //TODO 更新lastMessage表的lastTime
+        $state.go("messageDetail", {
+            "user": user
+        });
+    };
+
+    $scope.deleteMessage = function(user) {
+        // 删除联系人消息表
+        sqliteService.dropTable(user);
+    };
+
+    $scope.syncMessage = function(user) {
+        // TODO 先删库，再同步
         $state.go("messageDetail", {
             "user": user
         });
@@ -1178,7 +1204,7 @@ angular.module('penpen.controllers', [])
     // };
 }])
 
-.controller('groupDetailCtrl', ['$scope', '$state', '$stateParams', 'groupService', 'contactService', function($scope, $state, $stateParams, groupService, contactService) {
+.controller('groupDetailCtrl', ['$scope', '$state', '$stateParams', 'groupService', 'contactService', 'sqliteService', function($scope, $state, $stateParams, groupService, contactService, sqliteService) {
     $scope.$on("$ionicView.beforeEnter", function() {
         $scope.group = groupService.getGroup($stateParams.gid);
 
@@ -1221,6 +1247,20 @@ angular.module('penpen.controllers', [])
         $state.go("personDetail", {
             "user": user
         });
+    };
+
+    $scope.deleteMessage = function(user) {
+        // 删除讨论组消息表
+        // TODO 确认对话框
+        sqliteService.dropTable(user);
+        sqliteService.deleteLastMessage(user);
+
+    };
+
+    $scope.syncMessage = function(user) {
+        // TODO 先删表，再发送同步消息
+        sqliteService.dropTable(user);
+
     };
 
     // $scope.myGoBack = function() {
@@ -1497,7 +1537,7 @@ angular.module('penpen.controllers', [])
         }
 
         function onFail(message) {
-            window.plugins.toast.showLongBottom('取消更换头像：' + message);
+            // window.plugins.toast.showLongBottom('取消更换头像：' + message);
         }
     };
 

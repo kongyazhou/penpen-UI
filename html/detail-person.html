@@ -78,8 +78,8 @@
 
             <ion-item class="item-divider"></ion-item>
         
-            <button class="button button-calm  button-block">同步聊天记录</button>
-            <button class="button button-assertive  button-block">清空聊天记录</button>
+            <button class="button button-calm button-block" ng-click="syncMessage(contact.user)">同步聊天记录</button>
+            <button class="button button-assertive  button-block" ng-click="deleteMessage(contact.user)">清空聊天记录</button>
         </ion-list>
         <div class="spacer" style="width: 283px; height: 20px;"></div>
     </ion-content>

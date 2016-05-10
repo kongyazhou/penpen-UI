@@ -557,6 +557,7 @@ angular.module('penpen.services', [])
     // var dbName = 'penpen.12345678905';
     var stmt = "";
     var dbPenpen = {};
+
     this.openDatabase = function() {
         dbName = 'penpen.' + loginService.getUser();
         dbPenpen = window.sqlitePlugin.openDatabase({
@@ -568,11 +569,36 @@ angular.module('penpen.services', [])
             // window.plugins.toast.showLongBottom('打开数据库失败' + err);
         });
     };
+
     this.closeDatabase = function() {
         dbPenpen.close(function() {
             // window.plugins.toast.showLongBottom('database is closed ok');
         }, function(error) {
             // window.plugins.toast.showLongBottom('ERROR closing database');
+        });
+    };
+
+    this.dropTable = function(user) {
+        // 删除联系人或讨论组消息表
+        stmt = 'DROP TABLE IF EXISTS penpen' + user;
+        dbPenpen.transaction(function(tx) {
+            tx.executeSql(stmt, [], function(argument) {
+                // window.plugins.toast.showShortBottom('聊天记录已清除');
+            }, function(err) {
+                // window.plugins.toast.showLongBottom('创建表失败' + err.message);
+            });
+        });
+    };
+
+    this.deleteLastMessage = function(user) {
+        // TODO 删除联系人或讨论组的最后消息
+        stmt = 'DELETE FROM lastMessage WHERE user=?';
+        dbPenpen.transaction(function(tx) {
+            tx.executeSql(stmt, [user], function(argument) {
+                window.plugins.toast.showShortBottom('聊天记录已清除');
+            }, function(err) {
+                // window.plugins.toast.showLongBottom('创建表失败' + err.message);
+            });
         });
     };
 
